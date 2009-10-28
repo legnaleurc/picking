@@ -1,4 +1,7 @@
-/*
+/**
+ * @file Configuration.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -29,6 +32,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Hashtable;
 
+/**
+ * @brief Configuration utility.
+ */
 public class Configuration implements Serializable {
 	
 	private static final long serialVersionUID = -6422237746611091558L;
@@ -58,12 +64,23 @@ public class Configuration implements Serializable {
 		}
 	}
 	
+	/**
+	 * @brief Set configuration.
+	 * @param key configuration key
+	 * @param value configuration value
+	 */
 	public static void set( String key, Object value ) {
 		synchronized (self) {
 			self.data.put(key, value);
 		}
 	}
 	
+	/**
+	 * @brief Get configuration.
+	 * @param key configuration key
+	 * @return configuration value
+	 * @note Will return null if no such key.
+	 */
 	public static Object get( String key ) {
 		return self.data.get( key );
 	}
@@ -77,10 +94,15 @@ public class Configuration implements Serializable {
 		data.put( "debug", false );
 		data.put( "hidden", false );
 	}
-	
+
+	/**
+	 * @brief Synchronize to file.
+	 * @throws InterruptedException if Windows command has been interrupted
+	 * @throws IOException file writing error
+	 */
 	public static void sync() throws InterruptedException, IOException {
 		if( isWindows() && file.exists() && file.isHidden() ) {
-			Runtime.getRuntime().exec( String.format( "ATTRIB -H %s" , file.getAbsolutePath()) ).waitFor();
+			Runtime.getRuntime().exec( String.format( "ATTRIB -H \"%s\"" , file.getAbsolutePath()) ).waitFor();
 		}
 		try {
 			ObjectOutputStream fout = new ObjectOutputStream( new FileOutputStream( file ) );
@@ -90,7 +112,7 @@ public class Configuration implements Serializable {
 			LogDialog.getErrorLog().log( e.getMessage() );
 		}
 		if( isWindows() && !file.isHidden() ) {
-			Runtime.getRuntime().exec( String.format( "ATTRIB +H %s" , file.getAbsolutePath()) ).waitFor();
+			Runtime.getRuntime().exec( String.format( "ATTRIB +H \"%s\"" , file.getAbsolutePath()) ).waitFor();
 		}
 	}
 	

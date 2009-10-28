@@ -1,4 +1,7 @@
-/*
+/**
+ * @file NaturalField.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -25,15 +28,18 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
-public class NeturalField extends JTextField {
+/**
+ * @brief Text field which only accept natural number.
+ */
+public class NaturalField extends JTextField {
 
 	private static final long serialVersionUID = -4923755274608244338L;
 	
-	public NeturalField() {
+	public NaturalField() {
 		super( "4483" );
 	}
 	
-	public NeturalField( long number ) {
+	public NaturalField( long number ) {
 		super( String.valueOf( number ) );
 	}
 	

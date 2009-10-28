@@ -1,2 +1,15 @@
 This is a file combination picker, which helps you to choose a combination
 which is closest to maximum size.
+
+System Requirements:
+	JRE 6.0
+
+Development Requirements:
+	Eclipse
+
+License:
+	LGPL 3 or later
+
+Author:
+	Wei-Cheng Pan (legnaleurc) <legnaleurc@gmail.com>
+	Site: http://legnaleurc.blogspot.com/search/label/PicKing

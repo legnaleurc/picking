@@ -79,16 +79,14 @@ public class Performer {
 	}
 	
 	public Result once() {
-		Pack r = null;
-		if( size < limit ) {
-			r = new Pack( size, new Vector< Object >( items.keySet() ) );
-		} else {
-			Hashtable< Object, Long > tmp = new Hashtable< Object, Long >();
-			for( Entry< ShortFile, Long > e : items.entrySet() ) {
-				tmp.put( e.getKey(), e.getValue() );
-			}
-			r = Pack.pick( limit, tmp );
+		if( size < limit ) {	// need not to pick, directly return result
+			return new Result( size, new Vector< ShortFile >( items.keySet() ) );
 		}
+		Hashtable< Object, Long > tmpTable = new Hashtable< Object, Long >();
+		for( Entry< ShortFile, Long > e : items.entrySet() ) {
+			tmpTable.put( e.getKey(), e.getValue() );
+		}
+		Pack r = Pack.pick( limit, tmpTable );
 		Vector< ShortFile > tmp = new Vector< ShortFile >();
 		for( Object o : r.getItems() ) {
 			tmp.add( ( ShortFile )o );

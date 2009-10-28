@@ -1,4 +1,7 @@
-/*
+/**
+ * @file Pack.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -24,16 +27,33 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Map.Entry;
 
+/**
+ * @brief Storing picking result.
+ * 
+ * This class calculates the maximum combination of given objects table.<br/>
+ * To do this you should collect objects and their values, and store them to a
+ * <strong>Hashtable&lt;Object,Long&gt;</strong> as a table. Then decide a
+ * maximum value of combinations of objects.<br/>
+ * Simply use pick() to perform algorithm.<br/>
+ */
 public class Pack {
 
 	private long size;
 	private Vector< Object > items;
 	
+	/**
+	 * @brief Default constructor.
+	 */
 	private Pack() {
 		size = 0L;
 		items = new Vector< Object >();
 	}
-	public Pack( long size, Vector< Object > items ) {
+	/**
+	 * @brief Public constructor.
+	 * @param size total value of @p items
+	 * @param items selected objects
+	 */
+	private Pack( long size, Vector< Object > items ) {
 		this.size = size;
 		this.items = items;
 	}
@@ -206,6 +226,12 @@ public class Pack {
 		
 	}
 	
+	/**
+	 * Main pick function.
+	 * @param limit
+	 * @param items
+	 * @return
+	 */
 	public static Pack pick( Long limit, Hashtable< Object, Long > items ) {
 		if( items.size() < 16 ) {
 			return pickSmall( limit, items );

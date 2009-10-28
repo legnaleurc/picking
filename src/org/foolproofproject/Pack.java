@@ -35,6 +35,8 @@ import java.util.Map.Entry;
  * <strong>Hashtable&lt;Object,Long&gt;</strong> as a table. Then decide a
  * maximum value of combinations of objects.<br/>
  * Simply use pick() to perform algorithm.<br/>
+ * If the amount of items is less then 16, then it will use brute force to
+ * find an optimal solution. Or it will use heuristic algorithm to do it.<br/>
  */
 public class Pack {
 
@@ -43,13 +45,15 @@ public class Pack {
 	
 	/**
 	 * @brief Default constructor.
+	 * 
+	 * Will initialize size to 0, items as an empty Vector.
 	 */
 	private Pack() {
 		size = 0L;
 		items = new Vector< Object >();
 	}
 	/**
-	 * @brief Public constructor.
+	 * @brief Constructor.
 	 * @param size total value of @p items
 	 * @param items selected objects
 	 */
@@ -67,8 +71,14 @@ public class Pack {
 		return items;
 	}
 	
+	/**
+	 * @brief Genetic algorithm.
+	 */
 	private static class GeneticAlgorithm {
 		
+		/**
+		 * @brief One cell
+		 */
 		private class Cell implements Comparable< Cell > {
 			
 			private Hashtable< Object, Boolean > table;
@@ -227,10 +237,13 @@ public class Pack {
 	}
 	
 	/**
-	 * Main pick function.
-	 * @param limit
-	 * @param items
-	 * @return
+	 * @brief Main pick function.
+	 * @param limit maximum value of combinations
+	 * @param items object value table
+	 * @return solution
+	 * 
+	 * If table size is greater then or equal to 16, it will use heuristic
+	 * algorithm.
 	 */
 	public static Pack pick( Long limit, Hashtable< Object, Long > items ) {
 		if( items.size() < 16 ) {
@@ -240,11 +253,23 @@ public class Pack {
 		}
 	}
 	
+	/**
+	 * @brief Back-end to pick using brute force.
+	 * @param limit maximum value of combinations
+	 * @param items object value table
+	 * @return solution
+	 */
 	public static Pack pickLarge( Long limit, Hashtable< Object, Long > items ) {
 		GeneticAlgorithm ga = new GeneticAlgorithm( limit, items );
 		return ga.perform();
 	}
 	
+	/**
+	 * @brief Back-end to pick using heuristic algorithm.
+	 * @param limit maximum value of combinations
+	 * @param items object value table
+	 * @return solution
+	 */
 	public static Pack pickSmall( Long limit, Hashtable< Object, Long > items ) {
 		Vector< Pack > table = new Vector< Pack >();
 		table.add( new Pack() );

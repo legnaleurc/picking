@@ -1,4 +1,7 @@
-/*
+/**
+ * @file MainWindow.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -54,11 +57,14 @@ import org.foolproofproject.picking.Performer;
 import org.foolproofproject.picking.ShortFile;
 import org.foolproofproject.picking.UnitUtility;
 
+/**
+ * @brief Main window.
+ */
 public class MainWindow extends JFrame {
 	
 	private static final long serialVersionUID = 6869079478547863579L;
 	private FileList list;
-	private NeturalField size;
+	private NaturalField size;
 	private ResultTree result;
 	private JComboBox unit;
 	private JDialog about;
@@ -253,7 +259,7 @@ public class MainWindow extends JFrame {
 		limitPanel.setLayout( new GridLayout( 1, 2 ) );
 		limitPanel.setBorder( BorderFactory.createTitledBorder( "Limit" ) );
 		
-		size = new NeturalField();
+		size = new NaturalField();
 		limitPanel.add( size );
 		
 		unit = UnitUtility.createComboBox();

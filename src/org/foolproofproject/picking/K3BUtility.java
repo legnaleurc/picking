@@ -1,4 +1,7 @@
-/*
+/**
+ * @file K3BUtility.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -34,6 +37,9 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+/**
+ * @brief Some functionality of K3B.
+ */
 public class K3BUtility {
 
 	private static XMLOutputFactory xmlFactory = XMLOutputFactory.newInstance();
@@ -41,6 +47,13 @@ public class K3BUtility {
 	private ZipOutputStream zout;
 	private XMLStreamWriter xout;
 
+	/**
+	 * @brief Export items to K3B project.
+	 * @param file exporting file
+	 * @param node a tree node contents itmes
+	 * @throws IOException file writing error
+	 * @throws XMLStreamException XML serialization error
+	 */
 	public static void export( File file, DefaultMutableTreeNode node ) throws IOException, XMLStreamException {
 		K3BUtility k3b = new K3BUtility( node );
 		

@@ -1,4 +1,7 @@
-/*
+/**
+ * @file Main.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -26,8 +29,15 @@ import org.foolproofproject.picking.cli.CommandLine;
 import org.foolproofproject.picking.gui.LogDialog;
 import org.foolproofproject.picking.gui.MainWindow;
 
+/**
+ * @brief Entry class.
+ */
 public class Main {
 
+	/**
+	 * @brief Entry point.
+	 * @param args arguments
+	 */
 	public static void main(String[] args) {
 		if( args.length == 0 ) {
 			SwingUtilities.invokeLater( new Runnable() {

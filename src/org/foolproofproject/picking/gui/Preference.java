@@ -1,4 +1,7 @@
-/*
+/**
+ * @file Preference.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -35,15 +38,18 @@ import javax.swing.JPanel;
 
 import org.foolproofproject.picking.UnitUtility;
 
+/**
+ * @brief Preference widget.
+ */
 public class Preference extends JDialog {
 
 	private static final long serialVersionUID = -3910072899938489788L;
 	private JComboBox unit;
-	private NeturalField limit;
+	private NaturalField limit;
 	private JCheckBox debug;
 	private MainWindow parent;
 	private JCheckBox hidden;
-	private NeturalField k3bLB;
+	private NaturalField k3bLB;
 	private JComboBox k3bUnit;
 	
 	public Preference( MainWindow window ) {
@@ -60,7 +66,7 @@ public class Preference extends JDialog {
 		limits.setLayout( new GridLayout( 1, 2 ) );
 		limits.setBorder( BorderFactory.createTitledBorder( "Limit" ) );
 		
-		limit = new NeturalField();
+		limit = new NaturalField();
 		limits.add( limit );
 		
 		unit = UnitUtility.createComboBox();
@@ -72,9 +78,9 @@ public class Preference extends JDialog {
 		k3b.setLayout( new FlowLayout() );
 		
 		k3b.add( new JLabel( "Save upper then" ) );
-		k3bLB = new NeturalField( 4000 );
+		k3bLB = new NaturalField( 4000 );
 		k3b.add( k3bLB );
-		k3bUnit = UnitUtility.createComboBox(); 
+		k3bUnit = UnitUtility.createComboBox();
 		k3b.add( k3bUnit );
 		k3b.add( new JLabel( "results." ) );
 		

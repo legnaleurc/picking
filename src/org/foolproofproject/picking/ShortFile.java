@@ -1,4 +1,7 @@
-/*
+/**
+ * @file ShortFile.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -23,6 +26,9 @@ import java.io.File;
 import java.io.FileFilter;
 import java.net.URI;
 
+/**
+ * @brief File wrapper for file utility.
+ */
 public class ShortFile extends File {
 
 	private static final long serialVersionUID = -498630998152519151L;
@@ -47,6 +53,9 @@ public class ShortFile extends File {
 		super( file.getPath() );
 	}
 	
+	/**
+	 * @brief Use getName() instead of getAbsolutePath().
+	 */
 	public String toString() {
 		return this.getName();
 	}
@@ -76,6 +85,10 @@ public class ShortFile extends File {
 		}
 	}
 	
+	/**
+	 * @brief Recursively calculate directory size.
+	 * @return directory total size
+	 */
 	public long getTotalSize() {
 		if( isDirectory() ) {
 			long sum = length();

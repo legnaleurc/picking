@@ -1,4 +1,7 @@
-/*
+/**
+ * @file DirectoryTree.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -41,6 +44,9 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.foolproofproject.picking.ShortFile;
 
+/**
+ * @brief Directory tree view.
+ */
 public class DirectoryTree extends JPanel {
 	
 	private static final long serialVersionUID = -8724999594568776949L;

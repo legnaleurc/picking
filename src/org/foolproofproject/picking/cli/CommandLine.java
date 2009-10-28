@@ -1,4 +1,7 @@
-/*
+/**
+ * @file CommandLine.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -27,10 +30,17 @@ import org.foolproofproject.picking.Performer;
 import org.foolproofproject.picking.ShortFile;
 import org.foolproofproject.picking.UnitUtility;
 
+/**
+ * @brief Command line utility.
+ */
 public class CommandLine {
 	
 	private static final Pattern pattern = Pattern.compile( "(\\d+)((K|M|G)?B?)" );
 	
+	/**
+	 * @brief Parse command line arguments.
+	 * @param args arguments
+	 */
 	public static void parse( String[] args ) {
 		Matcher m = pattern.matcher( args[0].toUpperCase() );
 		if( !m.matches() ) {

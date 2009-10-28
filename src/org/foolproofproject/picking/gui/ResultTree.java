@@ -1,4 +1,7 @@
-/*
+/**
+ * @file ResultTree.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -49,6 +52,9 @@ import org.foolproofproject.picking.K3BUtility;
 import org.foolproofproject.picking.ShortFile;
 import org.foolproofproject.picking.UnitUtility;
 
+/**
+ * @brief Result tree widget.
+ */
 public class ResultTree extends JPanel {
 
 	private static final long serialVersionUID = 3366458847085663811L; 

@@ -1,4 +1,7 @@
-/*
+/**
+ * @file LogDialog.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -27,6 +30,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+/**
+ * @brief Log dialog.
+ */
 public class LogDialog extends JDialog {
 	
 	private static final long serialVersionUID = -8893137565616271012L;
@@ -34,10 +40,16 @@ public class LogDialog extends JDialog {
 	private static LogDialog debug = new LogDialog( "Debug Log" );
 	private JTextArea textArea;
 	
+	/**
+	 * @brief Get error log widget.
+	 */
 	public static LogDialog getErrorLog() {
 		return error;
 	}
 	
+	/**
+	 * @brief Get debug log widget.
+	 */
 	public static LogDialog getDebugLog() {
 		return debug;
 	}
@@ -62,6 +74,10 @@ public class LogDialog extends JDialog {
 		main.add( scroll );
 	}
 	
+	/**
+	 * @brief Write a log message.
+	 * @param msg log message
+	 */
 	public void log( String msg ) {
 		synchronized( textArea ) {
 			textArea.append( msg + "\n" );

@@ -1,4 +1,6 @@
-/*
+/**
+ * @file FileDialog.java
+ * @author Wei-Cheng Pan
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -25,8 +27,16 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
+/**
+ * @brief File dialog utility.
+ */
 public class FileDialog {
 	
+	/**
+	 * @brief Get existing directory.
+	 * @param parent parent widget
+	 * @return selected directory
+	 */
 	public static File getExistingDirectory( Component parent ) {
 		JFileChooser fc = new JFileChooser();
 		fc.setFileFilter( new FileFilter() {
@@ -49,6 +59,12 @@ public class FileDialog {
 		}
 	}
 	
+	/**
+	 * @brief Get save file name.
+	 * @param parent parent widget
+	 * @param filter file name filter
+	 * @return selected file
+	 */
 	public static File getSaveFileName( Component parent, FileFilter filter ) {
 		JFileChooser fc = new JFileChooser();
 		fc.setFileFilter( filter );

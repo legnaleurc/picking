@@ -1,4 +1,7 @@
-/*
+/**
+ * @file FileList.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -31,6 +34,9 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+/**
+ * @brief File list widget.
+ */
 public class FileList extends JPanel {
 
 	private static final long serialVersionUID = -5296371739711677521L;

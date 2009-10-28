@@ -118,9 +118,9 @@ public class MainWindow extends JFrame {
 		center.setLayout( new BoxLayout( center, BoxLayout.Y_AXIS ) );
 		center.setMaximumSize( new Dimension( Integer.MAX_VALUE, Integer.MAX_VALUE ) );
 
-		center.add( new JLabel( "Version: 0.2.0" ) );
+		center.add( new JLabel( "Version: 0.2.1" ) );
 		center.add( new JLabel( "Author: legnaleurc (FoolproofProject)" ) );
-		center.add( new JLabel( "License: LGPLv3" ) );
+		center.add( new JLabel( "License: LGPLv3 or later" ) );
 		center.add( new JLabel( "e-mail: legnaleurc@gmail.com" ) );
 		center.add( new JLabel( "blog: http://legnaleurc.blogspot.com/" ) );
 		

@@ -1,4 +1,7 @@
-/*
+/**
+ * @file Performer.java
+ * @author Wei-Cheng Pan
+ * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -28,21 +31,17 @@ import java.util.Map.Entry;
 import org.foolproofproject.Pack;
 
 /**
- * Algorithm performer.
- * @author legnaleurc
- *
+ * @brief Algorithm performer.
  */
 public class Performer {
 	
 	/**
-	 * Store picking result.
-	 * @author legnaleurc
-	 *
+	 * @brief Store picking result.
 	 */
-	public static class Result {
+	public class Result {
 		private long size;
 		private Vector< ShortFile > items;
-		public Result( long size, Vector< ShortFile > files ) {
+		private Result( long size, Vector< ShortFile > files ) {
 			this.size = size;
 			Collections.sort( files );
 			this.items = files;
@@ -61,9 +60,9 @@ public class Performer {
 	private Vector< ShortFile > overflow;
 	
 	/**
-	 * Constructor.
-	 * @param limit Combination maximum size
-	 * @param files
+	 * @brief Constructor.
+	 * @param limit combination maximum size
+	 * @param files all files
 	 */
 	public Performer( long limit, File[] files ) {
 		this.limit = limit;
@@ -78,6 +77,10 @@ public class Performer {
 		}
 	}
 	
+	/**
+	 * @brief Pick once.
+	 * @return Result
+	 */
 	public Result once() {
 		if( size < limit ) {	// need not to pick, directly return result
 			return new Result( size, new Vector< ShortFile >( items.keySet() ) );
@@ -94,6 +97,10 @@ public class Performer {
 		return new Result( r.getSize(), tmp );
 	}
 	
+	/**
+	 * @brief Remove items by given keys.
+	 * @param keys item keys
+	 */
 	public void remove( Vector< ShortFile > keys ) {
 		for( ShortFile key : keys ) {
 			size -= items.get( key );

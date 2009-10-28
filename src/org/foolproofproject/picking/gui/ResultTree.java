@@ -208,7 +208,7 @@ public class ResultTree extends JPanel {
 		for( int i = 0; i < indent; ++i ) {
 			sb.append( '\t' );
 		}
-		sb.append( node.getUserObject() );
+		sb.append( node );
 		fout.println( sb.toString() );
 		for( Enumeration< ? > e = node.children(); e.hasMoreElements(); ) {
 			savePath( path.pathByAddingChild( e.nextElement() ), indent + 1, fout );

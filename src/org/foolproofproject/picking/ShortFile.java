@@ -85,6 +85,16 @@ public class ShortFile extends File {
 		}
 	}
 	
+	public int compareTo( File that ) {
+		if( this.isDirectory() && !that.isDirectory() ) {
+			return -1;
+		} else if( !this.isDirectory() && that.isDirectory() ) {
+			return 1;
+		} else {
+			return super.compareTo( that );
+		}
+	}
+	
 	/**
 	 * @brief Recursively calculate directory size.
 	 * @return directory total size

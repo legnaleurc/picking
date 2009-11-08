@@ -77,7 +77,7 @@ public class DirectoryTree extends JPanel {
 			TreePath selection = tree.getSelectionPath();
 			if( selection != null ) {
 				File file = ( File )selection.getLastPathComponent();
-				File[] items = file.listFiles( new DirectoryFilter() );
+				File[] items = file.listFiles( new CustomFilter( false ) );
 				Arrays.sort( items );
 				for( FileList list : listener ) {
 					list.setItems( items );
@@ -197,7 +197,7 @@ public class DirectoryTree extends JPanel {
 
 		@Override
 		public File getChild(Object parent, int index) {
-			File[] children = ( ( File )parent ).listFiles( new DirectoryFilter() );
+			File[] children = ( ( File )parent ).listFiles( new CustomFilter( true ) );
 			if( children == null || ( index >= children.length ) ) {
 				return null;
 			}
@@ -206,7 +206,7 @@ public class DirectoryTree extends JPanel {
 
 		@Override
 		public int getChildCount(Object parent) {
-			File[] children = ( ( File )parent ).listFiles( new DirectoryFilter() );
+			File[] children = ( ( File )parent ).listFiles( new CustomFilter( true ) );
 			if( children == null ) {
 				return 0;
 			}
@@ -215,7 +215,7 @@ public class DirectoryTree extends JPanel {
 
 		@Override
 		public int getIndexOfChild(Object parent, Object child) {
-			File[] children = ( ( File )parent ).listFiles( new DirectoryFilter() );
+			File[] children = ( ( File )parent ).listFiles( new CustomFilter( true ) );
 			if( children == null ) {
 				return -1;
 			}
@@ -235,7 +235,7 @@ public class DirectoryTree extends JPanel {
 
 		@Override
 		public boolean isLeaf(Object node) {
-			return ( ( File )node ).listFiles( new DirectoryFilter() ) == null;
+			return ( ( File )node ).listFiles( new CustomFilter( true ) ) == null;
 		}
 
 		@Override
@@ -252,10 +252,16 @@ public class DirectoryTree extends JPanel {
 		
 	}
 	
-	private class DirectoryFilter implements FileFilter {
+	private class CustomFilter implements FileFilter {
+		private boolean directoryOnly;
+		public CustomFilter( boolean directoryOnly ) {
+			this.directoryOnly = directoryOnly;
+		}
 		@Override
 		public boolean accept(File file) {
-			return file.isDirectory() && ( !hidden ? !file.isHidden() : true );
+			boolean a = this.directoryOnly ? file.isDirectory() : true;
+			boolean b = hidden ? !file.isHidden() : true;
+			return a && b;
 		}
 	}
 

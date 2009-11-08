@@ -260,7 +260,7 @@ public class DirectoryTree extends JPanel {
 		@Override
 		public boolean accept(File file) {
 			boolean a = this.directoryOnly ? file.isDirectory() : true;
-			boolean b = hidden ? !file.isHidden() : true;
+			boolean b = hidden ? true : !file.isHidden();
 			return a && b;
 		}
 	}

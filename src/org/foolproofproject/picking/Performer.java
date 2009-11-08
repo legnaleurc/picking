@@ -40,8 +40,8 @@ public class Performer {
 	 */
 	public class Result {
 		private long size;
-		private Vector< ShortFile > items;
-		private Result( long size, Vector< ShortFile > files ) {
+		private Vector< SmartFile > items;
+		private Result( long size, Vector< SmartFile > files ) {
 			this.size = size;
 			Collections.sort( files );
 			this.items = files;
@@ -49,15 +49,15 @@ public class Performer {
 		public long getSize() {
 			return size;
 		}
-		public Vector< ShortFile > getItems() {
+		public Vector< SmartFile > getItems() {
 			return items;
 		}
 	}
 	
 	private final long limit;
 	private long size;
-	private Hashtable< ShortFile, Long > items, table;
-	private Vector< ShortFile > overflow;
+	private Hashtable< SmartFile, Long > items, table;
+	private Vector< SmartFile > overflow;
 	
 	/**
 	 * @brief Constructor.
@@ -67,12 +67,12 @@ public class Performer {
 	public Performer( long limit, File[] files ) {
 		this.limit = limit;
 		size = 0L;
-		items = new Hashtable< ShortFile, Long >();
-		table = new Hashtable< ShortFile, Long >();
-		overflow = new Vector< ShortFile >();
+		items = new Hashtable< SmartFile, Long >();
+		table = new Hashtable< SmartFile, Long >();
+		overflow = new Vector< SmartFile >();
 		
 		for( File f : files ) {
-			ShortFile file = new ShortFile( f );
+			SmartFile file = new SmartFile( f );
 			put( file, file.getTotalSize() );
 		}
 	}
@@ -83,16 +83,16 @@ public class Performer {
 	 */
 	public Result once() {
 		if( size < limit ) {	// need not to pick, directly return result
-			return new Result( size, new Vector< ShortFile >( items.keySet() ) );
+			return new Result( size, new Vector< SmartFile >( items.keySet() ) );
 		}
 		Hashtable< Object, Long > tmpTable = new Hashtable< Object, Long >();
-		for( Entry< ShortFile, Long > e : items.entrySet() ) {
+		for( Entry< SmartFile, Long > e : items.entrySet() ) {
 			tmpTable.put( e.getKey(), e.getValue() );
 		}
 		Pack r = Pack.pick( limit, tmpTable );
-		Vector< ShortFile > tmp = new Vector< ShortFile >();
+		Vector< SmartFile > tmp = new Vector< SmartFile >();
 		for( Object o : r.getItems() ) {
-			tmp.add( ( ShortFile )o );
+			tmp.add( ( SmartFile )o );
 		}
 		return new Result( r.getSize(), tmp );
 	}
@@ -101,14 +101,14 @@ public class Performer {
 	 * @brief Remove items by given keys.
 	 * @param keys item keys
 	 */
-	public void remove( Vector< ShortFile > keys ) {
-		for( ShortFile key : keys ) {
+	public void remove( Vector< SmartFile > keys ) {
+		for( SmartFile key : keys ) {
 			size -= items.get( key );
 			items.remove( key );
 		}
 	}
 	
-	public Hashtable< ShortFile, Long > getTable() {
+	public Hashtable< SmartFile, Long > getTable() {
 		return table;
 	}
 	public boolean noItem() {
@@ -117,11 +117,11 @@ public class Performer {
 	public boolean noOverflow() {
 		return overflow.isEmpty();
 	}
-	public Vector< ShortFile > getOverflow() {
+	public Vector< SmartFile > getOverflow() {
 		return overflow;
 	}
 	
-	private void put( ShortFile key, Long value ) {
+	private void put( SmartFile key, Long value ) {
 		if( value < limit ) {
 			size += value;
 			items.put( key, value );

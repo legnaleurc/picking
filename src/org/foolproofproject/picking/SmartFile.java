@@ -1,5 +1,5 @@
 /**
- * @file ShortFile.java
+ * @file SmartFile.java
  * @author Wei-Cheng Pan
  * 
  * PicKing, a file picker.
@@ -29,27 +29,27 @@ import java.net.URI;
 /**
  * @brief File wrapper for file utility.
  */
-public class ShortFile extends File {
+public class SmartFile extends File {
 
 	private static final long serialVersionUID = -498630998152519151L;
 
-	public ShortFile(String pathname) {
+	public SmartFile(String pathname) {
 		super(pathname);
 	}
 
-	public ShortFile(URI uri) {
+	public SmartFile(URI uri) {
 		super(uri);
 	}
 
-	public ShortFile(String parent, String child) {
+	public SmartFile(String parent, String child) {
 		super(parent, child);
 	}
 
-	public ShortFile(File parent, String child) {
+	public SmartFile(File parent, String child) {
 		super(parent, child);
 	}
 	
-	public ShortFile( File file ) {
+	public SmartFile( File file ) {
 		super( file.getPath() );
 	}
 	
@@ -60,28 +60,28 @@ public class ShortFile extends File {
 		return this.getName();
 	}
 	
-	public ShortFile[] listFiles() {
+	public SmartFile[] listFiles() {
 		return listFiles( (FileFilter)null );
 	}
 	
-	public ShortFile[] listFiles( FileFilter filter ) {
+	public SmartFile[] listFiles( FileFilter filter ) {
 		File[] original = super.listFiles( filter );
 		if( original == null ) {
 			return null;
 		}
-		ShortFile[] tmp = new ShortFile[original.length];
+		SmartFile[] tmp = new SmartFile[original.length];
 		for( int i = 0; i < tmp.length; ++i ) {
-			tmp[i] = new ShortFile( original[i] );
+			tmp[i] = new SmartFile( original[i] );
 		}
 		return tmp;
 	}
 	
-	public ShortFile getParentFile() {
+	public SmartFile getParentFile() {
 		File parent = super.getParentFile();
 		if( parent == null ) {
 			return null;
 		} else {
-			return new ShortFile( parent );
+			return new SmartFile( parent );
 		}
 	}
 	
@@ -102,9 +102,9 @@ public class ShortFile extends File {
 	public long getTotalSize() {
 		if( isDirectory() ) {
 			long sum = length();
-			ShortFile[] files = listFiles();
+			SmartFile[] files = listFiles();
 			if( files != null ) {
-				for( ShortFile file : files ) {
+				for( SmartFile file : files ) {
 					sum += file.getTotalSize();
 				}
 			}

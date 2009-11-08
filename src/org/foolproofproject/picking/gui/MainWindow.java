@@ -54,7 +54,7 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.foolproofproject.picking.Performer;
-import org.foolproofproject.picking.ShortFile;
+import org.foolproofproject.picking.SmartFile;
 import org.foolproofproject.picking.UnitUtility;
 
 /**
@@ -247,7 +247,7 @@ public class MainWindow extends JFrame {
 		Container pane = getContentPane();
 		pane.add( central );
 		
-		tree.open( new ShortFile( System.getProperty( "user.home" ) ) );
+		tree.open( new SmartFile( System.getProperty( "user.home" ) ) );
 	}
 	
 	private void initControlPanel() {

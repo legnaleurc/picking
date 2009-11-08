@@ -49,7 +49,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.xml.stream.XMLStreamException;
 import org.foolproofproject.picking.K3BUtility;
-import org.foolproofproject.picking.ShortFile;
+import org.foolproofproject.picking.SmartFile;
 import org.foolproofproject.picking.UnitUtility;
 
 /**
@@ -59,7 +59,7 @@ public class ResultTree extends JPanel {
 
 	private static final long serialVersionUID = 3366458847085663811L; 
 	private JTree view;
-	private Hashtable< ShortFile, Long > table;
+	private Hashtable< SmartFile, Long > table;
 	private JPopupMenu popup;
 	private DefaultMutableTreeNode selectedNode;
 	
@@ -116,7 +116,7 @@ public class ResultTree extends JPanel {
 				if( table != null && leaf ) {
 					DefaultMutableTreeNode node = ( DefaultMutableTreeNode )value;
 					Object item = node.getUserObject();
-					if( item instanceof ShortFile && table.containsKey( item ) ) {
+					if( item instanceof SmartFile && table.containsKey( item ) ) {
 						setToolTipText( UnitUtility.toString( table.get( item ) ) );
 					}
 				}
@@ -158,15 +158,15 @@ public class ResultTree extends JPanel {
 		( ( DefaultTreeModel )view.getModel() ).setRoot( null );
 	}
 	
-	public void setTable( Hashtable< ShortFile, Long > table ) {
+	public void setTable( Hashtable< SmartFile, Long > table ) {
 		this.table = table;
 	}
 	
-	public void addResult( long size, int eng, Vector< ShortFile > items ) {
+	public void addResult( long size, int eng, Vector< SmartFile > items ) {
 		getRoot().add( createNewNode( size, eng, items ) );
 	}
 	
-	public void addOverflow( Vector< ShortFile > overflow ) {
+	public void addOverflow( Vector< SmartFile > overflow ) {
 		getRoot().add( createNewNode( "Overflow", overflow ) );
 	}
 	

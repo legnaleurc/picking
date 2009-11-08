@@ -24,6 +24,7 @@ package org.foolproofproject.picking.gui;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -77,6 +78,7 @@ public class DirectoryTree extends JPanel {
 			if( selection != null ) {
 				File file = ( File )selection.getLastPathComponent();
 				File[] items = file.listFiles( new DirectoryFilter() );
+				Arrays.sort( items );
 				for( FileList list : listener ) {
 					list.setItems( items );
 				}

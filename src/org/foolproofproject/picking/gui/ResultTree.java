@@ -38,6 +38,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
@@ -62,6 +63,7 @@ public class ResultTree extends JPanel {
 	private Hashtable< SmartFile, Long > table;
 	private JPopupMenu popup;
 	private DefaultMutableTreeNode selectedNode;
+	private JProgressBar progressBar;
 	
 	private class LabelNode extends DefaultMutableTreeNode {
 		private static final long serialVersionUID = -3736698920372921805L;
@@ -82,6 +84,10 @@ public class ResultTree extends JPanel {
 		setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
 		setBorder( BorderFactory.createTitledBorder( "Result" ) );
 		add( scroll );
+		
+		progressBar = new JProgressBar();
+		add( progressBar );
+		progressBar.setVisible( false );
 		
 		selectedNode = null;
 		
@@ -158,16 +164,14 @@ public class ResultTree extends JPanel {
 		( ( DefaultTreeModel )view.getModel() ).setRoot( null );
 	}
 	
-	public void setTable( Hashtable< SmartFile, Long > table ) {
-		this.table = table;
-	}
-	
 	public void addResult( long size, int eng, Vector< SmartFile > items ) {
 		getRoot().add( createNewNode( size, eng, items ) );
+		progressBar.setValue( progressBar.getValue() + items.size() );
 	}
 	
 	public void addOverflow( Vector< SmartFile > overflow ) {
 		getRoot().add( createNewNode( "Overflow", overflow ) );
+		progressBar.setValue( progressBar.getValue() + overflow.size() );
 	}
 	
 	private DefaultMutableTreeNode getRoot() {
@@ -237,6 +241,20 @@ public class ResultTree extends JPanel {
 				LogDialog.getErrorLog().log( e.getMessage() );
 			}
 		}
+	}
+	
+	public void openProgress( Hashtable< SmartFile, Long > table ) {
+		this.table = table;
+		progressBar.setMaximum( table.size() );
+		progressBar.setValue( 0 );
+		progressBar.setVisible( true );
+	}
+	
+	public void closeProgress() {
+		progressBar.setVisible( false );
+		progressBar.setValue( 0 );
+		progressBar.setMaximum( 0 );
+		this.expandAll();
 	}
 
 }

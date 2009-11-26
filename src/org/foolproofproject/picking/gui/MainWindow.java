@@ -284,7 +284,12 @@ public class MainWindow extends JFrame {
 		panel.add( start );
 		start.addMouseListener( new MouseAdapter() {
 			public void mouseClicked( MouseEvent e ) {
-				perform();
+				new Thread( new Runnable() {
+					@Override
+					public void run() {
+						MainWindow.this.perform();
+					}
+				} ).start();
 			}
 		} );
 		
@@ -320,7 +325,7 @@ public class MainWindow extends JFrame {
 		
 		Performer p = new Performer( UnitUtility.extract( size.toLong(), unit.getSelectedIndex() ), list.getSelectedFiles() );
 		
-		result.setTable( p.getTable() );
+		result.openProgress( p.getTable() );
 		
 		while( !p.noItem() ) {
 			Performer.Result r = p.once();
@@ -332,7 +337,7 @@ public class MainWindow extends JFrame {
 			result.addOverflow( p.getOverflow() );
 		}
 		
-		result.expandAll();
+		result.closeProgress();
 	}
 
 }

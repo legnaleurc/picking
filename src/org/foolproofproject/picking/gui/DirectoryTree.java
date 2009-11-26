@@ -43,7 +43,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.foolproofproject.picking.ShortFile;
+import org.foolproofproject.picking.SmartFile;
 
 /**
  * @brief Directory tree view.
@@ -186,7 +186,7 @@ public class DirectoryTree extends JPanel {
 		private File root;
 		
 		public DirectoryTreeModel( File root ) {
-			this.root = new ShortFile( root );
+			this.root = new SmartFile( root );
 		}
 
 		@Override
@@ -201,7 +201,7 @@ public class DirectoryTree extends JPanel {
 			if( children == null || ( index >= children.length ) ) {
 				return null;
 			}
-			return new ShortFile( ( File )parent, children[index].getName() );
+			return new SmartFile( ( File )parent, children[index].getName() );
 		}
 
 		@Override

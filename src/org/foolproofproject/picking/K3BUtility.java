@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -77,6 +78,9 @@ public class K3BUtility {
 	}
 	
 	private void writeXML() throws UnsupportedEncodingException, XMLStreamException {
+		Calendar now = Calendar.getInstance();
+		String title = String.format( "%02d%02d%02d", now.get( Calendar.YEAR ) % 100, now.get( Calendar.MONTH ) + 1, now.get( Calendar.DATE ) );
+		
 		xout = xmlFactory.createXMLStreamWriter( new OutputStreamWriter( zout, "UTF-8" ) );
 		xout.writeStartDocument( "UTF-8", "1.0" );
 		xout.writeDTD( "<!DOCTYPE k3b_dvd_project>" );
@@ -165,7 +169,7 @@ public class K3BUtility {
 
 		xout.writeStartElement( "header" );
 		xout.writeStartElement( "volume_id" );
-		xout.writeCharacters( "PicKing" );
+		xout.writeCharacters( title );
 		xout.writeEndElement();
 		xout.writeStartElement( "volume_set_id" );
 		xout.writeEndElement();

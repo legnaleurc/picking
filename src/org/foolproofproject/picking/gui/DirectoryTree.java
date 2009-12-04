@@ -53,13 +53,13 @@ public class DirectoryTree extends JPanel {
 	private static final long serialVersionUID = -8724999594568776949L;
 	private Vector< FileList > listener;
 	private JTabbedPane tabWidget;
-	private boolean hidden;
+	private boolean viewHidden;
 	
 	public DirectoryTree() {
 		setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
 		setBorder( BorderFactory.createTitledBorder( "Directory Tree" ) );
 		listener = new Vector< FileList >();
-		hidden = (Boolean) Configuration.get( "hidden" );
+		viewHidden = (Boolean) Configuration.get( "hidden" );
 		
 		tabWidget = new JTabbedPane();
 		add( tabWidget );
@@ -114,7 +114,7 @@ public class DirectoryTree extends JPanel {
 	}
 	
 	public void setHidden( boolean hidden ) {
-		this.hidden = hidden;
+		this.viewHidden = hidden;
 	}
 	
 	public void addFileListListener( FileList list ) {
@@ -260,7 +260,7 @@ public class DirectoryTree extends JPanel {
 		@Override
 		public boolean accept(File file) {
 			boolean a = this.directoryOnly ? file.isDirectory() : true;
-			boolean b = hidden ? !file.isHidden() : true;
+			boolean b = viewHidden ? true : !file.isHidden();
 			return a && b;
 		}
 	}

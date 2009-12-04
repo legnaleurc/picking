@@ -1,0 +1,4 @@
+[v0.2.3]
+* Fixed hidden file filter.
+* Fixed the naming format of K3B project exporting.
+* Use yymmdd as project title.

@@ -231,7 +231,7 @@ public class ResultTree extends JPanel {
 				}
 			}
 		}
-		String template = String.format( "%%%dd.k3b", String.valueOf( tmp.size() ).length() );
+		String template = String.format( "%%0%dd.k3b", String.valueOf( tmp.size() ).length() );
 		for( int i = 0; i < tmp.size(); ++i ) {
 			try {
 				K3BUtility.export( new File( dout, String.format( template, i ) ), tmp.get( i ) );

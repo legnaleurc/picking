@@ -165,12 +165,24 @@ public class ResultTree extends JPanel {
 	}
 	
 	public void addResult( long size, int eng, Vector< SmartFile > items ) {
-		getRoot().add( createNewNode( size, eng, items ) );
+		DefaultMutableTreeNode child = createNewNode( size, eng, items );
+		getRoot().add( child );
+		DefaultTreeModel model = (DefaultTreeModel) view.getModel();
+		model.reload();
+		expandAll();
+		view.scrollPathToVisible( new TreePath( child.getPath() ) );
+		
 		progressBar.setValue( progressBar.getValue() + items.size() );
 	}
 	
 	public void addOverflow( Vector< SmartFile > overflow ) {
-		getRoot().add( createNewNode( "Overflow", overflow ) );
+		DefaultMutableTreeNode child = createNewNode( "Overflow", overflow );
+		getRoot().add( child );
+		DefaultTreeModel model = (DefaultTreeModel) view.getModel();
+		model.reload();
+		expandAll();
+		view.scrollPathToVisible( new TreePath( child.getPath() ) );
+		
 		progressBar.setValue( progressBar.getValue() + overflow.size() );
 	}
 	

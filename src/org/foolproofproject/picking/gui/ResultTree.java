@@ -35,6 +35,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
@@ -133,13 +134,26 @@ public class ResultTree extends JPanel {
 		ToolTipManager.sharedInstance().registerComponent( resultTree );
 		resultTree.setCellRenderer( new DefaultTreeCellRenderer() {
 			private static final long serialVersionUID = 8169622028702532699L;
-			public Component getTreeCellRendererComponent( JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus ) {
-				super.getTreeCellRendererComponent( tree, value, sel, expanded, leaf, row, hasFocus);
+			public Component getTreeCellRendererComponent( JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus ) {
+				super.getTreeCellRendererComponent( tree, value, selected, expanded, leaf, row, hasFocus );
 				if( table != null && leaf ) {
 					DefaultMutableTreeNode node = ( DefaultMutableTreeNode )value;
 					Object item = node.getUserObject();
 					if( item instanceof SmartFile && table.containsKey( item ) ) {
 						setToolTipText( UnitUtility.toString( table.get( item ) ) );
+					}
+				}
+				return this;
+			}
+		} );
+		ToolTipManager.sharedInstance().registerComponent( overflowList );
+		overflowList.setCellRenderer( new DefaultListCellRenderer() {
+			private static final long serialVersionUID = -2642459895866586526L;
+			public Component getListCellRendererComponent( JList list, Object value, int index, boolean isSelected, boolean cellHasFocus ) {
+				super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus );
+				if( table != null ) {
+					if( value instanceof SmartFile && table.containsKey( value ) ) {
+						setToolTipText( UnitUtility.toString( table.get( value ) ) );
 					}
 				}
 				return this;

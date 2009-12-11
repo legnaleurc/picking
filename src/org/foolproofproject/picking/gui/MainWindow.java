@@ -65,7 +65,7 @@ public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 6869079478547863579L;
 	private FileList list;
 	private NaturalField size;
-	private ResultTree result;
+	private ResultWidget result;
 	private JComboBox unit;
 	private JDialog about;
 	private Preference preference;
@@ -241,7 +241,7 @@ public class MainWindow extends JFrame {
 		list = new FileList( tree );
 		central.add( list );
 		
-		result = new ResultTree();
+		result = new ResultWidget();
 		central.add( result );
 		
 		Container pane = getContentPane();

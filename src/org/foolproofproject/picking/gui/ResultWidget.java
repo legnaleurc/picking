@@ -58,9 +58,9 @@ import org.foolproofproject.picking.SmartFile;
 import org.foolproofproject.picking.UnitUtility;
 
 /**
- * @brief Result tree widget.
+ * @brief Result widget.
  */
-public class ResultTree extends JPanel {
+public class ResultWidget extends JPanel {
 
 	private static final long serialVersionUID = 3366458847085663811L; 
 	private JTree resultTree;
@@ -82,7 +82,7 @@ public class ResultTree extends JPanel {
 		}
 	}
 	
-	public ResultTree() {
+	public ResultWidget() {
 		// setup layout
 		setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
 		setBorder( BorderFactory.createTitledBorder( "Result" ) );

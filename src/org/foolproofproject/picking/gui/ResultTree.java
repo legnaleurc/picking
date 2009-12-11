@@ -35,6 +35,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -66,6 +67,7 @@ public class ResultTree extends JPanel {
 	private JPopupMenu popup;
 	private DefaultMutableTreeNode selectedNode;
 	private JProgressBar progressBar;
+	private JList overflowList;
 	
 	private class LabelNode extends DefaultMutableTreeNode {
 		private static final long serialVersionUID = -3736698920372921805L;
@@ -95,7 +97,7 @@ public class ResultTree extends JPanel {
 		tabs.addTab( "Result", scroll );
 		
 		// setup overflow list
-		JList overflowList = new JList();
+		overflowList = new JList( new DefaultListModel() );
 		scroll = new JScrollPane( overflowList );
 		tabs.addTab( "Overflow", scroll );
 		
@@ -183,7 +185,10 @@ public class ResultTree extends JPanel {
 	}
 	
 	public void addOverflow( Vector< SmartFile > overflow ) {
-		addNode( createNewNode( "Overflow", overflow ) );
+		DefaultListModel model = (DefaultListModel) overflowList.getModel();
+		for( SmartFile file : overflow ) {
+			model.addElement( file );
+		}
 	}
 	
 	private void addNode( DefaultMutableTreeNode node ) {
@@ -208,14 +213,6 @@ public class ResultTree extends JPanel {
 	
 	private DefaultMutableTreeNode createNewNode( long size, int eng, Vector<?> items ) {
 		DefaultMutableTreeNode newNode = new LabelNode( size, eng );
-		for( Object item : items ) {
-			newNode.add( new DefaultMutableTreeNode( item ) );
-		}
-		return newNode;
-	}
-	
-	private DefaultMutableTreeNode createNewNode( String title, Vector<?> items ) {
-		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode( title );
 		for( Object item : items ) {
 			newNode.add( new DefaultMutableTreeNode( item ) );
 		}

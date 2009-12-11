@@ -165,25 +165,21 @@ public class ResultTree extends JPanel {
 	}
 	
 	public void addResult( long size, int eng, Vector< SmartFile > items ) {
-		DefaultMutableTreeNode child = createNewNode( size, eng, items );
-		getRoot().add( child );
-		DefaultTreeModel model = (DefaultTreeModel) view.getModel();
-		model.reload();
-		expandAll();
-		view.scrollPathToVisible( new TreePath( child.getPath() ) );
-		
-		progressBar.setValue( progressBar.getValue() + items.size() );
+		addNode( createNewNode( size, eng, items ) );
 	}
 	
 	public void addOverflow( Vector< SmartFile > overflow ) {
-		DefaultMutableTreeNode child = createNewNode( "Overflow", overflow );
-		getRoot().add( child );
+		addNode( createNewNode( "Overflow", overflow ) );
+	}
+	
+	private void addNode( DefaultMutableTreeNode node ) {
+		getRoot().add( node );
 		DefaultTreeModel model = (DefaultTreeModel) view.getModel();
 		model.reload();
 		expandAll();
-		view.scrollPathToVisible( new TreePath( child.getPath() ) );
+		view.scrollPathToVisible( new TreePath( node.getPath() ) );
 		
-		progressBar.setValue( progressBar.getValue() + overflow.size() );
+		progressBar.setValue( progressBar.getValue() + node.getChildCount() );
 	}
 	
 	private DefaultMutableTreeNode getRoot() {

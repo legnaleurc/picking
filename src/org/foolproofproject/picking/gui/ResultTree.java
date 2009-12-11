@@ -60,7 +60,7 @@ import org.foolproofproject.picking.UnitUtility;
 public class ResultTree extends JPanel {
 
 	private static final long serialVersionUID = 3366458847085663811L; 
-	private JTree view;
+	private JTree resultTree;
 	private Hashtable< SmartFile, Long > table;
 	private JPopupMenu popup;
 	private DefaultMutableTreeNode selectedNode;
@@ -87,9 +87,10 @@ public class ResultTree extends JPanel {
 		JTabbedPane tabs = new JTabbedPane();
 		add( tabs );
 		
-		view = new JTree();
-		view.setRootVisible( false );
-		JScrollPane scroll = new JScrollPane( view );
+		// setup result tree
+		resultTree = new JTree();
+		resultTree.setRootVisible( false );
+		JScrollPane scroll = new JScrollPane( resultTree );
 		tabs.addTab( "Result", scroll );
 		
 		progressBar = new JProgressBar();
@@ -106,7 +107,7 @@ public class ResultTree extends JPanel {
 				if( selectedNode == null ) {
 					return;
 				}
-				File file = FileDialog.getSaveFileName( view, new FileNameExtensionFilter( "K3B project", "k3b" ) );
+				File file = FileDialog.getSaveFileName( resultTree, new FileNameExtensionFilter( "K3B project", "k3b" ) );
 				if( file != null ) {
 					try {
 						K3BUtility.export( file, selectedNode );
@@ -121,8 +122,8 @@ public class ResultTree extends JPanel {
 		popup.add( k3b );
 		
 		// setup tool tip
-		ToolTipManager.sharedInstance().registerComponent( view );
-		view.setCellRenderer( new DefaultTreeCellRenderer() {
+		ToolTipManager.sharedInstance().registerComponent( resultTree );
+		resultTree.setCellRenderer( new DefaultTreeCellRenderer() {
 			private static final long serialVersionUID = 8169622028702532699L;
 			public Component getTreeCellRendererComponent( JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus ) {
 				super.getTreeCellRendererComponent( tree, value, sel, expanded, leaf, row, hasFocus);
@@ -138,15 +139,15 @@ public class ResultTree extends JPanel {
 		} );
 		
 		// setup mouse listener
-		view.addMouseListener( new MouseAdapter() {
+		resultTree.addMouseListener( new MouseAdapter() {
 			public void mouseClicked( MouseEvent e ) {
 				if( e.getButton() != MouseEvent.BUTTON3 ) {
 					return;
 				}
-				TreePath tp = view.getPathForLocation( e.getX(), e.getY() );
+				TreePath tp = resultTree.getPathForLocation( e.getX(), e.getY() );
 				if( tp != null && tp.getPathCount() == 2 ) {
 					selectedNode = ( DefaultMutableTreeNode )tp.getLastPathComponent();
-					popup.show( view, e.getX(), e.getY());
+					popup.show( resultTree, e.getX(), e.getY());
 				}
 			}
 		} );
@@ -160,7 +161,7 @@ public class ResultTree extends JPanel {
 	}
 	
 	private void expand( TreePath path ) {
-		view.expandPath( path );
+		resultTree.expandPath( path );
 		TreeNode node = ( TreeNode )path.getLastPathComponent();
 		for( Enumeration< ? > e = node.children(); e.hasMoreElements(); ) {
 			expand( path.pathByAddingChild( e.nextElement() ) );
@@ -168,7 +169,7 @@ public class ResultTree extends JPanel {
 	}
 	
 	public void clear() {
-		( ( DefaultTreeModel )view.getModel() ).setRoot( null );
+		( ( DefaultTreeModel )resultTree.getModel() ).setRoot( null );
 	}
 	
 	public void addResult( long size, int eng, Vector< SmartFile > items ) {
@@ -181,16 +182,16 @@ public class ResultTree extends JPanel {
 	
 	private void addNode( DefaultMutableTreeNode node ) {
 		getRoot().add( node );
-		DefaultTreeModel model = (DefaultTreeModel) view.getModel();
+		DefaultTreeModel model = (DefaultTreeModel) resultTree.getModel();
 		model.reload();
 		expandAll();
-		view.scrollPathToVisible( new TreePath( node.getPath() ) );
+		resultTree.scrollPathToVisible( new TreePath( node.getPath() ) );
 		
 		progressBar.setValue( progressBar.getValue() + node.getChildCount() );
 	}
 	
 	private DefaultMutableTreeNode getRoot() {
-		DefaultTreeModel model = ( DefaultTreeModel )view.getModel();
+		DefaultTreeModel model = ( DefaultTreeModel )resultTree.getModel();
 		DefaultMutableTreeNode root = ( DefaultMutableTreeNode )model.getRoot();
 		if( root == null ) {
 			root = new DefaultMutableTreeNode( "Results" );

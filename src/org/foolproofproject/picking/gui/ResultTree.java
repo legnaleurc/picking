@@ -35,6 +35,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -92,6 +93,11 @@ public class ResultTree extends JPanel {
 		resultTree.setRootVisible( false );
 		JScrollPane scroll = new JScrollPane( resultTree );
 		tabs.addTab( "Result", scroll );
+		
+		// setup overflow list
+		JList overflowList = new JList();
+		scroll = new JScrollPane( overflowList );
+		tabs.addTab( "Overflow", scroll );
 		
 		progressBar = new JProgressBar();
 		add( progressBar );

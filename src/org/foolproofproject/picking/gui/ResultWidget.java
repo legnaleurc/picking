@@ -1,5 +1,5 @@
 /**
- * @file ResultTree.java
+ * @file ResultWidget.java
  * @author Wei-Cheng Pan
  * 
  * PicKing, a file picker.

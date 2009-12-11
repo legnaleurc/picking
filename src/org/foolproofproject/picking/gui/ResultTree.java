@@ -40,6 +40,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -78,12 +79,18 @@ public class ResultTree extends JPanel {
 	}
 	
 	public ResultTree() {
+		// setup layout
+		setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
+		setBorder( BorderFactory.createTitledBorder( "Result" ) );
+		
+		// setup tabs
+		JTabbedPane tabs = new JTabbedPane();
+		add( tabs );
+		
 		view = new JTree();
 		view.setRootVisible( false );
 		JScrollPane scroll = new JScrollPane( view );
-		setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
-		setBorder( BorderFactory.createTitledBorder( "Result" ) );
-		add( scroll );
+		tabs.addTab( "Result", scroll );
 		
 		progressBar = new JProgressBar();
 		add( progressBar );

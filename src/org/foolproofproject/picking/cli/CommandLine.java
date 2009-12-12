@@ -78,11 +78,11 @@ public class CommandLine {
 		
 		while( !p.noItem() ) {
 			Performer.Result pair = p.once();
-			System.out.println( UnitUtility.toString( pair.getSize(), eng ) + ":" );
-			for( SmartFile item : pair.getItems() ) {
+			System.out.println( UnitUtility.toString( pair.getValue(), eng ) + ":" );
+			for( SmartFile item : pair.getFiles() ) {
 				System.out.println( "\t" + item );
 			}
-			p.remove( pair.getItems() );
+			p.remove( pair.getFiles() );
 		}
 		
 		if( !p.noOverflow() ) {

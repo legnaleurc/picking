@@ -1,7 +1,4 @@
 /**
- * @file Performer.java
- * @author Wei-Cheng Pan
- * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -26,70 +23,74 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.util.Map.Entry;
-
 import org.foolproofproject.Pack;
 
 /**
- * @brief Algorithm performer.
+ * Algorithm performer.
+ * 
+ * @author Wei-Cheng Pan
  */
 public class Performer {
 	
 	/**
-	 * @brief Store picking result.
+	 * Store picking result.
+	 * 
+	 * @author Wei-Cheng Pan
 	 */
 	public class Result {
-		private long size;
-		private Vector< SmartFile > items;
-		private Result( long size, Vector< SmartFile > files ) {
-			this.size = size;
+		private long value_;
+		private Vector< SmartFile > files_;
+		private Result( long value, Vector< SmartFile > files ) {
+			this.value_ = value;
 			Collections.sort( files );
-			this.items = files;
+			this.files_ = files;
 		}
-		public long getSize() {
-			return size;
+		public long getValue() {
+			return this.value_;
 		}
-		public Vector< SmartFile > getItems() {
-			return items;
+		public Vector< SmartFile > getFiles() {
+			return this.files_;
 		}
 	}
 	
-	private final long limit;
-	private long size;
-	private Hashtable< SmartFile, Long > items, table;
-	private Vector< SmartFile > overflow;
+	private final long limit_;
+	private long value_;
+	private Hashtable< SmartFile, Long > table_;
+	private Vector< SmartFile > overflow_, items_;
 	
 	/**
-	 * @brief Constructor.
+	 * Constructor.
+	 * 
 	 * @param limit combination maximum size
 	 * @param files all files
 	 */
 	public Performer( long limit, File[] files ) {
-		this.limit = limit;
-		size = 0L;
-		items = new Hashtable< SmartFile, Long >();
-		table = new Hashtable< SmartFile, Long >();
-		overflow = new Vector< SmartFile >();
+		this.limit_ = limit;
+		this.value_ = 0L;
+		this.items_ = new Vector< SmartFile >();
+		this.table_ = new Hashtable< SmartFile, Long >();
+		this.overflow_ = new Vector< SmartFile >();
 		
 		for( File f : files ) {
 			SmartFile file = SmartFile.fromFile( f );
-			put( file, file.getTotalSize() );
+			this.put_( file, file.getTotalSize() );
 		}
 	}
 	
 	/**
-	 * @brief Pick once.
-	 * @return Result
+	 * Pick once.
+	 * 
+	 * @return Result.
 	 */
 	public Result once() {
-		if( size < limit ) {	// need not to pick, directly return result
-			return new Result( size, new Vector< SmartFile >( items.keySet() ) );
+		if( this.value_ < this.limit_ ) {	// no need to pick, directly return result
+			return new Result( this.value_, this.items_ );
 		}
 		Hashtable< Object, Long > tmpTable = new Hashtable< Object, Long >();
-		for( Entry< SmartFile, Long > e : items.entrySet() ) {
-			tmpTable.put( e.getKey(), e.getValue() );
+		for( SmartFile item : this.items_ ) {
+			tmpTable.put( item, this.table_.get( item ) );
 		}
-		Pack r = Pack.pick( limit, tmpTable );
+		Pack r = Pack.pick( this.limit_, tmpTable );
 		Vector< SmartFile > tmp = new Vector< SmartFile >();
 		for( Object o : r.getItems() ) {
 			tmp.add( ( SmartFile )o );
@@ -98,37 +99,38 @@ public class Performer {
 	}
 	
 	/**
-	 * @brief Remove items by given keys.
+	 * Remove items by given keys.
+	 * 
 	 * @param keys item keys
 	 */
 	public void remove( Vector< SmartFile > keys ) {
+		this.items_.removeAll( keys );
 		for( SmartFile key : keys ) {
-			size -= items.get( key );
-			items.remove( key );
+			this.value_ -= this.table_.get( key );
 		}
 	}
 	
 	public Hashtable< SmartFile, Long > getTable() {
-		return table;
+		return this.table_;
 	}
 	public boolean noItem() {
-		return items.isEmpty();
+		return this.items_.isEmpty();
 	}
 	public boolean noOverflow() {
-		return overflow.isEmpty();
+		return this.overflow_.isEmpty();
 	}
 	public Vector< SmartFile > getOverflow() {
-		return overflow;
+		return this.overflow_;
 	}
 	
-	private void put( SmartFile key, Long value ) {
-		if( value < limit ) {
-			size += value;
-			items.put( key, value );
+	private void put_( SmartFile key, long value ) {
+		if( value < this.limit_ ) {
+			this.value_ += value;
+			this.items_.add( key );
 		} else {
-			overflow.add( key );
+			this.overflow_.add( key );
 		}
-		table.put( key, value );
+		this.table_.put( key, value );
 	}
 
 }

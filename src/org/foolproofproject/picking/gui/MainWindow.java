@@ -332,8 +332,8 @@ public class MainWindow extends JFrame {
 		
 		while( !p.noItem() ) {
 			Performer.Result r = p.once();
-			this.result_.addResult( r.getSize(), this.unit_.getSelectedIndex(), r.getItems() );
-			p.remove( r.getItems() );
+			this.result_.addResult( r.getValue(), this.unit_.getSelectedIndex(), r.getFiles() );
+			p.remove( r.getFiles() );
 		}
 		
 		this.result_.closeProgress();

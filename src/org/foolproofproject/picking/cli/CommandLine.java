@@ -1,7 +1,4 @@
 /**
- * @file CommandLine.java
- * @author Wei-Cheng Pan
- * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -31,41 +28,49 @@ import org.foolproofproject.picking.SmartFile;
 import org.foolproofproject.picking.UnitUtility;
 
 /**
- * @brief Command line utility.
+ * Command line utility.
+ * 
+ * @author Wei-Cheng Pan
  */
 public class CommandLine {
 	
 	private static final Pattern pattern = Pattern.compile( "(\\d+)((K|M|G)?B?)" );
 	
 	/**
-	 * @brief Parse command line arguments.
+	 * Parse command line arguments.
+	 * 
 	 * @param args arguments
 	 */
 	public static void parse( String[] args ) {
+		if( args.length < 1 || args.length > 2 ) {
+			CommandLine.printUsage();
+			return;
+		}
 		Matcher m = pattern.matcher( args[0].toUpperCase() );
 		if( !m.matches() ) {
-			System.out.println( "Usage." );
-		} else {
-			long limit = Long.parseLong( m.group( 1 ) );
-			String unit = m.group( 2 );
-			int eng = 0;
-			if( unit.startsWith( "G" ) ) {
-				eng = 3;
-			} else if( unit.startsWith( "M" ) ) {
-				eng = 2;
-			} else if( unit.startsWith( "K" ) ) {
-				eng = 1;
-			} else {
-				;
-			}
-			
-			File path = new File( ( args.length < 2 ) ? "." : args[1] );
-			if( !path.isDirectory() ) {
-				path = new File( "." );
-			}
-			
-			perform( path.listFiles(), UnitUtility.extract( limit, eng ), eng );
+			CommandLine.printUsage();
+			return;
 		}
+		
+		long limit = Long.parseLong( m.group( 1 ) );
+		String unit = m.group( 2 );
+		int eng = 0;
+		if( unit.startsWith( "G" ) ) {
+			eng = 3;
+		} else if( unit.startsWith( "M" ) ) {
+			eng = 2;
+		} else if( unit.startsWith( "K" ) ) {
+			eng = 1;
+		} else {
+			;
+		}
+
+		File path = new File( ( args.length < 2 ) ? "." : args[1] );
+		if( !path.isDirectory() ) {
+			path = new File( "." );
+		}
+
+		CommandLine.perform( path.listFiles(), UnitUtility.extract( limit, eng ), eng );	
 	}
 	
 	private static void perform( File[] files, long limit, int eng ) {
@@ -86,6 +91,10 @@ public class CommandLine {
 				System.out.println( "\t" + item );
 			}
 		}
+	}
+	
+	private static void printUsage() {
+		System.out.println( "Usage: <limit[(K|M|G)[B]]> <directory>" );
 	}
 
 }

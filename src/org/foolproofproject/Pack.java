@@ -297,9 +297,9 @@ public class Pack {
 	 */
 	public static Pack pick( Long limit, Hashtable< Object, Long > items ) {
 		if( items.size() < 16 ) {
-			return pickSmall( limit, items );
+			return Pack.pickSmall( limit, items );
 		} else {
-			return pickLarge( limit, items );
+			return Pack.pickLarge( limit, items );
 		}
 	}
 	

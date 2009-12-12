@@ -272,6 +272,7 @@ class ResultWidget extends JPanel {
 	}
 	
 	public void openProgress( Hashtable< SmartFile, Long > table ) {
+		this.clear();
 		this.table_ = table;
 		this.progressBar_.setMaximum( table.size() );
 		this.progressBar_.setValue( 0 );

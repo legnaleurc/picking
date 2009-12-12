@@ -1,7 +1,4 @@
 /**
- * @file MainWindow.java
- * @author Wei-Cheng Pan
- * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -58,38 +55,41 @@ import org.foolproofproject.picking.SmartFile;
 import org.foolproofproject.picking.UnitUtility;
 
 /**
- * @brief Main window.
+ * Main window.
+ * 
+ * @author Wei-Cheng Pan
  */
 public class MainWindow extends JFrame {
 	
 	private static final long serialVersionUID = 6869079478547863579L;
-	private FileList list;
-	private NaturalField size;
-	private ResultWidget result;
-	private JComboBox unit;
-	private JDialog about;
-	private Preference preference;
-	private DirectoryTree tree;
-	private JCheckBox hidden;
+	private FileList list_;
+	private NaturalField limit_;
+	private ResultWidget result_;
+	private JComboBox unit_;
+	private JDialog about_;
+	private Preference preference_;
+	private DirectoryTree tree_;
+	private JCheckBox hidden_;
 	
 	public MainWindow( String title ) {
 		super( title );
 		
-		setDefaultCloseOperation( EXIT_ON_CLOSE );
-		setSize( 800, 600 );
-		setLocationRelativeTo( null );
+		this.setDefaultCloseOperation( EXIT_ON_CLOSE );
+		this.setSize( 800, 600 );
+		this.setLocationRelativeTo( null );
 		
-		Container pane = getContentPane();
+		Container pane = this.getContentPane();
 		pane.setLayout( new BoxLayout( pane, BoxLayout.Y_AXIS ) );
 		
-		initViewPort();
-		initControlPanel();
-		initPreference();
-		initAbout();
+		this.initViewPort_();
+		this.initControlPanel_();
+		this.initPreference_();
+		this.initAbout_();
 		
-		initMenuBar();
+		this.initMenuBar_();
 		
 		this.addWindowListener( new WindowAdapter() {
+			@Override
 			public void windowClosing( WindowEvent e ) {
 				try {
 					Configuration.sync();
@@ -100,17 +100,17 @@ public class MainWindow extends JFrame {
 		} );
 	}
 	
-	private void initPreference() {
-		preference = new Preference( this );
+	private void initPreference_() {
+		this.preference_ = new Preference( this );
 	}
 	
-	private void initAbout() {
-		about = new JDialog( this );
-		about.setTitle( "About PacKing" );
-		about.setSize( 320, 240 );
-		about.setLocationRelativeTo( this );
+	private void initAbout_() {
+		this.about_ = new JDialog( this );
+		this.about_.setTitle( "About PacKing" );
+		this.about_.setSize( 320, 240 );
+		this.about_.setLocationRelativeTo( this );
 		
-		Container pane = about.getContentPane();
+		Container pane = this.about_.getContentPane();
 		pane.setLayout( new BoxLayout( pane, BoxLayout.Y_AXIS ) );
 		
 		JPanel center = new JPanel();
@@ -131,28 +131,29 @@ public class MainWindow extends JFrame {
 		JButton ok = new JButton( "OK" );
 		bottom.add( ok );
 		ok.addMouseListener( new MouseAdapter() {
+			@Override
 			public void mouseClicked( MouseEvent e ) {
-				about.setVisible( false );
+				MainWindow.this.about_.setVisible( false );
 			}
 		} );
 	}
 	
-	private void initMenuBar() {
+	private void initMenuBar_() {
 		JMenuBar menuBar = new JMenuBar();
-		setJMenuBar( menuBar );
+		this.setJMenuBar( menuBar );
 		
 		JMenu file = new JMenu( "File" );
 		menuBar.add( file );
 		file.setMnemonic( KeyEvent.VK_F );
 		
-		JMenuItem save_ = new JMenuItem( "Save Result" );
-		file.add( save_ );
-		save_.setMnemonic( KeyEvent.VK_S );
-		save_.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK ) );
-		save_.addActionListener( new ActionListener() {
+		JMenuItem save = new JMenuItem( "Save Result" );
+		file.add( save );
+		save.setMnemonic( KeyEvent.VK_S );
+		save.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK ) );
+		save.addActionListener( new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				save();
+				MainWindow.this.save();
 			}
 		} );
 		
@@ -165,7 +166,7 @@ public class MainWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				File file = FileDialog.getExistingDirectory( (Component)e.getSource() );
 				if( file != null ) {
-					result.exportK3BProjectsTo( file );
+					MainWindow.this.result_.exportK3BProjectsTo( file );
 				}
 			}
 		} );
@@ -181,7 +182,7 @@ public class MainWindow extends JFrame {
 		refresh.addActionListener( new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				tree.refresh();
+				MainWindow.this.tree_.refresh();
 			}
 		} );
 		
@@ -191,7 +192,7 @@ public class MainWindow extends JFrame {
 		preferences.addActionListener( new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				preference.exec( size.toLong(), unit.getSelectedIndex(), hidden.isSelected() );
+				MainWindow.this.preference_.exec( MainWindow.this.limit_.toLong(), MainWindow.this.unit_.getSelectedIndex(), MainWindow.this.hidden_.isSelected() );
 			}
 		} );
 		
@@ -219,38 +220,38 @@ public class MainWindow extends JFrame {
 			}
 		} );
 		
-		JMenuItem about_ = new JMenuItem( "About ..." );
-		help.add( about_ );
-		about_.setMnemonic( KeyEvent.VK_A );
-		about_.addActionListener( new ActionListener() {
+		JMenuItem about = new JMenuItem( "About ..." );
+		help.add( about );
+		about.setMnemonic( KeyEvent.VK_A );
+		about.addActionListener( new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				about.setVisible( true );
+				MainWindow.this.about_.setVisible( true );
 			}
 		} );
 	}
 
-	private void initViewPort() {
+	private void initViewPort_() {
 		JPanel central = new JPanel();
 		central.setLayout( new GridLayout( 1, 3 ) );
 		central.setMaximumSize( new Dimension( Integer.MAX_VALUE, Integer.MAX_VALUE ) );
 		
-		tree = new DirectoryTree();
-		central.add( tree );
+		this.tree_ = new DirectoryTree();
+		central.add( this.tree_ );
 		
-		list = new FileList( tree );
-		central.add( list );
+		this.list_ = new FileList( tree_ );
+		central.add( this.list_ );
 		
-		result = new ResultWidget();
-		central.add( result );
+		this.result_ = new ResultWidget();
+		central.add( this.result_ );
 		
-		Container pane = getContentPane();
+		Container pane = this.getContentPane();
 		pane.add( central );
 		
-		tree.open( new SmartFile( System.getProperty( "user.home" ) ) );
+		this.tree_.open( new SmartFile( System.getProperty( "user.home" ) ) );
 	}
 	
-	private void initControlPanel() {
+	private void initControlPanel_() {
 		JPanel panel = new JPanel();
 		panel.setLayout( new GridLayout( 1, 3 ) );
 		
@@ -259,24 +260,24 @@ public class MainWindow extends JFrame {
 		limitPanel.setLayout( new GridLayout( 1, 2 ) );
 		limitPanel.setBorder( BorderFactory.createTitledBorder( "Limit" ) );
 		
-		size = new NaturalField();
-		limitPanel.add( size );
+		this.limit_ = new NaturalField();
+		limitPanel.add( this.limit_ );
 		
-		unit = UnitUtility.createComboBox();
-		limitPanel.add( unit );
+		this.unit_ = UnitUtility.createComboBox();
+		limitPanel.add( this.unit_ );
 		
 		JPanel viewPanel = new JPanel();
 		panel.add( viewPanel );
 		viewPanel.setLayout( new GridLayout( 1, 1 ) );
 		viewPanel.setBorder( BorderFactory.createTitledBorder( "View" ) );
 		
-		hidden = new JCheckBox( "Hidden" );
-		viewPanel.add( hidden );
-		hidden.addActionListener( new ActionListener() {
+		this.hidden_ = new JCheckBox( "Hidden" );
+		viewPanel.add( this.hidden_ );
+		this.hidden_.addActionListener( new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				tree.setHiddenVisible( hidden.isSelected() );
-				tree.refresh();
+				MainWindow.this.tree_.setHiddenVisible( MainWindow.this.hidden_.isSelected() );
+				MainWindow.this.tree_.refresh();
 			}
 		} );
 		
@@ -293,16 +294,16 @@ public class MainWindow extends JFrame {
 			}
 		} );
 		
-		Container pane = getContentPane();
+		Container pane = this.getContentPane();
 		pane.add( panel );
 		
-		read();
+		this.read();
 	}
 	
 	public void read() {
-		size.setLong( (Long) Configuration.get( "limit" ) );
-		unit.setSelectedIndex( (Integer) Configuration.get( "unit" ) );
-		hidden.setSelected( (Boolean) Configuration.get( "hidden" ) );
+		this.limit_.setLong( (Long) Configuration.get( "limit" ) );
+		this.unit_.setSelectedIndex( (Integer) Configuration.get( "unit" ) );
+		this.hidden_.setSelected( (Boolean) Configuration.get( "hidden" ) );
 	}
 	
 	public void save() {
@@ -310,7 +311,7 @@ public class MainWindow extends JFrame {
 		if( file != null ) {
 			try {
 				PrintStream fout = new PrintStream( file, "UTF-8" );
-				result.save( fout );
+				this.result_.save( fout );
 				fout.close();
 			} catch (FileNotFoundException e) {
 				LogDialog.getErrorLog().log( e.getMessage() );
@@ -321,23 +322,21 @@ public class MainWindow extends JFrame {
 	}
 	
 	public void perform() {
-		result.clear();
+		Performer p = new Performer( UnitUtility.extract( this.limit_.toLong(), this.unit_.getSelectedIndex() ), this.list_.getSelectedFiles() );
 		
-		Performer p = new Performer( UnitUtility.extract( size.toLong(), unit.getSelectedIndex() ), list.getSelectedFiles() );
+		this.result_.openProgress( p.getTable() );
 		
-		result.openProgress( p.getTable() );
+		if( !p.noOverflow() ) {
+			this.result_.addOverflow( p.getOverflow() );
+		}
 		
 		while( !p.noItem() ) {
 			Performer.Result r = p.once();
-			result.addResult( r.getSize(), unit.getSelectedIndex(), r.getItems() );
+			this.result_.addResult( r.getSize(), this.unit_.getSelectedIndex(), r.getItems() );
 			p.remove( r.getItems() );
 		}
 		
-		if( !p.noOverflow() ) {
-			result.addOverflow( p.getOverflow() );
-		}
-		
-		result.closeProgress();
+		this.result_.closeProgress();
 	}
 
 }

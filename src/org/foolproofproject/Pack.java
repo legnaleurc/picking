@@ -1,7 +1,4 @@
 /**
- * @file Pack.java
- * @author Wei-Cheng Pan
- * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -28,122 +25,172 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 /**
- * @brief Storing picking result.
+ * <p>Calculates the maximum combination of given objects table.</p>
+ * <p>To do this you should collect objects and their values, and store them
+ * to a <code>Hashtable&lt;Object,Long&gt;</code> as a table. Then decide a
+ * maximum value of combinations of objects.</p>
+ * <p>Simply use {@link #pick} to perform algorithm.</p>
+ * <p>If the amount of items is less then 16, then it will use brute force to
+ * find an optimal solution. Or it will use heuristic algorithm to do it.</p>
  * 
- * This class calculates the maximum combination of given objects table.<br/>
- * To do this you should collect objects and their values, and store them to a
- * <strong>Hashtable&lt;Object,Long&gt;</strong> as a table. Then decide a
- * maximum value of combinations of objects.<br/>
- * Simply use pick() to perform algorithm.<br/>
- * If the amount of items is less then 16, then it will use brute force to
- * find an optimal solution. Or it will use heuristic algorithm to do it.<br/>
+ * @author Wei-Cheng Pan
  */
 public class Pack {
 
-	private long size;
-	private Vector< Object > items;
+	private long value_;
+	private Vector< Object > items_;
 	
 	/**
-	 * @brief Default constructor.
-	 * 
-	 * Will initialize size to 0, items as an empty Vector.
+	 * Default constructor.
+	 * Will initialize value to 0, items as an empty Vector.
 	 */
 	private Pack() {
-		size = 0L;
-		items = new Vector< Object >();
+		this.value_ = 0L;
+		this.items_ = new Vector< Object >();
 	}
 	/**
-	 * @brief Constructor.
-	 * @param size total value of @p items
+	 * Constructor.
+	 * 
+	 * @param value total value of items
 	 * @param items selected objects
 	 */
-	private Pack( long size, Vector< Object > items ) {
-		this.size = size;
-		this.items = items;
+	private Pack( long value, Vector< Object > items ) {
+		this.value_ = value;
+		this.items_ = items;
 	}
+	@Override
 	public String toString() {
-		return "("+size+":"+items+")";
+		return "(" + this.value_ + ":" + this.items_ + ")";
 	}
-	public long getSize() {
-		return size;
+	/**
+	 * Get value.
+	 * 
+	 * @return Total value of items.
+	 */
+	public long getValue() {
+		return this.value_;
 	}
+	/**
+	 * Get items list.
+	 * 
+	 * @return Items list.
+	 */
 	public Vector< Object > getItems() {
-		return items;
+		return this.items_;
 	}
 	
 	/**
-	 * @brief Genetic algorithm.
+	 * Genetic algorithm.
+	 * For internal usage only.
 	 */
 	private static class GeneticAlgorithm {
 		
 		/**
-		 * @brief One cell
+		 * A cell which represents a possible combination.
 		 */
-		private class Cell implements Comparable< Cell > {
+		private static class Cell implements Comparable< Cell > {
 			
-			private Hashtable< Object, Boolean > table;
-			private Long size;
+			/// Table of item selection.
+			private Hashtable< Object, Boolean > table_;
+			/// Total value
+			private Long value_;
 			
-			public Cell( Hashtable< Object, Boolean > table, Long size ) {
-				this.table = table;
-				this.size = size;
+			/**
+			 * Constructor.
+			 * 
+			 * @param table Item selection table
+			 * @param value Total value
+			 */
+			public Cell( Hashtable< Object, Boolean > table, Long value ) {
+				this.table_ = table;
+				this.value_ = value;
 			}
-			public Cell( Cell cell ) {
-				this.table = new Hashtable< Object, Boolean >( cell.table );
-				this.size = new Long( cell.size );
+			/**
+			 * Copy constructor.
+			 * 
+			 * @param that Copy source
+			 */
+			public Cell( Cell that ) {
+				this.table_ = new Hashtable< Object, Boolean >( that.table_ );
+				this.value_ = that.value_;
 			}
+			/**
+			 * Check if can toggle.
+			 * 
+			 * @param key Toggle target
+			 * @param value Value of target
+			 * @param limit Maximum limit
+			 * @return true if can toggle.
+			 */
 			public boolean canToggle( Object key, Long value, Long limit ) {
-				return ( table.get( key ) || size + value < limit );
+				return ( this.table_.get( key ) || this.value_ + value < limit );
 			}
+			/**
+			 * Toggle item selection.
+			 * 
+			 * @param key Toggle target
+			 * @param value Value of target
+			 */
 			public void toggle( Object key, Long value ) {
-				boolean tmp = table.get( key );
-				table.put( key, !tmp );
+				boolean tmp = this.table_.get( key );
+				this.table_.put( key, !tmp );
 				if( tmp ) {
-					size -= value;
+					this.value_ -= value;
 				} else {
-					size += value;
+					this.value_ += value;
 				}
 			}
+			/**
+			 * Get item selection table.
+			 * 
+			 * @return Selection table.
+			 */
 			public Hashtable< Object, Boolean > getTable() {
-				return table;
+				return this.table_;
 			}
-			public Long getSize() {
-				return size;
-			}
-			public String toString() {
-				return String.format( "(%d,%s)", size, table.keySet() );
+			/**
+			 * Get total value.
+			 * 
+			 * @return Total value.
+			 */
+			public Long getValue() {
+				return this.value_;
 			}
 			@Override
-			public int compareTo(Cell rhs) {
-				return rhs.size.compareTo( size );
+			public String toString() {
+				return String.format( "(%d,%s)", this.value_, this.table_.keySet() );
+			}
+			@Override
+			public int compareTo( Cell rhs ) {
+				return rhs.value_.compareTo( this.value_ );
 			}
 		}
 		
-		private Long limit;
-		private Hashtable< Object, Long > items;
-		private Vector< Cell > population;
+		private Long limit_;
+		private Hashtable< Object, Long > table_;
+		private Vector< Cell > population_;
 		
 		public GeneticAlgorithm( Long limit, Hashtable< Object, Long > items ) {
-			this.limit = limit;
-			this.items = items;
+			this.limit_ = limit;
+			this.table_ = items;
 			
-			population = new Vector< Cell >();
+			this.population_ = new Vector< Cell >();
 			for( int i = 0; i < items.size(); ++i ) {
-				population.add( generatePopulation() );
+				this.population_.add( this.generatePopulation() );
 			}
-			Collections.sort( population );
+			Collections.sort( this.population_ );
 		}
 		
 		public Pack perform() {
-			while( !canStop() ) {
-				crossOver();
-				mutation();
-				Collections.sort( population );
-				population.subList( items.size(), population.size() ).clear();
+			while( !this.canStop() ) {
+				this.crossOver();
+				this.mutation();
+				Collections.sort( this.population_ );
+				this.population_.subList( this.table_.size(), this.population_.size() ).clear();
 			}
 			
-			Cell survivor = population.get( 0 );
-			Pack result = new Pack( survivor.getSize(), new Vector< Object >() );
+			Cell survivor = this.population_.get( 0 );
+			Pack result = new Pack( survivor.getValue(), new Vector< Object >() );
 			for( Entry< Object, Boolean > e : survivor.getTable().entrySet() ) {
 				if( e.getValue() ) {
 					result.getItems().add( e.getKey() );
@@ -155,8 +202,8 @@ public class Pack {
 		private Cell generatePopulation() {
 			Hashtable< Object, Boolean > cell = new Hashtable< Object, Boolean >();
 			Long sum = 0L;
-			for( Entry< Object, Long > e : items.entrySet() ) {
-				if( e.getValue() + sum >= limit || Math.random() * 2 < 1.0 ) {
+			for( Entry< Object, Long > e : this.table_.entrySet() ) {
+				if( e.getValue() + sum >= this.limit_ || Math.random() * 2 < 1.0 ) {
 					cell.put( e.getKey(), false );
 				} else {
 					cell.put( e.getKey(), true );
@@ -168,7 +215,7 @@ public class Pack {
 		
 		/**
 		 * Select parent index.
-		 * 
+		 * <pre>
 		 * N := total size
 		 * 
 		 * Plain:
@@ -184,9 +231,10 @@ public class Pack {
 		 * b = 2N-1
 		 * d = b^2 - 4CN(N-1)
 		 * i = (b-d^0.5)/2
+		 * </pre>
 		 */
 		private int selectParent() {
-			int n = items.size();
+			int n = this.table_.size();
 			int b = 2 * n - 1;
 			double c = Math.random();
 			double d = ( b * b - 1 ) * ( 1 - c ) + 1;
@@ -195,21 +243,21 @@ public class Pack {
 		}
 		
 		private Boolean canStop() {
-			Cell head = population.firstElement();
-			Cell tail = population.lastElement();
-			return head.getSize().equals( tail.getSize() );
+			Cell head = this.population_.firstElement();
+			Cell tail = this.population_.lastElement();
+			return head.getValue().equals( tail.getValue() );
 		}
 		
 		private void crossOver() {
-			final int length = population.size();
+			final int length = this.population_.size();
 			for( int i = 0; i < length; ++i ) {
-				Cell new1 = new Cell( population.get( i ) );
-				Cell new2 = new Cell( population.get( selectParent() ) );
-				for( Entry< Object, Long > e : items.entrySet() ) {
+				Cell new1 = new Cell( this.population_.get( i ) );
+				Cell new2 = new Cell( this.population_.get( selectParent() ) );
+				for( Entry< Object, Long > e : this.table_.entrySet() ) {
 					if( new1.getTable().get( e.getKey() ) == new2.getTable().get( e.getKey() ) ) {
 						continue;
 					}
-					if( !new1.canToggle( e.getKey(), e.getValue(), limit ) || !new2.canToggle( e.getKey(), e.getValue(), limit ) ) {
+					if( !new1.canToggle( e.getKey(), e.getValue(), this.limit_ ) || !new2.canToggle( e.getKey(), e.getValue(), this.limit_ ) ) {
 						continue;
 					}
 					if( Math.random() < 0.5 ) {
@@ -217,17 +265,17 @@ public class Pack {
 						new2.toggle( e.getKey(), e.getValue() );
 					}
 				}
-				population.add( new1 );
-				population.add( new2 );
+				this.population_.add( new1 );
+				this.population_.add( new2 );
 			}
 		}
 		
 		private void mutation() {
-			final int length = population.size();
+			final int length = this.population_.size();
 			for( int i = 0; i < length; ++i ) {
-				Cell cell = population.get( i );
-				for( Entry< Object, Long > e : items.entrySet() ) {
-					if( cell.canToggle( e.getKey(), e.getValue(), limit) && Math.random() * items.size() < 1.0 ) {
+				Cell cell = this.population_.get( i );
+				for( Entry< Object, Long > e : table_.entrySet() ) {
+					if( cell.canToggle( e.getKey(), e.getValue(), this.limit_) && Math.random() * this.table_.size() < 1.0 ) {
 						cell.toggle( e.getKey(), e.getValue() );
 					}
 				}
@@ -237,13 +285,13 @@ public class Pack {
 	}
 	
 	/**
-	 * @brief Main pick function.
+	 * Main pick function.
+	 * If table size is greater then or equal to 16, it will use heuristic
+	 * algorithm.
+	 * 
 	 * @param limit maximum value of combinations
 	 * @param items object value table
 	 * @return solution
-	 * 
-	 * If table size is greater then or equal to 16, it will use heuristic
-	 * algorithm.
 	 */
 	public static Pack pick( Long limit, Hashtable< Object, Long > items ) {
 		if( items.size() < 16 ) {
@@ -254,7 +302,9 @@ public class Pack {
 	}
 	
 	/**
-	 * @brief Back-end to pick using brute force.
+	 * Back-end to pick using brute force.
+	 * The complexity is O(2^n).
+	 * 
 	 * @param limit maximum value of combinations
 	 * @param items object value table
 	 * @return solution
@@ -265,7 +315,8 @@ public class Pack {
 	}
 	
 	/**
-	 * @brief Back-end to pick using heuristic algorithm.
+	 * Back-end to pick using heuristic algorithm.
+	 * 
 	 * @param limit maximum value of combinations
 	 * @param items object value table
 	 * @return solution
@@ -277,7 +328,7 @@ public class Pack {
 		for( Entry< Object, Long> e : items.entrySet() ) {
 			Vector< Pack > tmp = new Vector< Pack >();
 			for( Pack p : table ) {
-				Long newSize = p.getSize() + e.getValue();
+				Long newSize = p.getValue() + e.getValue();
 				if( newSize <= limit ) {
 					Vector< Object > newDirs = new Vector< Object >( p.getItems() );
 					newDirs.add( e.getKey() );
@@ -289,7 +340,7 @@ public class Pack {
 		
 		Pack max = new Pack();
 		for( Pack p : table ) {
-			if( p.getSize() >= max.getSize() ) {
+			if( p.getValue() >= max.getValue() ) {
 				max = p;
 			}
 		}

@@ -94,7 +94,7 @@ public class Performer {
 		for( Object o : r.getItems() ) {
 			tmp.add( ( SmartFile )o );
 		}
-		return new Result( r.getSize(), tmp );
+		return new Result( r.getValue(), tmp );
 	}
 	
 	/**

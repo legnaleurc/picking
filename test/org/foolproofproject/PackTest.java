@@ -46,7 +46,7 @@ public class PackTest {
 	public void testPick() {
 		long[] result = new long[10];
 		for( int i = 0; i < 10; ++i ) {
-			result[i] = Pack.pick( limit, table ).getSize();
+			result[i] = Pack.pick( limit, table ).getValue();
 		}
 		Arrays.sort( result );
 		for( int i = 0; i < 10; ++i ) {

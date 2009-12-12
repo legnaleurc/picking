@@ -1,7 +1,4 @@
 /**
- * @file ResultWidget.java
- * @author Wei-Cheng Pan
- * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -58,68 +55,72 @@ import org.foolproofproject.picking.SmartFile;
 import org.foolproofproject.picking.UnitUtility;
 
 /**
- * @brief Result widget.
+ * Result widget.
+ * 
+ * @author Wei-Cheng Pan
  */
-public class ResultWidget extends JPanel {
+class ResultWidget extends JPanel {
 
 	private static final long serialVersionUID = 3366458847085663811L; 
-	private JTree resultTree;
-	private Hashtable< SmartFile, Long > table;
-	private JPopupMenu popup;
-	private DefaultMutableTreeNode selectedNode;
-	private JProgressBar progressBar;
-	private JList overflowList;
+	private JTree resultTree_;
+	private Hashtable< SmartFile, Long > table_;
+	private JPopupMenu popup_;
+	private DefaultMutableTreeNode selectedNode_;
+	private JProgressBar progressBar_;
+	private JList overflowList_;
 	
 	private class LabelNode extends DefaultMutableTreeNode {
 		private static final long serialVersionUID = -3736698920372921805L;
-		private int pow;
+		private int pow_;
 		public LabelNode( Long size, int pow ) {
 			super( size );
-			this.pow = pow;
+			this.pow_ = pow;
 		}
+		@Override
 		public String toString() {
-			return UnitUtility.toString( (Long)getUserObject(), pow );
+			return UnitUtility.toString( (Long)this.getUserObject(), this.pow_ );
 		}
 	}
 	
 	public ResultWidget() {
 		// setup layout
-		setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
-		setBorder( BorderFactory.createTitledBorder( "Result" ) );
+		this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
+		this.setBorder( BorderFactory.createTitledBorder( "Result" ) );
 		
 		// setup tabs
 		JTabbedPane tabs = new JTabbedPane();
-		add( tabs );
+		this.add( tabs );
 		
 		// setup result tree
-		resultTree = new JTree();
-		resultTree.setRootVisible( false );
-		JScrollPane scroll = new JScrollPane( resultTree );
+		this.resultTree_ = new JTree();
+		this.resultTree_.setRootVisible( false );
+		JScrollPane scroll = new JScrollPane( this.resultTree_ );
 		tabs.addTab( "Result", scroll );
 		
 		// setup overflow list
-		overflowList = new JList( new DefaultListModel() );
-		scroll = new JScrollPane( overflowList );
+		this.overflowList_ = new JList( new DefaultListModel() );
+		scroll = new JScrollPane( this.overflowList_ );
 		tabs.addTab( "Overflow", scroll );
 		
-		progressBar = new JProgressBar();
-		add( progressBar );
-		progressBar.setVisible( false );
+		this.progressBar_ = new JProgressBar();
+		this.add( this.progressBar_ );
+		this.progressBar_.setVisible( false );
 		
-		selectedNode = null;
+		this.selectedNode_ = null;
 		
 		// setup pop up context menu
-		popup = new JPopupMenu();
+		this.popup_ = new JPopupMenu();
 		JMenuItem k3b = new JMenuItem( "Export to K3B project file" );
 		k3b.addActionListener( new ActionListener() {
+			@Override
 			public void actionPerformed( ActionEvent e ) {
-				if( selectedNode == null ) {
+				if( ResultWidget.this.selectedNode_ == null ) {
 					return;
 				}
-				File file = FileDialog.getSaveFileName( resultTree, new FileNameExtensionFilter( "K3B project", "k3b" ) );
+				File file = FileDialog.getSaveFileName( ResultWidget.this.resultTree_, new FileNameExtensionFilter( "K3B project", "k3b" ) );
 				if( file != null ) {
 					try {
-						K3BUtility.export( file, selectedNode );
+						K3BUtility.export( file, ResultWidget.this.selectedNode_ );
 					} catch (IOException e1) {
 						LogDialog.getErrorLog().log( e1.getMessage() );
 					} catch (XMLStreamException e1) {
@@ -128,32 +129,34 @@ public class ResultWidget extends JPanel {
 				}
 			}
 		} );
-		popup.add( k3b );
+		this.popup_.add( k3b );
 		
 		// setup tool tip
-		ToolTipManager.sharedInstance().registerComponent( resultTree );
-		resultTree.setCellRenderer( new DefaultTreeCellRenderer() {
+		ToolTipManager.sharedInstance().registerComponent( this.resultTree_ );
+		this.resultTree_.setCellRenderer( new DefaultTreeCellRenderer() {
 			private static final long serialVersionUID = 8169622028702532699L;
+			@Override
 			public Component getTreeCellRendererComponent( JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus ) {
-				super.getTreeCellRendererComponent( tree, value, selected, expanded, leaf, row, hasFocus );
-				if( table != null && leaf ) {
+				DefaultTreeCellRenderer self = (DefaultTreeCellRenderer) super.getTreeCellRendererComponent( tree, value, selected, expanded, leaf, row, hasFocus );
+				if( ResultWidget.this.table_ != null && leaf ) {
 					DefaultMutableTreeNode node = ( DefaultMutableTreeNode )value;
 					Object item = node.getUserObject();
-					if( item instanceof SmartFile && table.containsKey( item ) ) {
-						setToolTipText( UnitUtility.toString( table.get( item ) ) );
+					if( item instanceof SmartFile && ResultWidget.this.table_.containsKey( item ) ) {
+						self.setToolTipText( UnitUtility.toString( ResultWidget.this.table_.get( item ) ) );
 					}
 				}
-				return this;
+				return self;
 			}
 		} );
-		ToolTipManager.sharedInstance().registerComponent( overflowList );
-		overflowList.setCellRenderer( new DefaultListCellRenderer() {
+		ToolTipManager.sharedInstance().registerComponent( this.overflowList_ );
+		this.overflowList_.setCellRenderer( new DefaultListCellRenderer() {
 			private static final long serialVersionUID = -2642459895866586526L;
+			@Override
 			public Component getListCellRendererComponent( JList list, Object value, int index, boolean isSelected, boolean cellHasFocus ) {
 				super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus );
-				if( table != null ) {
-					if( value instanceof SmartFile && table.containsKey( value ) ) {
-						setToolTipText( UnitUtility.toString( table.get( value ) ) );
+				if( ResultWidget.this.table_ != null ) {
+					if( value instanceof SmartFile && ResultWidget.this.table_.containsKey( value ) ) {
+						this.setToolTipText( UnitUtility.toString( ResultWidget.this.table_.get( value ) ) );
 					}
 				}
 				return this;
@@ -161,62 +164,62 @@ public class ResultWidget extends JPanel {
 		} );
 		
 		// setup mouse listener
-		resultTree.addMouseListener( new MouseAdapter() {
+		this.resultTree_.addMouseListener( new MouseAdapter() {
 			public void mouseClicked( MouseEvent e ) {
 				if( e.getButton() != MouseEvent.BUTTON3 ) {
 					return;
 				}
-				TreePath tp = resultTree.getPathForLocation( e.getX(), e.getY() );
+				TreePath tp = ResultWidget.this.resultTree_.getPathForLocation( e.getX(), e.getY() );
 				if( tp != null && tp.getPathCount() == 2 ) {
-					selectedNode = ( DefaultMutableTreeNode )tp.getLastPathComponent();
-					popup.show( resultTree, e.getX(), e.getY());
+					ResultWidget.this.selectedNode_ = ( DefaultMutableTreeNode )tp.getLastPathComponent();
+					ResultWidget.this.popup_.show( ResultWidget.this.resultTree_, e.getX(), e.getY());
 				}
 			}
 		} );
 		
-		table = null;
-		clear();
+		this.table_ = null;
+		this.clear();
 	}
 	
-	public void expandAll() {
-		expand( new TreePath( getRoot() ) );
+	private void expandAll_() {
+		this.expand_( new TreePath( this.getRoot_() ) );
 	}
 	
-	private void expand( TreePath path ) {
-		resultTree.expandPath( path );
+	private void expand_( TreePath path ) {
+		this.resultTree_.expandPath( path );
 		TreeNode node = ( TreeNode )path.getLastPathComponent();
 		for( Enumeration< ? > e = node.children(); e.hasMoreElements(); ) {
-			expand( path.pathByAddingChild( e.nextElement() ) );
+			this.expand_( path.pathByAddingChild( e.nextElement() ) );
 		}
 	}
 	
 	public void clear() {
-		( ( DefaultTreeModel )resultTree.getModel() ).setRoot( null );
+		( ( DefaultTreeModel )this.resultTree_.getModel() ).setRoot( null );
 	}
 	
 	public void addResult( long size, int eng, Vector< SmartFile > items ) {
-		addNode( createNewNode( size, eng, items ) );
+		DefaultMutableTreeNode node = new LabelNode( size, eng );
+		for( SmartFile item : items ) {
+			node.add( new DefaultMutableTreeNode( item ) );
+		}
+		this.getRoot_().add( node );
+		DefaultTreeModel model = (DefaultTreeModel) this.resultTree_.getModel();
+		model.reload();
+		
+		this.progressBar_.setValue( this.progressBar_.getValue() + node.getChildCount() );
 	}
 	
 	public void addOverflow( Vector< SmartFile > overflow ) {
-		DefaultListModel model = (DefaultListModel) overflowList.getModel();
+		DefaultListModel model = (DefaultListModel) this.overflowList_.getModel();
 		for( SmartFile file : overflow ) {
 			model.addElement( file );
 		}
-	}
-	
-	private void addNode( DefaultMutableTreeNode node ) {
-		getRoot().add( node );
-		DefaultTreeModel model = (DefaultTreeModel) resultTree.getModel();
-		model.reload();
-		expandAll();
-		resultTree.scrollPathToVisible( new TreePath( node.getPath() ) );
 		
-		progressBar.setValue( progressBar.getValue() + node.getChildCount() );
+		this.progressBar_.setValue( this.progressBar_.getValue() + overflow.size() );
 	}
 	
-	private DefaultMutableTreeNode getRoot() {
-		DefaultTreeModel model = ( DefaultTreeModel )resultTree.getModel();
+	private DefaultMutableTreeNode getRoot_() {
+		DefaultTreeModel model = ( DefaultTreeModel )this.resultTree_.getModel();
 		DefaultMutableTreeNode root = ( DefaultMutableTreeNode )model.getRoot();
 		if( root == null ) {
 			root = new DefaultMutableTreeNode( "Results" );
@@ -225,21 +228,13 @@ public class ResultWidget extends JPanel {
 		return root;
 	}
 	
-	private DefaultMutableTreeNode createNewNode( long size, int eng, Vector<?> items ) {
-		DefaultMutableTreeNode newNode = new LabelNode( size, eng );
-		for( Object item : items ) {
-			newNode.add( new DefaultMutableTreeNode( item ) );
-		}
-		return newNode;
-	}
-	
 	public void save( PrintStream fout ) {
 		if( fout != null ) {
-			savePath( new TreePath( getRoot() ), 0, fout );
+			this.savePath_( new TreePath( this.getRoot_() ), 0, fout );
 		}
 	}
 	
-	private void savePath( TreePath path, int indent, PrintStream fout ) {
+	private void savePath_( TreePath path, int indent, PrintStream fout ) {
 		DefaultMutableTreeNode node = ( DefaultMutableTreeNode )path.getLastPathComponent();
 		StringBuilder sb = new StringBuilder();
 		for( int i = 0; i < indent; ++i ) {
@@ -248,14 +243,14 @@ public class ResultWidget extends JPanel {
 		sb.append( node );
 		fout.println( sb.toString() );
 		for( Enumeration< ? > e = node.children(); e.hasMoreElements(); ) {
-			savePath( path.pathByAddingChild( e.nextElement() ), indent + 1, fout );
+			this.savePath_( path.pathByAddingChild( e.nextElement() ), indent + 1, fout );
 		}
 	}
 	
 	public void exportK3BProjectsTo( File dout ) {
 		Long k3bBound = UnitUtility.extract( (Long)Configuration.get( "k3b_export_lower_bound" ), (Integer)Configuration.get( "k3b_export_bound_unit" ) );
 		Vector< DefaultMutableTreeNode > tmp = new Vector< DefaultMutableTreeNode >();
-		for( Enumeration< ? > e = getRoot().children(); e.hasMoreElements(); ) {
+		for( Enumeration< ? > e = this.getRoot_().children(); e.hasMoreElements(); ) {
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode)e.nextElement();
 			if( node instanceof LabelNode ) {
 				Long size = (Long)node.getUserObject();
@@ -277,17 +272,17 @@ public class ResultWidget extends JPanel {
 	}
 	
 	public void openProgress( Hashtable< SmartFile, Long > table ) {
-		this.table = table;
-		progressBar.setMaximum( table.size() );
-		progressBar.setValue( 0 );
-		progressBar.setVisible( true );
+		this.table_ = table;
+		this.progressBar_.setMaximum( table.size() );
+		this.progressBar_.setValue( 0 );
+		this.progressBar_.setVisible( true );
 	}
 	
 	public void closeProgress() {
-		progressBar.setVisible( false );
-		progressBar.setValue( 0 );
-		progressBar.setMaximum( 0 );
-		this.expandAll();
+		progressBar_.setVisible( false );
+		progressBar_.setValue( 0 );
+		progressBar_.setMaximum( 0 );
+		this.expandAll_();
 	}
 
 }

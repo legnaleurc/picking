@@ -29,9 +29,11 @@ import java.util.Map.Entry;
  * <p>To do this you should collect objects and their values, and store them
  * to a <code>Hashtable&lt;Object,Long&gt;</code> as a table. Then decide a
  * maximum value of combinations of objects.</p>
- * <p>Simply use {@link #pick} to perform algorithm.</p>
- * <p>If the amount of items is less then 16, then it will use brute force to
- * find an optimal solution. Or it will use heuristic algorithm to do it.</p>
+ * <p>Simply use {@link #pick(Long, Hashtable)} to perform algorithm.</p>
+ * <p>If the amount of items is less then 16, then it will use brute force
+ * (i.e. {@link #pickSmall(Long, Hashtable)}) to find an optimal solution. Or
+ * it will use heuristic algorithm (i.e. {@link #pickLarge(Long, Hashtable)})
+ * to do it.</p>
  * 
  * @author Wei-Cheng Pan
  */

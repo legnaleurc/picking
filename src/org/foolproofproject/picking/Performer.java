@@ -72,7 +72,7 @@ public class Performer {
 		overflow = new Vector< SmartFile >();
 		
 		for( File f : files ) {
-			SmartFile file = new SmartFile( f );
+			SmartFile file = SmartFile.fromFile( f );
 			put( file, file.getTotalSize() );
 		}
 	}

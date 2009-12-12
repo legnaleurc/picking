@@ -25,6 +25,7 @@ package org.foolproofproject.picking;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URI;
+import java.util.Arrays;
 
 /**
  * @brief File wrapper for file utility.
@@ -32,6 +33,10 @@ import java.net.URI;
 public class SmartFile extends File {
 
 	private static final long serialVersionUID = -498630998152519151L;
+	
+	public static SmartFile fromFile( File file ) {
+		return new SmartFile( file.getPath() );
+	}
 
 	public SmartFile(String pathname) {
 		super(pathname);
@@ -49,42 +54,40 @@ public class SmartFile extends File {
 		super(parent, child);
 	}
 	
-	public SmartFile( File file ) {
-		super( file.getPath() );
-	}
-	
 	/**
-	 * @brief Use getName() instead of getAbsolutePath().
+	 * Use getName() instead of getAbsolutePath().
 	 */
+	@Override
 	public String toString() {
 		return this.getName();
 	}
-	
+	@Override
 	public SmartFile[] listFiles() {
-		return listFiles( (FileFilter)null );
+		return this.listFiles( (FileFilter)null );
 	}
-	
+	@Override
 	public SmartFile[] listFiles( FileFilter filter ) {
 		File[] original = super.listFiles( filter );
+		Arrays.sort( original );
 		if( original == null ) {
 			return null;
 		}
 		SmartFile[] tmp = new SmartFile[original.length];
 		for( int i = 0; i < tmp.length; ++i ) {
-			tmp[i] = new SmartFile( original[i] );
+			tmp[i] = SmartFile.fromFile( original[i] );
 		}
 		return tmp;
 	}
-	
+	@Override
 	public SmartFile getParentFile() {
 		File parent = super.getParentFile();
 		if( parent == null ) {
 			return null;
 		} else {
-			return new SmartFile( parent );
+			return SmartFile.fromFile( parent );
 		}
 	}
-	
+	@Override
 	public int compareTo( File that ) {
 		if( this.isDirectory() && !that.isDirectory() ) {
 			return -1;
@@ -96,21 +99,31 @@ public class SmartFile extends File {
 	}
 	
 	/**
-	 * @brief Recursively calculate directory size.
-	 * @return directory total size
+	 * Recursively calculate directory size.
+	 * Overloaded version of {@link #getTotalSize(FileFilter)} for convince.
+	 * 
+	 * @return Total size of directory or file.
 	 */
 	public long getTotalSize() {
-		if( isDirectory() ) {
-			long sum = length();
-			SmartFile[] files = listFiles();
+		return this.getTotalSize( null );
+	}
+	/**
+	 * Recursively calculate directory size with file filter.
+	 * @param filter File filter
+	 * @return Total size of directory or file.
+	 */
+	public long getTotalSize( FileFilter filter ) {
+		if( this.isDirectory() ) {
+			long sum = this.length();
+			SmartFile[] files = this.listFiles( filter );
 			if( files != null ) {
 				for( SmartFile file : files ) {
-					sum += file.getTotalSize();
+					sum += file.getTotalSize( filter );
 				}
 			}
 			return sum;
 		} else {
-			return length();
+			return this.length();
 		}
 	}
 

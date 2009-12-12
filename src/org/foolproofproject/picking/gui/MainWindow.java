@@ -275,7 +275,7 @@ public class MainWindow extends JFrame {
 		hidden.addActionListener( new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				tree.setHidden( hidden.isSelected() );
+				tree.setHiddenVisible( hidden.isSelected() );
 				tree.refresh();
 			}
 		} );

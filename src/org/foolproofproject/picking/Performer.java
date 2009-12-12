@@ -61,8 +61,8 @@ public class Performer {
 	/**
 	 * Constructor.
 	 * 
-	 * @param limit combination maximum size
-	 * @param files all files
+	 * @param limit Combination maximum size
+	 * @param files All files
 	 */
 	public Performer( long limit, File[] files ) {
 		this.limit_ = limit;
@@ -101,7 +101,7 @@ public class Performer {
 	/**
 	 * Remove items by given keys.
 	 * 
-	 * @param keys item keys
+	 * @param keys Item keys
 	 */
 	public void remove( Vector< SmartFile > keys ) {
 		this.items_.removeAll( keys );

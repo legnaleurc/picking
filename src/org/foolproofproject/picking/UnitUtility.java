@@ -1,7 +1,4 @@
-/**
- * @file UnitUtility.java
- * @author Wei-Cheng Pan
- * 
+/*
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -25,7 +22,8 @@ package org.foolproofproject.picking;
 import javax.swing.JComboBox;
 
 /**
- * @brief Unit conversion utility.
+ * Unit conversion utility.
+ * @author Wei-Cheng Pan
  */
 public class UnitUtility {
 	
@@ -39,7 +37,7 @@ public class UnitUtility {
 	}
 	
 	/**
-	 * @brief Extract IEC standard units to precise value.
+	 * Extract IEC standard units to precise value.
 	 * @param value unit value
 	 * @param eng unit
 	 * @return precise value
@@ -49,7 +47,7 @@ public class UnitUtility {
 	}
 	
 	/**
-	 * @brief Convert precise value to IEC string.
+	 * Convert precise value to IEC string.
 	 * @param value precise value
 	 * @param eng unit
 	 * @return IEC string
@@ -59,7 +57,7 @@ public class UnitUtility {
 	}
 	
 	/**
-	 * @brief Convert precise value to IEC string.
+	 * Convert precise value to IEC string.
 	 * @param value precise value
 	 * @return most fit IEC unit string
 	 */
@@ -74,7 +72,7 @@ public class UnitUtility {
 	}
 	
 	/**
-	 * @brief Create unit JComboBox.
+	 * Create unit JComboBox.
 	 * @return JComboBox
 	 */
 	public static JComboBox createComboBox() {

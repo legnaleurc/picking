@@ -1,4 +1,4 @@
-/**
+/*
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -25,7 +25,6 @@ import java.util.Arrays;
 
 /**
  * File wrapper for file utility.
- * 
  * @author Wei-Cheng Pan
  */
 public class SmartFile extends File {
@@ -34,7 +33,6 @@ public class SmartFile extends File {
 	
 	/**
 	 * Named constructor.
-	 * 
 	 * @param file Source object
 	 * @return A new instance.
 	 */
@@ -44,7 +42,6 @@ public class SmartFile extends File {
 
 	/**
 	 * Construct with path.
-	 * 
 	 * @param pathname Path
 	 */
 	public SmartFile(String pathname) {
@@ -52,7 +49,7 @@ public class SmartFile extends File {
 	}
 	
 	/**
-	 * Use getName() instead of getAbsolutePath().
+	 * Use {@link #getName()} instead of {@link #getAbsolutePath()}.
 	 */
 	@Override
 	public String toString() {

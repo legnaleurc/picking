@@ -1,4 +1,4 @@
-/**
+/*
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -27,14 +27,12 @@ import org.foolproofproject.Pack;
 
 /**
  * Algorithm performer.
- * 
  * @author Wei-Cheng Pan
  */
 public class Performer {
 	
 	/**
 	 * Store picking result.
-	 * 
 	 * @author Wei-Cheng Pan
 	 */
 	public class Result {
@@ -60,7 +58,6 @@ public class Performer {
 	
 	/**
 	 * Constructor.
-	 * 
 	 * @param limit Combination maximum size
 	 * @param files All files
 	 */
@@ -79,7 +76,6 @@ public class Performer {
 	
 	/**
 	 * Pick once.
-	 * 
 	 * @return Result.
 	 */
 	public Result once() {
@@ -100,7 +96,6 @@ public class Performer {
 	
 	/**
 	 * Remove items by given keys.
-	 * 
 	 * @param keys Item keys
 	 */
 	public void remove( Vector< SmartFile > keys ) {

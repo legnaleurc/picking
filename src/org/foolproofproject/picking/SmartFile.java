@@ -1,7 +1,4 @@
 /**
- * @file SmartFile.java
- * @author Wei-Cheng Pan
- * 
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  * 
@@ -24,34 +21,34 @@ package org.foolproofproject.picking;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.net.URI;
 import java.util.Arrays;
 
 /**
- * @brief File wrapper for file utility.
+ * File wrapper for file utility.
+ * 
+ * @author Wei-Cheng Pan
  */
 public class SmartFile extends File {
 
 	private static final long serialVersionUID = -498630998152519151L;
 	
+	/**
+	 * Named constructor.
+	 * 
+	 * @param file Source object
+	 * @return A new instance.
+	 */
 	public static SmartFile fromFile( File file ) {
 		return new SmartFile( file.getPath() );
 	}
 
+	/**
+	 * Construct with path.
+	 * 
+	 * @param pathname Path
+	 */
 	public SmartFile(String pathname) {
 		super(pathname);
-	}
-
-	public SmartFile(URI uri) {
-		super(uri);
-	}
-
-	public SmartFile(String parent, String child) {
-		super(parent, child);
-	}
-
-	public SmartFile(File parent, String child) {
-		super(parent, child);
 	}
 	
 	/**
@@ -68,10 +65,10 @@ public class SmartFile extends File {
 	@Override
 	public SmartFile[] listFiles( FileFilter filter ) {
 		File[] original = super.listFiles( filter );
-		Arrays.sort( original );
 		if( original == null ) {
 			return null;
 		}
+		Arrays.sort( original );
 		SmartFile[] tmp = new SmartFile[original.length];
 		for( int i = 0; i < tmp.length; ++i ) {
 			tmp[i] = SmartFile.fromFile( original[i] );
@@ -109,6 +106,7 @@ public class SmartFile extends File {
 	}
 	/**
 	 * Recursively calculate directory size with file filter.
+	 * 
 	 * @param filter File filter
 	 * @return Total size of directory or file.
 	 */

@@ -195,6 +195,7 @@ class ResultWidget extends JPanel {
 	
 	public void clear() {
 		( ( DefaultTreeModel )this.resultTree_.getModel() ).setRoot( null );
+		( ( DefaultListModel )this.overflowList_.getModel() ).clear();
 	}
 	
 	public void addResult( long size, int eng, Vector< SmartFile > items ) {

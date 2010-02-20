@@ -169,7 +169,8 @@ public class MainWindow extends JFrame {
 						JOptionPane.showMessageDialog( MainWindow.this, "`" + file.getAbsolutePath() + "\' dose not exists.", "Open Error", JOptionPane.ERROR_MESSAGE );
 						return;
 					}
-					result.exportK3BProjectsTo( file );
+					int succeed = result.exportK3BProjectsTo( file );
+					JOptionPane.showMessageDialog( MainWindow.this, "Exported " + succeed + " K3B project(s).", "Done", JOptionPane.INFORMATION_MESSAGE );
 				}
 			}
 		} );

@@ -165,6 +165,10 @@ public class MainWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				File file = FileDialog.getExistingDirectory( (Component)e.getSource() );
 				if( file != null ) {
+					if( !file.exists() ) {
+						JOptionPane.showMessageDialog( MainWindow.this, "`" + file.getAbsolutePath() + "\' dose not exists.", "Open Error", JOptionPane.ERROR_MESSAGE );
+						return;
+					}
 					result.exportK3BProjectsTo( file );
 				}
 			}

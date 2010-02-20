@@ -248,7 +248,7 @@ class ResultWidget extends JPanel {
 		}
 	}
 	
-	public void exportK3BProjectsTo( File dout ) {
+	public int exportK3BProjectsTo( File dout ) {
 		Long k3bBound = UnitUtility.extract( (Long)Configuration.get( "k3b_export_lower_bound" ), (Integer)Configuration.get( "k3b_export_bound_unit" ) );
 		Vector< DefaultMutableTreeNode > tmp = new Vector< DefaultMutableTreeNode >();
 		for( Enumeration< ? > e = this.getRoot_().children(); e.hasMoreElements(); ) {
@@ -261,15 +261,18 @@ class ResultWidget extends JPanel {
 			}
 		}
 		String template = String.format( "%%0%dd.k3b", String.valueOf( tmp.size() ).length() );
+		int counter = 0;
 		for( int i = 0; i < tmp.size(); ++i ) {
 			try {
 				K3BUtility.export( new File( dout, String.format( template, i ) ), tmp.get( i ) );
+				++counter;
 			} catch (IOException e) {
 				LogDialog.getErrorLog().log( e.getMessage() );
 			} catch (XMLStreamException e) {
 				LogDialog.getErrorLog().log( e.getMessage() );
 			}
 		}
+		return counter;
 	}
 	
 	public void openProgress( Hashtable< SmartFile, Long > table ) {

@@ -316,6 +316,25 @@ public class Pack {
 		return ga.perform();
 	}
 	
+	public static Pack pickSmall2( Long limit, Hashtable< Object, Long > items ) {
+		Vector< Object > keys = new Vector< Object >( items.keySet() );
+		Vector< Long > values = new Vector< Long >( items.values() );
+		return recurse( limit, keys, values, 0 );
+	}
+	
+	private static Pack recurse( Long limit, Vector< Object > keys, Vector< Long > values, Integer n ) {
+		if( n == keys.size() ) {
+			return new Pack();
+		} else {
+			Pack tmp = recurse( limit, keys, values, n + 1 );
+			if( values.get( n ) + tmp.getValue() <= limit ) {
+				tmp.items_.add( keys.get( n ) );
+				tmp.value_ += values.get( n );
+			}
+			return tmp;
+		}
+	}
+	
 	/**
 	 * Back-end to pick using heuristic algorithm.
 	 * 

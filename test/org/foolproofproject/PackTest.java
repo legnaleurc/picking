@@ -19,6 +19,8 @@
  */
 package org.foolproofproject;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.Hashtable;
 
@@ -29,17 +31,31 @@ public class PackTest {
 	
 	private static Hashtable< Object, Long > table = new Hashtable< Object, Long >();
 	private static long limit = 0L;
+	
+	private static Hashtable< Object, Long > generateTestCase( int size, long seed ) {
+		Hashtable< Object, Long > h = new Hashtable< Object, Long >();
+		for( int i = 0; i < size; ++i ) {
+			long tmp = ( long )Math.floor( ( 0.5 + Math.random() * 2.5 * seed ) );
+			h.put( Integer.toString( i ), tmp);
+		}
+		return h;
+	}
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		long totalSize = 0L;
-		int tableSize = (int) (Math.random() * 128) + 16;
-		for( int i = 0; i < tableSize; ++i ) {
-			long single = (long) (Math.random() * 1073741824);
-			table.put( Integer.toString( i ), single );
-			totalSize += single;
-		}
-		limit = totalSize / 3;
+		int size = 16;
+		long seed = ( long )Math.floor( Math.random() * 100 );
+		table = generateTestCase( size, seed );
+		limit = size * seed;
+	}
+	
+	@Test
+	public void testSmall() {
+		Pack bfs = Pack.pickSmall( limit, table );
+		System.out.println( bfs );
+		Pack dfs = Pack.pickSmall2( limit, table );
+		System.out.println( dfs );
+		assertTrue( bfs.equals( dfs ) );
 	}
 
 	@Test

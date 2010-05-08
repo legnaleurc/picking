@@ -60,6 +60,11 @@ public class Pack {
 		this.value_ = value;
 		this.items_ = items;
 	}
+	private Pack add( long value, Object key ) {
+		Vector< Object > tmp = new Vector< Object >( this.items_ );
+		tmp.add( key );
+		return new Pack( this.value_ + value, tmp );
+	}
 	@Override
 	public String toString() {
 		return "(" + this.value_ + ":" + this.items_ + ")";
@@ -317,22 +322,35 @@ public class Pack {
 	}
 	
 	public static Pack pickSmall2( Long limit, Hashtable< Object, Long > items ) {
-		Vector< Object > keys = new Vector< Object >( items.keySet() );
-		Vector< Long > values = new Vector< Long >( items.values() );
-		return recurse( limit, keys, values, 0 );
+		return new Recursion( limit, items ).perform( 0, new Pack() );
 	}
 	
-	private static Pack recurse( Long limit, Vector< Object > keys, Vector< Long > values, Integer n ) {
-		if( n == keys.size() ) {
-			return new Pack();
-		} else {
-			Pack tmp = recurse( limit, keys, values, n + 1 );
-			if( values.get( n ) + tmp.getValue() <= limit ) {
-				tmp.items_.add( keys.get( n ) );
-				tmp.value_ += values.get( n );
-			}
-			return tmp;
+	private static class Recursion {
+		
+		private Vector< Object > keys_;
+		private Vector< Long > values_;
+		private Long limit_;
+		
+		public Recursion( Long limit, Hashtable< Object, Long > items ) {
+			this.keys_ = new Vector< Object >( items.keySet() );
+			this.values_ = new Vector< Long >( items.values() );
+			this.limit_ = limit;
 		}
+		
+		public Pack perform( int n, Pack p ) {
+			if( n == this.keys_.size() || ( p.value_ + this.values_.get( n ) ) > this.limit_ ) {
+				return p;
+			} else {
+				Pack a = this.perform( n + 1, p );
+				Pack b = this.perform( n + 1, p.add( this.values_.get( n ), this.keys_.get( n ) ) );
+				if( a.value_ > b.value_ ) {
+					return a;
+				} else {
+					return b;
+				}
+			}
+		}
+		
 	}
 	
 	/**

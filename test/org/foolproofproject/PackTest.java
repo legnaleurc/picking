@@ -27,7 +27,7 @@ import org.junit.Test;
 
 public class PackTest {
 	
-	private static Hashtable< Object, Long > table = new Hashtable< Object, Long >();
+	private static Hashtable< Integer, Long > table = new Hashtable< Integer, Long >();
 	private static long limit = 0L;
 
 	@BeforeClass
@@ -36,7 +36,7 @@ public class PackTest {
 		int tableSize = (int) (Math.random() * 128) + 16;
 		for( int i = 0; i < tableSize; ++i ) {
 			long single = (long) (Math.random() * 1073741824);
-			table.put( Integer.toString( i ), single );
+			table.put( i, single );
 			totalSize += single;
 		}
 		limit = totalSize / 3;

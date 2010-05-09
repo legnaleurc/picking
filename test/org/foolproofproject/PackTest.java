@@ -61,7 +61,7 @@ public class PackTest {
 			sum += table.get( i );
 		}
 		System.out.println( sum );
-		assertEquals( sum, dfs.getValue() );
+		assertEquals( sum, dfs.getScore() );
 	}
 	
 	@Test
@@ -74,14 +74,14 @@ public class PackTest {
 		Collections.sort( dfs.getItems() );
 		System.out.println( dfs );
 		
-		assertEquals( bfs.getValue(), dfs.getValue() );
+		assertEquals( bfs.getScore(), dfs.getScore() );
 	}
 
 	@Test
 	public void testPick() {
 		long[] result = new long[10];
 		for( int i = 0; i < 10; ++i ) {
-			result[i] = Pack.pick( limit, table ).getValue();
+			result[i] = Pack.pick( limit, table ).getScore();
 		}
 		Arrays.sort( result );
 		for( int i = 0; i < 10; ++i ) {

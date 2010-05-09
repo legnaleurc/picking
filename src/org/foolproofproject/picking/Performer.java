@@ -82,16 +82,12 @@ public class Performer {
 		if( this.value_ < this.limit_ ) {	// no need to pick, directly return result
 			return new Result( this.value_, this.items_ );
 		}
-//		Hashtable< Object, Long > tmpTable = new Hashtable< Object, Long >();
-//		for( SmartFile item : this.items_ ) {
-//			tmpTable.put( item, this.table_.get( item ) );
-//		}
 		Pack< SmartFile > r = Pack.pick( this.limit_, this.table_ );
 		Vector< SmartFile > tmp = new Vector< SmartFile >();
-		for( Object o : r.getItems() ) {
-			tmp.add( ( SmartFile )o );
+		for( SmartFile file : r.getItems() ) {
+			tmp.add( file );
 		}
-		return new Result( r.getValue(), tmp );
+		return new Result( r.getScore(), tmp );
 	}
 	
 	/**

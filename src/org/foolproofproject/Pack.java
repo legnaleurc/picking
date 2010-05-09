@@ -39,7 +39,7 @@ import java.util.Map.Entry;
  */
 public class Pack< T > {
 
-	private long value_;
+	private long score_;
 	private Vector< T > items_;
 	
 	/**
@@ -47,35 +47,35 @@ public class Pack< T > {
 	 * Will initialize value to 0, items as an empty Vector.
 	 */
 	private Pack() {
-		this.value_ = 0L;
+		this.score_ = 0L;
 		this.items_ = new Vector< T >();
 	}
 	/**
 	 * Constructor.
 	 * 
-	 * @param value total value of items
+	 * @param score total value of items
 	 * @param items selected objects
 	 */
-	private Pack( long value, Vector< T > items ) {
-		this.value_ = value;
+	private Pack( long score, Vector< T > items ) {
+		this.score_ = score;
 		this.items_ = items;
 	}
 	private Pack< T > add( long value, T key ) {
 		Vector< T > tmp = new Vector< T >( this.items_ );
 		tmp.add( key );
-		return new Pack< T >( this.value_ + value, tmp );
+		return new Pack< T >( this.score_ + value, tmp );
 	}
 	@Override
 	public String toString() {
-		return "(" + this.value_ + ":" + this.items_ + ")";
+		return "(" + this.score_ + ":" + this.items_ + ")";
 	}
 	/**
 	 * Get value.
 	 * 
 	 * @return Total value of items.
 	 */
-	public long getValue() {
-		return this.value_;
+	public long getScore() {
+		return this.score_;
 	}
 	/**
 	 * Get items list.
@@ -338,14 +338,14 @@ public class Pack< T > {
 		}
 		
 		public Pack< T > perform( int n, Pack< T > p ) {
-			if( p.value_ > this.limit_) {
+			if( p.score_ > this.limit_) {
 				return new Pack< T >();
 			} else if( n == this.keys_.size() ) {
 				return p;
 			} else {
 				Pack< T > a = this.perform( n + 1, p );
 				Pack< T > b = this.perform( n + 1, p.add( this.values_.get( n ), this.keys_.get( n ) ) );
-				if( a.value_ > b.value_ ) {
+				if( a.score_ > b.score_ ) {
 					return a;
 				} else {
 					return b;
@@ -369,7 +369,7 @@ public class Pack< T > {
 		for( Entry< T, Long> e : items.entrySet() ) {
 			Vector< Pack< T > > tmp = new Vector< Pack< T > >();
 			for( Pack< T > p : table ) {
-				Long newSize = p.getValue() + e.getValue();
+				Long newSize = p.getScore() + e.getValue();
 				if( newSize <= limit ) {
 					Vector< T > newDirs = new Vector< T >( p.getItems() );
 					newDirs.add( e.getKey() );
@@ -381,7 +381,7 @@ public class Pack< T > {
 		
 		Pack< T > max = new Pack< T >();
 		for( Pack< T > p : table ) {
-			if( p.getValue() >= max.getValue() ) {
+			if( p.getScore() >= max.getScore() ) {
 				max = p;
 			}
 		}

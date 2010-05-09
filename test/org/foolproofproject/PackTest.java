@@ -56,7 +56,7 @@ public class PackTest {
 		Collections.sort( dfs.getItems() );
 		System.out.println( dfs );
 		
-		long sum = 0;
+		Long sum = 0L;
 		for( int i : dfs.getItems() ) {
 			sum += table.get( i );
 		}
@@ -64,6 +64,7 @@ public class PackTest {
 		assertEquals( sum, dfs.getScore() );
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testSmallEquals() {
 		Pack< Integer > bfs = Pack.pickSmall( limit, table );

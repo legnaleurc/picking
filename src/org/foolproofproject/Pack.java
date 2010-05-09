@@ -28,18 +28,17 @@ import java.util.Map.Entry;
  * <p>Calculates the maximum combination of given objects table.</p>
  * <p>To do this you should collect objects and their values, and store them
  * to a <code>Hashtable&lt;T,Long&gt;</code> as a table. Then decide a
- * maximum value of combinations of objects.</p>
- * <p>Simply use {@link #pick(Long, Hashtable)} to perform algorithm.</p>
+ * maximum score of combinations of objects.</p>
+ * <p>Simply use {@link #pick} to perform algorithm.</p>
  * <p>If the amount of items is less then 16, then it will use brute force
- * (i.e. {@link #pickSmall(Long, Hashtable)}) to find an optimal solution. Or
- * it will use heuristic algorithm (i.e. {@link #pickLarge(Long, Hashtable)})
- * to do it.</p>
+ * (i.e. {@link #pickSmall2}) to find an optimal solution. Or
+ * it will use heuristic algorithm (i.e. {@link #pickLarge}) to do it.</p>
  * 
  * @author Wei-Cheng Pan
  */
 public class Pack< T > {
 
-	private long score_;
+	private Long score_;
 	private Vector< T > items_;
 	
 	/**
@@ -60,21 +59,24 @@ public class Pack< T > {
 		this.score_ = score;
 		this.items_ = items;
 	}
-	private Pack< T > add( long value, T key ) {
+	private Pack< T > add( T key, Long value ) {
 		Vector< T > tmp = new Vector< T >( this.items_ );
 		tmp.add( key );
 		return new Pack< T >( this.score_ + value, tmp );
 	}
+	/**
+	 * Returns the score and picked items in this pack.
+	 */
 	@Override
 	public String toString() {
 		return "(" + this.score_ + ":" + this.items_ + ")";
 	}
 	/**
-	 * Get value.
+	 * Get score.
 	 * 
-	 * @return Total value of items.
+	 * @return Total score of items.
 	 */
-	public long getScore() {
+	public Long getScore() {
 		return this.score_;
 	}
 	/**
@@ -309,7 +311,7 @@ public class Pack< T > {
 	}
 	
 	/**
-	 * Back-end to pick using brute force.
+	 * Back-end to pick using heuristic algorithm.
 	 * The complexity is O(2^n).
 	 * 
 	 * @param limit maximum value of combinations
@@ -320,7 +322,14 @@ public class Pack< T > {
 		GeneticAlgorithm< T > ga = new GeneticAlgorithm< T >( limit, items );
 		return ga.perform();
 	}
-	
+
+	/**
+	 * Back-end to pick using DFS.
+	 * 
+	 * @param limit maximum value of combinations
+	 * @param items object value table
+	 * @return solution
+	 */
 	public static< T > Pack< T > pickSmall2( Long limit, Hashtable< T, Long > items ) {
 		return new Recursion< T >( limit, items ).perform( 0, new Pack< T >() );
 	}
@@ -344,7 +353,7 @@ public class Pack< T > {
 				return p;
 			} else {
 				Pack< T > a = this.perform( n + 1, p );
-				Pack< T > b = this.perform( n + 1, p.add( this.values_.get( n ), this.keys_.get( n ) ) );
+				Pack< T > b = this.perform( n + 1, p.add( this.keys_.get( n ) , this.values_.get( n ) ) );
 				if( a.score_ > b.score_ ) {
 					return a;
 				} else {
@@ -356,12 +365,13 @@ public class Pack< T > {
 	}
 	
 	/**
-	 * Back-end to pick using heuristic algorithm.
+	 * Back-end to pick using BFS.
 	 * 
 	 * @param limit maximum value of combinations
 	 * @param items object value table
 	 * @return solution
 	 */
+	@Deprecated
 	public static< T > Pack< T > pickSmall( Long limit, Hashtable< T, Long > items ) {
 		Vector< Pack< T > > table = new Vector< Pack< T > >();
 		table.add( new Pack< T >() );

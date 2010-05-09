@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 /**
  * <p>Calculates the maximum combination of given objects table.</p>
  * <p>To do this you should collect objects and their values, and store them
- * to a <code>Hashtable&lt;Object,Long&gt;</code> as a table. Then decide a
+ * to a <code>Hashtable&lt;T,Long&gt;</code> as a table. Then decide a
  * maximum value of combinations of objects.</p>
  * <p>Simply use {@link #pick(Long, Hashtable)} to perform algorithm.</p>
  * <p>If the amount of items is less then 16, then it will use brute force

@@ -83,11 +83,7 @@ public class Performer {
 			return new Result( this.value_, this.items_ );
 		}
 		Pack< SmartFile > r = Pack.pick( this.limit_, this.table_ );
-		Vector< SmartFile > tmp = new Vector< SmartFile >();
-		for( SmartFile file : r.getItems() ) {
-			tmp.add( file );
-		}
-		return new Result( r.getScore(), tmp );
+		return new Result( r.getScore(), r.getItems() );
 	}
 	
 	/**

@@ -302,7 +302,7 @@ public class Pack< T > {
 	 */
 	public static< T > Pack< T > pick( Long limit, Hashtable< T, Long > items ) {
 		if( items.size() < 16 ) {
-			return Pack.pickSmall( limit, items );
+			return Pack.pickSmall2( limit, items );
 		} else {
 			return Pack.pickLarge( limit, items );
 		}
@@ -338,7 +338,9 @@ public class Pack< T > {
 		}
 		
 		public Pack< T > perform( int n, Pack< T > p ) {
-			if( n == this.keys_.size() || ( p.value_ + this.values_.get( n ) ) > this.limit_ ) {
+			if( p.value_ > this.limit_) {
+				return new Pack< T >();
+			} else if( n == this.keys_.size() ) {
 				return p;
 			} else {
 				Pack< T > a = this.perform( n + 1, p );

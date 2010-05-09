@@ -47,17 +47,34 @@ public class PackTest {
 		long seed = ( long )Math.floor( Math.random() * 100 );
 		table = generateTestCase( size, seed );
 		limit = size * seed;
+		System.out.printf( "(%s,%d)\n", table, limit );
 	}
 	
 	@Test
-	public void testSmall() {
-		Pack< Integer > bfs = Pack.pickSmall( limit, table );
-		Collections.sort( bfs.getItems() );
-		System.out.println( bfs );
+	public void testSmall2() {
 		Pack< Integer > dfs = Pack.pickSmall2( limit, table );
 		Collections.sort( dfs.getItems() );
 		System.out.println( dfs );
-		assertEquals( bfs, dfs );
+		
+		long sum = 0;
+		for( int i : dfs.getItems() ) {
+			sum += table.get( i );
+		}
+		System.out.println( sum );
+		assertEquals( sum, dfs.getValue() );
+	}
+	
+	@Test
+	public void testSmallEquals() {
+		Pack< Integer > bfs = Pack.pickSmall( limit, table );
+		Collections.sort( bfs.getItems() );
+		System.out.println( bfs );
+		
+		Pack< Integer > dfs = Pack.pickSmall2( limit, table );
+		Collections.sort( dfs.getItems() );
+		System.out.println( dfs );
+		
+		assertEquals( bfs.getValue(), dfs.getValue() );
 	}
 
 	@Test

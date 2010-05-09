@@ -37,10 +37,10 @@ import java.util.Map.Entry;
  * 
  * @author Wei-Cheng Pan
  */
-public class Pack {
+public class Pack< T > {
 
 	private long value_;
-	private Vector< Object > items_;
+	private Vector< T > items_;
 	
 	/**
 	 * Default constructor.
@@ -48,7 +48,7 @@ public class Pack {
 	 */
 	private Pack() {
 		this.value_ = 0L;
-		this.items_ = new Vector< Object >();
+		this.items_ = new Vector< T >();
 	}
 	/**
 	 * Constructor.
@@ -56,14 +56,14 @@ public class Pack {
 	 * @param value total value of items
 	 * @param items selected objects
 	 */
-	private Pack( long value, Vector< Object > items ) {
+	private Pack( long value, Vector< T > items ) {
 		this.value_ = value;
 		this.items_ = items;
 	}
-	private Pack add( long value, Object key ) {
-		Vector< Object > tmp = new Vector< Object >( this.items_ );
+	private Pack< T > add( long value, T key ) {
+		Vector< T > tmp = new Vector< T >( this.items_ );
 		tmp.add( key );
-		return new Pack( this.value_ + value, tmp );
+		return new Pack< T >( this.value_ + value, tmp );
 	}
 	@Override
 	public String toString() {
@@ -82,7 +82,7 @@ public class Pack {
 	 * 
 	 * @return Items list.
 	 */
-	public Vector< Object > getItems() {
+	public Vector< T > getItems() {
 		return this.items_;
 	}
 	
@@ -90,15 +90,15 @@ public class Pack {
 	 * Genetic algorithm.
 	 * For internal usage only.
 	 */
-	private static class GeneticAlgorithm {
+	private static class GeneticAlgorithm< T > {
 		
 		/**
 		 * A cell which represents a possible combination.
 		 */
-		private static class Cell implements Comparable< Cell > {
+		private static class Cell< T > implements Comparable< Cell< T > > {
 			
 			/// Table of item selection.
-			private Hashtable< Object, Boolean > table_;
+			private Hashtable< T, Boolean > table_;
 			/// Total value
 			private Long value_;
 			
@@ -108,7 +108,7 @@ public class Pack {
 			 * @param table Item selection table
 			 * @param value Total value
 			 */
-			public Cell( Hashtable< Object, Boolean > table, Long value ) {
+			public Cell( Hashtable< T, Boolean > table, Long value ) {
 				this.table_ = table;
 				this.value_ = value;
 			}
@@ -117,8 +117,8 @@ public class Pack {
 			 * 
 			 * @param that Copy source
 			 */
-			public Cell( Cell that ) {
-				this.table_ = new Hashtable< Object, Boolean >( that.table_ );
+			public Cell( Cell< T > that ) {
+				this.table_ = new Hashtable< T, Boolean >( that.table_ );
 				this.value_ = that.value_;
 			}
 			/**
@@ -129,7 +129,7 @@ public class Pack {
 			 * @param limit Maximum limit
 			 * @return true if can toggle.
 			 */
-			public boolean canToggle( Object key, Long value, Long limit ) {
+			public boolean canToggle( T key, Long value, Long limit ) {
 				return ( this.table_.get( key ) || this.value_ + value < limit );
 			}
 			/**
@@ -138,7 +138,7 @@ public class Pack {
 			 * @param key Toggle target
 			 * @param value Value of target
 			 */
-			public void toggle( Object key, Long value ) {
+			public void toggle( T key, Long value ) {
 				boolean tmp = this.table_.get( key );
 				this.table_.put( key, !tmp );
 				if( tmp ) {
@@ -152,7 +152,7 @@ public class Pack {
 			 * 
 			 * @return Selection table.
 			 */
-			public Hashtable< Object, Boolean > getTable() {
+			public Hashtable< T, Boolean > getTable() {
 				return this.table_;
 			}
 			/**
@@ -168,27 +168,27 @@ public class Pack {
 				return String.format( "(%d,%s)", this.value_, this.table_.keySet() );
 			}
 			@Override
-			public int compareTo( Cell rhs ) {
+			public int compareTo( Cell< T > rhs ) {
 				return rhs.value_.compareTo( this.value_ );
 			}
 		}
 		
 		private Long limit_;
-		private Hashtable< Object, Long > table_;
-		private Vector< Cell > population_;
+		private Hashtable< T, Long > table_;
+		private Vector< Cell< T > > population_;
 		
-		public GeneticAlgorithm( Long limit, Hashtable< Object, Long > items ) {
+		public GeneticAlgorithm( Long limit, Hashtable< T, Long > items ) {
 			this.limit_ = limit;
 			this.table_ = items;
 			
-			this.population_ = new Vector< Cell >();
+			this.population_ = new Vector< Cell< T > >();
 			for( int i = 0; i < items.size(); ++i ) {
 				this.population_.add( this.generatePopulation() );
 			}
 			Collections.sort( this.population_ );
 		}
 		
-		public Pack perform() {
+		public Pack< T > perform() {
 			while( !this.canStop() ) {
 				this.crossOver();
 				this.mutation();
@@ -196,9 +196,9 @@ public class Pack {
 				this.population_.subList( this.table_.size(), this.population_.size() ).clear();
 			}
 			
-			Cell survivor = this.population_.get( 0 );
-			Pack result = new Pack( survivor.getValue(), new Vector< Object >() );
-			for( Entry< Object, Boolean > e : survivor.getTable().entrySet() ) {
+			Cell< T > survivor = this.population_.get( 0 );
+			Pack< T > result = new Pack< T >( survivor.getValue(), new Vector< T >() );
+			for( Entry< T, Boolean > e : survivor.getTable().entrySet() ) {
 				if( e.getValue() ) {
 					result.getItems().add( e.getKey() );
 				}
@@ -206,10 +206,10 @@ public class Pack {
 			return result;
 		}
 		
-		private Cell generatePopulation() {
-			Hashtable< Object, Boolean > cell = new Hashtable< Object, Boolean >();
+		private Cell< T > generatePopulation() {
+			Hashtable< T, Boolean > cell = new Hashtable< T, Boolean >();
 			Long sum = 0L;
-			for( Entry< Object, Long > e : this.table_.entrySet() ) {
+			for( Entry< T, Long > e : this.table_.entrySet() ) {
 				if( e.getValue() + sum >= this.limit_ || Math.random() * 2 < 1.0 ) {
 					cell.put( e.getKey(), false );
 				} else {
@@ -217,7 +217,7 @@ public class Pack {
 					sum += e.getValue();
 				}
 			}
-			return new Cell( cell, sum );
+			return new Cell< T >( cell, sum );
 		}
 		
 		/**
@@ -250,17 +250,17 @@ public class Pack {
 		}
 		
 		private Boolean canStop() {
-			Cell head = this.population_.firstElement();
-			Cell tail = this.population_.lastElement();
+			Cell< T > head = this.population_.firstElement();
+			Cell< T > tail = this.population_.lastElement();
 			return head.getValue().equals( tail.getValue() );
 		}
 		
 		private void crossOver() {
 			final int length = this.population_.size();
 			for( int i = 0; i < length; ++i ) {
-				Cell new1 = new Cell( this.population_.get( i ) );
-				Cell new2 = new Cell( this.population_.get( selectParent() ) );
-				for( Entry< Object, Long > e : this.table_.entrySet() ) {
+				Cell< T > new1 = new Cell< T >( this.population_.get( i ) );
+				Cell< T > new2 = new Cell< T >( this.population_.get( selectParent() ) );
+				for( Entry< T, Long > e : this.table_.entrySet() ) {
 					if( new1.getTable().get( e.getKey() ) == new2.getTable().get( e.getKey() ) ) {
 						continue;
 					}
@@ -280,8 +280,8 @@ public class Pack {
 		private void mutation() {
 			final int length = this.population_.size();
 			for( int i = 0; i < length; ++i ) {
-				Cell cell = this.population_.get( i );
-				for( Entry< Object, Long > e : table_.entrySet() ) {
+				Cell< T > cell = this.population_.get( i );
+				for( Entry< T, Long > e : table_.entrySet() ) {
 					if( cell.canToggle( e.getKey(), e.getValue(), this.limit_) && Math.random() * this.table_.size() < 1.0 ) {
 						cell.toggle( e.getKey(), e.getValue() );
 					}
@@ -300,7 +300,7 @@ public class Pack {
 	 * @param items object value table
 	 * @return solution
 	 */
-	public static Pack pick( Long limit, Hashtable< Object, Long > items ) {
+	public static< T > Pack< T > pick( Long limit, Hashtable< T, Long > items ) {
 		if( items.size() < 16 ) {
 			return Pack.pickSmall( limit, items );
 		} else {
@@ -316,33 +316,33 @@ public class Pack {
 	 * @param items object value table
 	 * @return solution
 	 */
-	public static Pack pickLarge( Long limit, Hashtable< Object, Long > items ) {
-		GeneticAlgorithm ga = new GeneticAlgorithm( limit, items );
+	public static< T > Pack< T > pickLarge( Long limit, Hashtable< T, Long > items ) {
+		GeneticAlgorithm< T > ga = new GeneticAlgorithm< T >( limit, items );
 		return ga.perform();
 	}
 	
-	public static Pack pickSmall2( Long limit, Hashtable< Object, Long > items ) {
-		return new Recursion( limit, items ).perform( 0, new Pack() );
+	public static< T > Pack< T > pickSmall2( Long limit, Hashtable< T, Long > items ) {
+		return new Recursion< T >( limit, items ).perform( 0, new Pack< T >() );
 	}
 	
-	private static class Recursion {
+	private static class Recursion< T > {
 		
-		private Vector< Object > keys_;
+		private Vector< T > keys_;
 		private Vector< Long > values_;
 		private Long limit_;
 		
-		public Recursion( Long limit, Hashtable< Object, Long > items ) {
-			this.keys_ = new Vector< Object >( items.keySet() );
+		public Recursion( Long limit, Hashtable< T, Long > items ) {
+			this.keys_ = new Vector< T >( items.keySet() );
 			this.values_ = new Vector< Long >( items.values() );
 			this.limit_ = limit;
 		}
 		
-		public Pack perform( int n, Pack p ) {
+		public Pack< T > perform( int n, Pack< T > p ) {
 			if( n == this.keys_.size() || ( p.value_ + this.values_.get( n ) ) > this.limit_ ) {
 				return p;
 			} else {
-				Pack a = this.perform( n + 1, p );
-				Pack b = this.perform( n + 1, p.add( this.values_.get( n ), this.keys_.get( n ) ) );
+				Pack< T > a = this.perform( n + 1, p );
+				Pack< T > b = this.perform( n + 1, p.add( this.values_.get( n ), this.keys_.get( n ) ) );
 				if( a.value_ > b.value_ ) {
 					return a;
 				} else {
@@ -360,25 +360,25 @@ public class Pack {
 	 * @param items object value table
 	 * @return solution
 	 */
-	public static Pack pickSmall( Long limit, Hashtable< Object, Long > items ) {
-		Vector< Pack > table = new Vector< Pack >();
-		table.add( new Pack() );
+	public static< T > Pack< T > pickSmall( Long limit, Hashtable< T, Long > items ) {
+		Vector< Pack< T > > table = new Vector< Pack< T > >();
+		table.add( new Pack< T >() );
 		
-		for( Entry< Object, Long> e : items.entrySet() ) {
-			Vector< Pack > tmp = new Vector< Pack >();
-			for( Pack p : table ) {
+		for( Entry< T, Long> e : items.entrySet() ) {
+			Vector< Pack< T > > tmp = new Vector< Pack< T > >();
+			for( Pack< T > p : table ) {
 				Long newSize = p.getValue() + e.getValue();
 				if( newSize <= limit ) {
-					Vector< Object > newDirs = new Vector< Object >( p.getItems() );
+					Vector< T > newDirs = new Vector< T >( p.getItems() );
 					newDirs.add( e.getKey() );
-					tmp.add( new Pack( newSize, newDirs ) );
+					tmp.add( new Pack< T >( newSize, newDirs ) );
 				}
 			}
 			table.addAll(table.size(), tmp);
 		}
 		
-		Pack max = new Pack();
-		for( Pack p : table ) {
+		Pack< T > max = new Pack< T >();
+		for( Pack< T > p : table ) {
 			if( p.getValue() >= max.getValue() ) {
 				max = p;
 			}

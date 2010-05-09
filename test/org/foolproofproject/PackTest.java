@@ -19,9 +19,9 @@
  */
 package org.foolproofproject;
 
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Hashtable;
 
 import org.junit.BeforeClass;
@@ -52,10 +52,12 @@ public class PackTest {
 	@Test
 	public void testSmall() {
 		Pack< Integer > bfs = Pack.pickSmall( limit, table );
+		Collections.sort( bfs.getItems() );
 		System.out.println( bfs );
 		Pack< Integer > dfs = Pack.pickSmall2( limit, table );
+		Collections.sort( dfs.getItems() );
 		System.out.println( dfs );
-		assertTrue( bfs.equals( dfs ) );
+		assertEquals( bfs, dfs );
 	}
 
 	@Test

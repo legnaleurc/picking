@@ -43,6 +43,47 @@ public class Pack< T > {
 	private Vector< T > items_;
 	
 	/**
+	 * Main pick function.
+	 * If table size is greater then or equal to 16, it will use heuristic
+	 * algorithm.
+	 * 
+	 * @param limit maximum value of combinations
+	 * @param items object value table
+	 * @return solution
+	 */
+	public static< T > Pack< T > pick( Long limit, Hashtable< T, Long > items ) {
+		if( items.size() < 16 ) {
+			return Pack.pickSmall2( limit, items );
+		} else {
+			return Pack.pickLarge( limit, items );
+		}
+	}
+	
+	/**
+	 * Back-end to pick using heuristic algorithm.
+	 * The complexity is O(2^n).
+	 * 
+	 * @param limit maximum value of combinations
+	 * @param items object value table
+	 * @return solution
+	 */
+	public static< T > Pack< T > pickLarge( Long limit, Hashtable< T, Long > items ) {
+		GeneticAlgorithm< T > ga = new GeneticAlgorithm< T >( limit, items );
+		return ga.perform();
+	}
+
+	/**
+	 * Back-end to pick using DFS.
+	 * 
+	 * @param limit maximum value of combinations
+	 * @param items object value table
+	 * @return solution
+	 */
+	public static< T > Pack< T > pickSmall2( Long limit, Hashtable< T, Long > items ) {
+		return new Recursion< T >( limit, items ).perform( 0, new Pack< T >() );
+	}
+	
+	/**
 	 * Default constructor.
 	 * Will initialize value to 0, items as an empty Vector.
 	 */
@@ -292,47 +333,6 @@ public class Pack< T > {
 			}
 		}
 		
-	}
-	
-	/**
-	 * Main pick function.
-	 * If table size is greater then or equal to 16, it will use heuristic
-	 * algorithm.
-	 * 
-	 * @param limit maximum value of combinations
-	 * @param items object value table
-	 * @return solution
-	 */
-	public static< T > Pack< T > pick( Long limit, Hashtable< T, Long > items ) {
-		if( items.size() < 16 ) {
-			return Pack.pickSmall2( limit, items );
-		} else {
-			return Pack.pickLarge( limit, items );
-		}
-	}
-	
-	/**
-	 * Back-end to pick using heuristic algorithm.
-	 * The complexity is O(2^n).
-	 * 
-	 * @param limit maximum value of combinations
-	 * @param items object value table
-	 * @return solution
-	 */
-	public static< T > Pack< T > pickLarge( Long limit, Hashtable< T, Long > items ) {
-		GeneticAlgorithm< T > ga = new GeneticAlgorithm< T >( limit, items );
-		return ga.perform();
-	}
-
-	/**
-	 * Back-end to pick using DFS.
-	 * 
-	 * @param limit maximum value of combinations
-	 * @param items object value table
-	 * @return solution
-	 */
-	public static< T > Pack< T > pickSmall2( Long limit, Hashtable< T, Long > items ) {
-		return new Recursion< T >( limit, items ).perform( 0, new Pack< T >() );
 	}
 	
 	private static class Recursion< T > {

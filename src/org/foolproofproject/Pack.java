@@ -32,7 +32,7 @@ import java.util.Map.Entry;
  * maximum score of combinations of objects.</p>
  * <p>Simply use {@link #pick} to perform algorithm.</p>
  * <p>If the amount of items is less then 16, then it will use brute force
- * (i.e. {@link #pickSmall2}) to find an optimal solution. Or
+ * (i.e. {@link #pickSmall}) to find an optimal solution. Or
  * it will use heuristic algorithm (i.e. {@link #pickLarge}) to do it.</p>
  * 
  * @author Wei-Cheng Pan
@@ -53,7 +53,7 @@ public class Pack< T > {
 	 */
 	public static< T > Pack< T > pick( Long limit, Hashtable< T, Long > items ) {
 		if( items.size() < 16 ) {
-			return Pack.pickSmall2( limit, items );
+			return Pack.pickSmall( limit, items );
 		} else {
 			return Pack.pickLarge( limit, items );
 		}
@@ -79,7 +79,7 @@ public class Pack< T > {
 	 * @param items object value table
 	 * @return solution
 	 */
-	public static< T > Pack< T > pickSmall2( Long limit, Hashtable< T, Long > items ) {
+	public static< T > Pack< T > pickSmall( Long limit, Hashtable< T, Long > items ) {
 		return new Recursion< T >( limit, items ).perform( 0, new Pack< T >() );
 	}
 	
@@ -385,8 +385,9 @@ public class Pack< T > {
 	 * @param items object value table
 	 * @return solution
 	 */
+	/*
 	@Deprecated
-	public static< T > Pack< T > pickSmall( Long limit, Hashtable< T, Long > items ) {
+	public static< T > Pack< T > pickSmall2( Long limit, Hashtable< T, Long > items ) {
 		Vector< Pack< T > > table = new Vector< Pack< T > >();
 		table.add( new Pack< T >() );
 		
@@ -411,5 +412,6 @@ public class Pack< T > {
 		}
 		return max;
 	}
+	*/
 
 }

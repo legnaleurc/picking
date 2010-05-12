@@ -51,8 +51,8 @@ public class PackTest {
 	}
 	
 	@Test
-	public void testSmall2() {
-		Pack< Integer > dfs = Pack.pickSmall2( limit, table );
+	public void testSmall() {
+		Pack< Integer > dfs = Pack.pickSmall( limit, table );
 		Collections.sort( dfs.getItems() );
 		System.out.println( dfs );
 		
@@ -63,20 +63,6 @@ public class PackTest {
 		System.out.println( sum );
 		assertEquals( sum, dfs.getScore() );
 	}
-	
-	@SuppressWarnings("deprecation")
-	@Test
-	public void testSmallEquals() {
-		Pack< Integer > bfs = Pack.pickSmall( limit, table );
-		Collections.sort( bfs.getItems() );
-		System.out.println( bfs );
-		
-		Pack< Integer > dfs = Pack.pickSmall2( limit, table );
-		Collections.sort( dfs.getItems() );
-		System.out.println( dfs );
-		
-		assertEquals( bfs.getScore(), dfs.getScore() );
-	}
 
 	@Test
 	public void testPick() {
@@ -85,9 +71,12 @@ public class PackTest {
 			result[i] = Pack.pick( limit, table ).getScore();
 		}
 		Arrays.sort( result );
-		for( int i = 0; i < 10; ++i ) {
-			System.out.println( result[i] );
+		StringBuilder sin = new StringBuilder( String.valueOf( result[0] ) );
+		for( int i = 1; i < 10; ++i ) {
+			sin.append( ", " );
+			sin.append( result[i] );
 		}
+		System.out.println( sin );
 	}
 
 }

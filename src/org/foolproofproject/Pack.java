@@ -20,6 +20,7 @@
 package org.foolproofproject;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Map.Entry;
@@ -341,8 +342,21 @@ public class Pack< T > {
 		private Long limit_;
 		
 		public Recursion( Long limit, Hashtable< T, Long > items ) {
-			this.keys_ = new Vector< T >( items.keySet() );
-			this.values_ = new Vector< Long >( items.values() );
+			Vector< Entry< T, Long > > tmp = new Vector< Entry< T, Long > >( items.entrySet() );
+			Collections.sort( tmp, new Comparator< Entry< T, Long > >() {
+				@Override
+				public int compare( Entry<T, Long> r, Entry<T, Long> l ) {
+					return l.getValue().compareTo( r.getValue() );
+				}
+			} );
+			
+			this.keys_ = new Vector< T >();
+			this.values_ = new Vector< Long >();
+			for( Entry< T, Long > e : tmp ) {
+				this.keys_.add( e.getKey() );
+				this.values_.add( e.getValue() );
+			}
+			
 			this.limit_ = limit;
 		}
 		

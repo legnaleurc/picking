@@ -37,7 +37,7 @@ import java.util.Map.Entry;
  * 
  * @author Wei-Cheng Pan
  */
-public class Pack< T > {
+public class Pack< T > implements Comparable< Pack< T > > {
 
 	private Long score_;
 	private Vector< T > items_;
@@ -128,6 +128,20 @@ public class Pack< T > {
 	 */
 	public Vector< T > getItems() {
 		return this.items_;
+	}
+
+	@Override
+	public int compareTo( Pack< T > that ) {
+		int tmp = this.score_.compareTo( that.score_ );
+		if( tmp != 0 ) {
+			return tmp;
+		} else if( this.items_.size() > that.items_.size() ) {
+			return 1;
+		} else if( this.items_.size() < that.items_.size() ) {
+			return -1;
+		} else {
+			return 0;
+		}
 	}
 	
 	/**
@@ -368,7 +382,7 @@ public class Pack< T > {
 			} else {
 				Pack< T > a = this.perform( n + 1, p );
 				Pack< T > b = this.perform( n + 1, p.add( this.keys_.get( n ) , this.values_.get( n ) ) );
-				if( a.score_ > b.score_ ) {
+				if( a.compareTo( b ) > 0 ) {
 					return a;
 				} else {
 					return b;

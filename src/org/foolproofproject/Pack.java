@@ -59,6 +59,10 @@ public class Pack< T > implements Comparable< Pack< T > > {
 		}
 	}
 	
+	public static< T > Pack< T > binarySearch( Long limit, Hashtable< T, Long > items ) {
+		return new BinarySearch< T >( limit, items ).call();
+	}
+	
 	/**
 	 * Back-end to pick using heuristic algorithm.
 	 * The complexity is O(2^n).
@@ -142,6 +146,58 @@ public class Pack< T > implements Comparable< Pack< T > > {
 		} else {
 			return 0;
 		}
+	}
+	
+	private static class BinarySearch< T > {
+		
+		private Long limit_;
+		private Hashtable< T, Long > items_;
+		private Vector< T > map_;
+		
+		public BinarySearch( Long limit, Hashtable< T, Long > items ) {
+			this.limit_ = limit;
+			this.items_ = items;
+			this.map_ = new Vector< T >( items.keySet() );
+		}
+		
+		public Pack< T > call() {
+			Vector< Boolean > lower = new Vector< Boolean >();
+			for( int i = 0; i <= items.size(); ++i ) {
+				lower.add( false );
+			}
+			Vector< Boolean > upper = new Vector< Boolean >();
+			for( int i = 0; i < items.size(); ++i ) {
+				upper.add( false );
+			}
+			upper.add( true );
+			Vector< Boolean > middle = Pack.avg( upper, lower );
+			Long mValue = Pack.value( middle );
+			
+			while( true ) {
+				;
+			}
+		}
+		
+		private Vector< Boolean > avg( Vector< Boolean > l, Vector< Boolean > r ) {
+			Vector< Boolean > m = new Vector< Boolean >();
+			Boolean c = false;
+			for( int i = 0; i < l.size(); ++i ) {
+				m.add( l.get( i ) ^ r.get( i ) ^ c );
+				c = ( l.get( i ) && r.get( i ) ) || ( c ^ ( l.get( i ) ^ r.get( i ) ) );
+			}
+			m.add( c );
+			m.remove( 0 );
+			m.add( false );
+			return m;
+		}
+		
+		private Long compute( Vector< Boolean > t ) {
+			for( int i = 0; i < t.size() - 1; ++i ) {
+				;
+			}
+			return 0L;
+		}
+		
 	}
 	
 	/**

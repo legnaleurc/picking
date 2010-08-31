@@ -32,8 +32,8 @@ import java.util.Map.Entry;
  * maximum score of combinations of objects.</p>
  * <p>Simply use {@link #pick} to perform algorithm.</p>
  * <p>If the amount of items is less then 16, then it will use brute force
- * (i.e. {@link #pickSmall}) to find an optimal solution. Or
- * it will use heuristic algorithm (i.e. {@link #pickLarge}) to do it.</p>
+ * (i.e. {@link #depthFirstSearch}) to find an optimal solution. Or
+ * it will use heuristic algorithm (i.e. {@link #geneticAlgorithm}) to do it.</p>
  * 
  * @author Wei-Cheng Pan
  */
@@ -53,9 +53,9 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	 */
 	public static< T > Pack< T > pick( Long limit, Hashtable< T, Long > items ) {
 		if( items.size() < 16 ) {
-			return Pack.pickSmall( limit, items );
+			return Pack.depthFirstSearch( limit, items );
 		} else {
-			return Pack.pickLarge( limit, items );
+			return Pack.geneticAlgorithm( limit, items );
 		}
 	}
 	
@@ -67,9 +67,9 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	 * @param items object value table
 	 * @return solution
 	 */
-	public static< T > Pack< T > pickLarge( Long limit, Hashtable< T, Long > items ) {
+	public static< T > Pack< T > geneticAlgorithm( Long limit, Hashtable< T, Long > items ) {
 		GeneticAlgorithm< T > ga = new GeneticAlgorithm< T >( limit, items );
-		return ga.perform();
+		return ga.call();
 	}
 
 	/**
@@ -79,8 +79,8 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	 * @param items object value table
 	 * @return solution
 	 */
-	public static< T > Pack< T > pickSmall( Long limit, Hashtable< T, Long > items ) {
-		return new Recursion< T >( limit, items ).perform( 0, new Pack< T >() );
+	public static< T > Pack< T > depthFirstSearch( Long limit, Hashtable< T, Long > items ) {
+		return new DepthFirstSearch< T >( limit, items ).call( 0, new Pack< T >() );
 	}
 	
 	/**
@@ -246,7 +246,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 			Collections.sort( this.population_ );
 		}
 		
-		public Pack< T > perform() {
+		public Pack< T > call() {
 			while( !this.canStop() ) {
 				this.crossOver();
 				this.mutation();
@@ -349,13 +349,13 @@ public class Pack< T > implements Comparable< Pack< T > > {
 		
 	}
 	
-	private static class Recursion< T > {
+	private static class DepthFirstSearch< T > {
 		
 		private Vector< T > keys_;
 		private Vector< Long > values_;
 		private Long limit_;
 		
-		public Recursion( Long limit, Hashtable< T, Long > items ) {
+		public DepthFirstSearch( Long limit, Hashtable< T, Long > items ) {
 			Vector< Entry< T, Long > > tmp = new Vector< Entry< T, Long > >( items.entrySet() );
 			Collections.sort( tmp, new Comparator< Entry< T, Long > >() {
 				@Override
@@ -374,14 +374,14 @@ public class Pack< T > implements Comparable< Pack< T > > {
 			this.limit_ = limit;
 		}
 		
-		public Pack< T > perform( int n, Pack< T > p ) {
+		public Pack< T > call( int n, Pack< T > p ) {
 			if( p.score_ > this.limit_) {
 				return new Pack< T >();
 			} else if( n == this.keys_.size() ) {
 				return p;
 			} else {
-				Pack< T > a = this.perform( n + 1, p );
-				Pack< T > b = this.perform( n + 1, p.add( this.keys_.get( n ) , this.values_.get( n ) ) );
+				Pack< T > a = this.call( n + 1, p );
+				Pack< T > b = this.call( n + 1, p.add( this.keys_.get( n ) , this.values_.get( n ) ) );
 				if( a.compareTo( b ) > 0 ) {
 					return a;
 				} else {
@@ -399,9 +399,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	 * @param items object value table
 	 * @return solution
 	 */
-	/*
-	@Deprecated
-	public static< T > Pack< T > pickSmall2( Long limit, Hashtable< T, Long > items ) {
+	public static< T > Pack< T > breadthFirstSearch( Long limit, Hashtable< T, Long > items ) {
 		Vector< Pack< T > > table = new Vector< Pack< T > >();
 		table.add( new Pack< T >() );
 		
@@ -426,6 +424,5 @@ public class Pack< T > implements Comparable< Pack< T > > {
 		}
 		return max;
 	}
-	*/
 
 }

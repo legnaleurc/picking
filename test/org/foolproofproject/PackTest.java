@@ -52,7 +52,7 @@ public class PackTest {
 	
 	@Test
 	public void testSmall() {
-		Pack< Integer > dfs = Pack.pickSmall( limit, table );
+		Pack< Integer > dfs = Pack.depthFirstSearch( limit, table );
 		Collections.sort( dfs.getItems() );
 		System.out.println( dfs );
 		

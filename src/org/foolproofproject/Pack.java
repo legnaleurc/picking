@@ -150,6 +150,49 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	
 	private static class BinarySearch< T > {
 		
+		private class Index {
+			
+			private Boolean c_;
+			private Vector< Boolean > b_;
+			
+			public Index( int digits, Boolean carry ) {
+				this.c_ = carry;
+				this.b_ = new Vector< Boolean >();
+				this.b_.setSize( digits );
+				Collections.fill( this.b_, false );
+			}
+			
+			public Index( Index index ) {
+				this.c_ = index.c_;
+				this.b_ = new Vector< Boolean >( index.b_ ); 
+			}
+
+			public Vector< Boolean > getIndex() {
+				return this.b_;
+			}
+			
+			public Index avg( Index that ) {
+				Index m = new Index( this.b_.size(), false );
+				for( int i = 0; i < this.b_.size(); ++i ) {
+					m.b_.set( i, this.b_.get( i ) ^ that.b_.get( i ) ^ m.c_ );
+					m.c_ = ( this.b_.get( i ) && that.b_.get( i ) ) || ( m.c_ ^ ( this.b_.get( i ) ^ that.b_.get( i ) ) );
+				}
+				m.b_.remove( 0 );
+				m.b_.add( false );
+				return m;
+			}
+			
+			public Index dec() {
+				Index result = new Index( this );
+				Boolean borrow = true;
+				while( borrow ) {
+					;
+				}
+				return null;
+			}
+			
+		}
+		
 		private Long limit_;
 		private Hashtable< T, Long > items_;
 		private Vector< T > map_;
@@ -161,41 +204,43 @@ public class Pack< T > implements Comparable< Pack< T > > {
 		}
 		
 		public Pack< T > call() {
-			Vector< Boolean > lower = new Vector< Boolean >();
-			for( int i = 0; i <= items.size(); ++i ) {
-				lower.add( false );
-			}
-			Vector< Boolean > upper = new Vector< Boolean >();
-			for( int i = 0; i < items.size(); ++i ) {
-				upper.add( false );
-			}
-			upper.add( true );
-			Vector< Boolean > middle = Pack.avg( upper, lower );
-			Long mValue = Pack.value( middle );
+			Index lower = new Index( this.items_.size(), false );
+			Index upper = new Index( this.items_.size(), false );
 			
-			while( true ) {
-				;
-			}
+			return this.call( lower, upper );
 		}
 		
-		private Vector< Boolean > avg( Vector< Boolean > l, Vector< Boolean > r ) {
-			Vector< Boolean > m = new Vector< Boolean >();
-			Boolean c = false;
-			for( int i = 0; i < l.size(); ++i ) {
-				m.add( l.get( i ) ^ r.get( i ) ^ c );
-				c = ( l.get( i ) && r.get( i ) ) || ( c ^ ( l.get( i ) ^ r.get( i ) ) );
+		private Pack< T > call( Index l, Index u ) {
+			if( this.eval( l ) == this.limit_ ) {
+				return this.extract( l );
 			}
-			m.add( c );
-			m.remove( 0 );
-			m.add( false );
-			return m;
+			if( this.eval( u ) == this.limit_ ) {
+				return this.extract( u );
+			}
+			Index ml = l.avg( u );
+			return null;
 		}
 		
-		private Long compute( Vector< Boolean > t ) {
-			for( int i = 0; i < t.size() - 1; ++i ) {
-				;
+		private Long eval( Index index ) {
+			Long sum = 0L;
+			Vector< Boolean > b = index.getIndex();
+			for( int i = 0; i < b.size(); ++i ) {
+				if( b.get( i ) ) {
+					sum += this.items_.get( this.map_.get( i ) );
+				}
 			}
-			return 0L;
+			return sum;
+		}
+		
+		private Pack< T > extract( Index index ) {
+			Vector< T > items = new Vector< T >();
+			Vector< Boolean > b = index.getIndex();
+			for( int i = 0; i < b.size(); ++i ) {
+				if( b.get( i ) ) {
+					items.add( this.map_.get( i ) );
+				}
+			}
+			return new Pack< T >( this.eval( index ), items );
 		}
 		
 	}

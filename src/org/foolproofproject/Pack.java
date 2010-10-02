@@ -55,7 +55,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 		if( items.size() < 16 ) {
 			return Pack.depthFirstSearch( limit, items );
 		} else {
-			return Pack.geneticAlgorithm( limit, items );
+			return Pack.binarySearch( limit, items );
 		}
 	}
 	
@@ -188,19 +188,23 @@ public class Pack< T > implements Comparable< Pack< T > > {
 			
 			public BinaryIndex add( BinaryIndex that ) {
 				BinaryIndex tmp = new BinaryIndex( this.b_.size() );
+				Boolean carry = false;
 				for( int i = 0; i < this.b_.size(); ++i ) {
-					tmp.b_.set( i, this.b_.get( i ) ^ that.b_.get( i ) ^ tmp.c_ );
-					tmp.c_ = ( this.b_.get( i ) && that.b_.get( i ) ) || ( tmp.c_ ^ ( this.b_.get( i ) ^ that.b_.get( i ) ) );
+					tmp.b_.set( i, this.b_.get( i ) ^ that.b_.get( i ) ^ carry );
+					carry = ( this.b_.get( i ) && that.b_.get( i ) ) || ( that.b_.get( i ) ^ carry ) || ( carry ^ this.b_.get( i ) );
 				}
+				tmp.c_ = carry;
 				return tmp;
 			}
 			
 			public BinaryIndex sub( BinaryIndex that ) {
 				BinaryIndex tmp = new BinaryIndex( this.b_.size() );
+				Boolean carry = false;
 				for( int i = 0; i < this.b_.size(); ++i ) {
-					tmp.b_.set( i, this.b_.get( i ) ^ that.b_.get( i ) ^ tmp.c_ );
-					tmp.c_ = ( !this.b_.get( i ) && that.b_.get( i ) ) || ( tmp.c_ ^ ( !this.b_.get( i ) ^ that.b_.get( i ) ) );
+					tmp.b_.set( i, this.b_.get( i ) ^ that.b_.get( i ) ^ carry );
+					carry = ( !this.b_.get( i ) && that.b_.get( i ) ) || ( that.b_.get( i ) ^ carry ) || ( carry ^ !this.b_.get( i ) );
 				}
+				tmp.c_ = carry;
 				return tmp;
 			}
 			
@@ -214,12 +218,14 @@ public class Pack< T > implements Comparable< Pack< T > > {
 			
 			public BinaryIndex sub() {
 				BinaryIndex tmp = new BinaryIndex( this.b_.size() );
-				tmp.b_.set( 0, this.b_.get( 0 ) ^ true ^ tmp.c_ );
-				tmp.c_ = ( !this.b_.get( 0 ) && true ) || ( tmp.c_ ^ ( !this.b_.get( 0 ) ^ true ) );
+				Boolean carry = false;
+				tmp.b_.set( 0, this.b_.get( 0 ) ^ true ^ carry );
+				carry = ( !this.b_.get( 0 ) && true ) || ( carry ^ ( !this.b_.get( 0 ) ^ true ) );
 				for( int i = 1; i < this.b_.size(); ++i ) {
-					tmp.b_.set( i, this.b_.get( i ) ^ false ^ tmp.c_ );
-					tmp.c_ = ( !this.b_.get( i ) && false ) || ( tmp.c_ ^ ( !this.b_.get( i ) ^ false ) );
+					tmp.b_.set( i, this.b_.get( i ) ^ false ^ carry );
+					carry = ( !this.b_.get( i ) && false ) || ( false ^ carry ) || ( carry ^ !this.b_.get( i ) );
 				}
+				tmp.c_ = carry;
 				return tmp;
 			}
 			

@@ -150,45 +150,77 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	
 	private static class BinarySearch< T > {
 		
-		private class Index {
+		private static class BinaryIndex {
 			
 			private Boolean c_;
 			private Vector< Boolean > b_;
 			
-			public Index( int digits, Boolean carry ) {
-				this.c_ = carry;
-				this.b_ = new Vector< Boolean >();
-				this.b_.setSize( digits );
-				Collections.fill( this.b_, false );
+			public static BinaryIndex max( int digits ) {
+				BinaryIndex tmp = BinaryIndex.zero( digits );
+				tmp.c_ = true;
+				return tmp;
 			}
 			
-			public Index( Index index ) {
-				this.c_ = index.c_;
-				this.b_ = new Vector< Boolean >( index.b_ ); 
+			public static BinaryIndex zero( int digits ) {
+				BinaryIndex tmp = new BinaryIndex( digits );
+				Collections.fill( tmp.b_, false );
+				return tmp;
+			}
+			
+			private BinaryIndex( int digits ) {
+				this.c_ = false;
+				this.b_ = new Vector< Boolean >();
+				this.b_.setSize( digits );
+			}
+			
+			public BinaryIndex( BinaryIndex that ) {
+				this.c_ = that.c_;
+				this.b_ = new Vector< Boolean >( that.b_ ); 
+			}
+			
+			public Boolean equals( BinaryIndex that ) {
+				return ( this.c_ == that.c_ ) && ( this.b_.equals( that.b_ ) );
 			}
 
 			public Vector< Boolean > getIndex() {
 				return this.b_;
 			}
 			
-			public Index avg( Index that ) {
-				Index m = new Index( this.b_.size(), false );
+			public BinaryIndex add( BinaryIndex that ) {
+				BinaryIndex tmp = new BinaryIndex( this.b_.size() );
 				for( int i = 0; i < this.b_.size(); ++i ) {
-					m.b_.set( i, this.b_.get( i ) ^ that.b_.get( i ) ^ m.c_ );
-					m.c_ = ( this.b_.get( i ) && that.b_.get( i ) ) || ( m.c_ ^ ( this.b_.get( i ) ^ that.b_.get( i ) ) );
+					tmp.b_.set( i, this.b_.get( i ) ^ that.b_.get( i ) ^ tmp.c_ );
+					tmp.c_ = ( this.b_.get( i ) && that.b_.get( i ) ) || ( tmp.c_ ^ ( this.b_.get( i ) ^ that.b_.get( i ) ) );
 				}
-				m.b_.remove( 0 );
-				m.b_.add( false );
-				return m;
+				return tmp;
 			}
 			
-			public Index dec() {
-				Index result = new Index( this );
-				Boolean borrow = true;
-				while( borrow ) {
-					;
+			public BinaryIndex sub( BinaryIndex that ) {
+				BinaryIndex tmp = new BinaryIndex( this.b_.size() );
+				for( int i = 0; i < this.b_.size(); ++i ) {
+					tmp.b_.set( i, this.b_.get( i ) ^ that.b_.get( i ) ^ tmp.c_ );
+					tmp.c_ = ( !this.b_.get( i ) && that.b_.get( i ) ) || ( tmp.c_ ^ ( !this.b_.get( i ) ^ that.b_.get( i ) ) );
 				}
-				return null;
+				return tmp;
+			}
+			
+			public BinaryIndex div() {
+				BinaryIndex tmp = new BinaryIndex( this );
+				tmp.b_.remove( 0 );
+				tmp.b_.add( tmp.c_ );
+				tmp.c_ = false;
+				return tmp;
+			}
+			
+			public BinaryIndex sub() {
+				BinaryIndex tmp = new BinaryIndex( this.b_.size() );
+				tmp.b_.set( 0, this.b_.get( 0 ) ^ true ^ tmp.c_ );
+				tmp.c_ = ( !this.b_.get( 0 ) && true ) || ( tmp.c_ ^ ( !this.b_.get( 0 ) ^ true ) );
+				for( int i = 1; i < this.b_.size(); ++i ) {
+					tmp.b_.set( i, this.b_.get( i ) ^ false ^ tmp.c_ );
+					tmp.c_ = ( !this.b_.get( i ) && false ) || ( tmp.c_ ^ ( !this.b_.get( i ) ^ false ) );
+				}
+				return tmp;
 			}
 			
 		}
@@ -204,24 +236,32 @@ public class Pack< T > implements Comparable< Pack< T > > {
 		}
 		
 		public Pack< T > call() {
-			Index lower = new Index( this.items_.size(), false );
-			Index upper = new Index( this.items_.size(), false );
+			BinaryIndex lower = BinaryIndex.zero( this.items_.size() );
+			BinaryIndex upper = BinaryIndex.max( this.items_.size() );
 			
-			return this.call( lower, upper );
+			return this.extract( this.call( lower, upper ) );
 		}
 		
-		private Pack< T > call( Index l, Index u ) {
-			if( this.eval( l ) == this.limit_ ) {
-				return this.extract( l );
+		private BinaryIndex call( BinaryIndex b, BinaryIndex e ) {
+			BinaryIndex u = b.add( e.sub( b ).div() );
+			BinaryIndex l = u.sub();
+			Long lv = this.eval( l );
+			Long uv = this.eval( u );
+			
+			if( u.equals( l ) ) {
+				return l;
+			} else if( this.limit_ < lv ) {
+				return this.call( b, u );
+			} else if( this.limit_ > uv ) {
+				return this.call( u, e );
+			} else if( this.limit_ == lv ) {
+				return l;
+			} else {
+				return l;
 			}
-			if( this.eval( u ) == this.limit_ ) {
-				return this.extract( u );
-			}
-			Index ml = l.avg( u );
-			return null;
 		}
 		
-		private Long eval( Index index ) {
+		private Long eval( BinaryIndex index ) {
 			Long sum = 0L;
 			Vector< Boolean > b = index.getIndex();
 			for( int i = 0; i < b.size(); ++i ) {
@@ -232,7 +272,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 			return sum;
 		}
 		
-		private Pack< T > extract( Index index ) {
+		private Pack< T > extract( BinaryIndex index ) {
 			Vector< T > items = new Vector< T >();
 			Vector< Boolean > b = index.getIndex();
 			for( int i = 0; i < b.size(); ++i ) {

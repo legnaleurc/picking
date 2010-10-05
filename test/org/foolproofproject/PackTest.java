@@ -51,24 +51,23 @@ public class PackTest {
 	}
 	
 	@Test
-	public void testSmall() {
-		Pack< Integer > dfs = Pack.depthFirstSearch( limit, table );
-		Collections.sort( dfs.getItems() );
-		System.out.println( dfs );
+	public void testBinarySearch() {
+		Pack< Integer > bs = Pack.binarySearch( limit, table );
+		Collections.sort( bs.getItems() );
+		System.out.println( bs );
 		
 		Long sum = 0L;
-		for( int i : dfs.getItems() ) {
+		for( int i : bs.getItems() ) {
 			sum += table.get( i );
 		}
-		System.out.println( sum );
-		assertEquals( sum, dfs.getScore() );
+		assertEquals( sum, bs.getScore() );
 	}
 
 	@Test
-	public void testPick() {
+	public void testGeneticAlgorithm() {
 		long[] result = new long[10];
 		for( int i = 0; i < 10; ++i ) {
-			result[i] = Pack.pick( limit, table ).getScore();
+			result[i] = Pack.geneticAlgorithm( limit, table ).getScore();
 		}
 		Arrays.sort( result );
 		StringBuilder sin = new StringBuilder( String.valueOf( result[0] ) );
@@ -77,6 +76,19 @@ public class PackTest {
 			sin.append( result[i] );
 		}
 		System.out.println( sin );
+	}
+	
+	@Test
+	public void testDepthFirstSearch() {
+		Pack< Integer > dfs = Pack.depthFirstSearch( limit, table );
+		Collections.sort( dfs.getItems() );
+		System.out.println( dfs );
+		
+		Long sum = 0L;
+		for( int i : dfs.getItems() ) {
+			sum += table.get( i );
+		}
+		assertEquals( sum, dfs.getScore() );
 	}
 
 }

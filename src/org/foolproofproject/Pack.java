@@ -52,10 +52,10 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	 * @return solution
 	 */
 	public static< T > Pack< T > pick( Long limit, Hashtable< T, Long > items ) {
-		if( items.size() < 16 ) {
-			return Pack.depthFirstSearch( limit, items );
-		} else {
+		if( items.size() < 26 ) {
 			return Pack.binarySearch( limit, items );
+		} else {
+			return Pack.geneticAlgorithm( limit, items );
 		}
 	}
 	
@@ -155,13 +155,13 @@ public class Pack< T > implements Comparable< Pack< T > > {
 			private Boolean c_;
 			private Vector< Boolean > b_;
 			
-			public static BinaryIndex max( int digits ) {
-				BinaryIndex tmp = BinaryIndex.zero( digits );
+			public static BinaryIndex end( int digits ) {
+				BinaryIndex tmp = BinaryIndex.begin( digits );
 				tmp.c_ = true;
 				return tmp;
 			}
 			
-			public static BinaryIndex zero( int digits ) {
+			public static BinaryIndex begin( int digits ) {
 				BinaryIndex tmp = new BinaryIndex( digits );
 				Collections.fill( tmp.b_, false );
 				return tmp;
@@ -181,30 +181,43 @@ public class Pack< T > implements Comparable< Pack< T > > {
 			public Boolean equals( BinaryIndex that ) {
 				return ( this.c_ == that.c_ ) && ( this.b_.equals( that.b_ ) );
 			}
+			
+			public String toString() {
+				Long tmp = 0L;
+				for( int i = 0; i < this.b_.size(); ++i ) {
+					if( this.b_.get( i ) ) {
+						tmp += ( long )Math.floor( Math.pow( 2, i ) );
+					}
+				}
+				if( this.c_ ) {
+					tmp += ( long )Math.floor( Math.pow( 2, this.b_.size() ) );
+				}
+				return tmp.toString();
+			}
 
 			public Vector< Boolean > getIndex() {
 				return this.b_;
 			}
 			
 			public BinaryIndex add( BinaryIndex that ) {
-				BinaryIndex tmp = new BinaryIndex( this.b_.size() );
+				BinaryIndex tmp = new BinaryIndex( this );
 				Boolean carry = false;
 				for( int i = 0; i < this.b_.size(); ++i ) {
 					tmp.b_.set( i, this.b_.get( i ) ^ that.b_.get( i ) ^ carry );
-					carry = ( this.b_.get( i ) && that.b_.get( i ) ) || ( that.b_.get( i ) ^ carry ) || ( carry ^ this.b_.get( i ) );
+					carry = ( this.b_.get( i ) && that.b_.get( i ) ) || ( that.b_.get( i ) && carry ) || ( carry && this.b_.get( i ) );
 				}
 				tmp.c_ = carry;
 				return tmp;
 			}
 			
 			public BinaryIndex sub( BinaryIndex that ) {
-				BinaryIndex tmp = new BinaryIndex( this.b_.size() );
+				BinaryIndex tmp = new BinaryIndex( this );
 				Boolean carry = false;
 				for( int i = 0; i < this.b_.size(); ++i ) {
 					tmp.b_.set( i, this.b_.get( i ) ^ that.b_.get( i ) ^ carry );
-					carry = ( !this.b_.get( i ) && that.b_.get( i ) ) || ( that.b_.get( i ) ^ carry ) || ( carry ^ !this.b_.get( i ) );
+					carry = ( !this.b_.get( i ) && that.b_.get( i ) ) || ( that.b_.get( i ) && carry ) || ( carry && !this.b_.get( i ) );
 				}
-				tmp.c_ = carry;
+				tmp.c_ ^= carry;
 				return tmp;
 			}
 			
@@ -217,15 +230,15 @@ public class Pack< T > implements Comparable< Pack< T > > {
 			}
 			
 			public BinaryIndex sub() {
-				BinaryIndex tmp = new BinaryIndex( this.b_.size() );
+				BinaryIndex tmp = new BinaryIndex( this );
 				Boolean carry = false;
 				tmp.b_.set( 0, this.b_.get( 0 ) ^ true ^ carry );
-				carry = ( !this.b_.get( 0 ) && true ) || ( carry ^ ( !this.b_.get( 0 ) ^ true ) );
+				carry = ( !this.b_.get( 0 ) /*&& true*/ ) || ( /*true &&*/ carry ) || ( carry && !this.b_.get( 0 ) );
 				for( int i = 1; i < this.b_.size(); ++i ) {
 					tmp.b_.set( i, this.b_.get( i ) ^ false ^ carry );
-					carry = ( !this.b_.get( i ) && false ) || ( false ^ carry ) || ( carry ^ !this.b_.get( i ) );
+					carry = /*( !this.b_.get( i ) && false ) || ( false && carry ) ||*/ ( carry && !this.b_.get( i ) );
 				}
-				tmp.c_ = carry;
+				tmp.c_ ^= carry;
 				return tmp;
 			}
 			
@@ -239,32 +252,54 @@ public class Pack< T > implements Comparable< Pack< T > > {
 			this.limit_ = limit;
 			this.items_ = items;
 			this.map_ = new Vector< T >( items.keySet() );
+			Collections.sort( this.map_, new Comparator< T >() {
+				@Override
+				public int compare( T l, T r ) {
+					return BinarySearch.this.items_.get( l ).compareTo( BinarySearch.this.items_.get( r ) );
+				}
+			} );
 		}
 		
 		public Pack< T > call() {
-			BinaryIndex lower = BinaryIndex.zero( this.items_.size() );
-			BinaryIndex upper = BinaryIndex.max( this.items_.size() );
+			BinaryIndex lower = BinaryIndex.begin( this.items_.size() );
+			BinaryIndex upper = BinaryIndex.end( this.items_.size() );
 			
 			return this.extract( this.call( lower, upper ) );
 		}
 		
 		private BinaryIndex call( BinaryIndex b, BinaryIndex e ) {
+			if( b.equals( e.sub() ) ) {
+				return b;
+			}
+			
 			BinaryIndex u = b.add( e.sub( b ).div() );
 			BinaryIndex l = u.sub();
 			Long lv = this.eval( l );
 			Long uv = this.eval( u );
 			
-			if( u.equals( l ) ) {
-				return l;
-			} else if( this.limit_ < lv ) {
-				return this.call( b, u );
-			} else if( this.limit_ > uv ) {
-				return this.call( u, e );
-			} else if( this.limit_ == lv ) {
-				return l;
-			} else {
+			if( this.limit_ == lv ) {
 				return l;
 			}
+			if( this.limit_ == uv ) {
+				return u;
+			}
+			
+			Vector< BinaryIndex > tmp = new Vector< BinaryIndex >();
+			if( this.limit_ < lv ) {
+				tmp.add( this.call( b, u ) );
+			}
+			if( this.limit_ > uv ) {
+				tmp.add( this.call( u, e ) );
+			}
+			if( tmp.isEmpty() ) {
+				return l;
+			}
+			return Collections.max( tmp, new Comparator< BinaryIndex >() {
+				@Override
+				public int compare( BinaryIndex l, BinaryIndex r ) {
+					return BinarySearch.this.eval( l ).compareTo( BinarySearch.this.eval( r ) );
+				}
+			} );
 		}
 		
 		private Long eval( BinaryIndex index ) {

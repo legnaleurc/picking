@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.foolproofproject.Pack;
 import org.foolproofproject.picking.Performer;
 import org.foolproofproject.picking.SmartFile;
 import org.foolproofproject.picking.UnitUtility;
@@ -77,12 +78,12 @@ public class CommandLine {
 		Performer p = new Performer( limit, files );
 		
 		while( !p.noItem() ) {
-			Performer.Result pair = p.once();
-			System.out.println( UnitUtility.toString( pair.getValue(), eng ) + ":" );
-			for( SmartFile item : pair.getFiles() ) {
+			Pack< SmartFile > pair = p.call();
+			System.out.println( UnitUtility.toString( pair.getScore(), eng ) + ":" );
+			for( SmartFile item : pair.getItems() ) {
 				System.out.println( "\t" + item );
 			}
-			p.remove( pair.getFiles() );
+			p.remove( pair.getItems() );
 		}
 		
 		if( !p.noOverflow() ) {

@@ -60,7 +60,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	}
 	
 	public static< T > Pack< T > binarySearch( Long limit, Hashtable< T, Long > items ) {
-		return new BinarySearch< T >( limit, items ).call();
+		return ( Pack.needSearch( limit, items ) ) ? new BinarySearch< T >( limit, items ).call() : new Pack< T >( limit, new Vector< T >( items.keySet() ) );
 	}
 	
 	/**
@@ -72,8 +72,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	 * @return solution
 	 */
 	public static< T > Pack< T > geneticAlgorithm( Long limit, Hashtable< T, Long > items ) {
-		GeneticAlgorithm< T > ga = new GeneticAlgorithm< T >( limit, items );
-		return ga.call();
+		return ( Pack.needSearch( limit, items ) ) ? new GeneticAlgorithm< T >( limit, items ).call() : new Pack< T >( limit, new Vector< T >( items.keySet() ) );
 	}
 
 	/**
@@ -84,7 +83,52 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	 * @return solution
 	 */
 	public static< T > Pack< T > depthFirstSearch( Long limit, Hashtable< T, Long > items ) {
-		return new DepthFirstSearch< T >( limit, items ).call( 0, new Pack< T >() );
+		return ( Pack.needSearch( limit, items ) ) ? new DepthFirstSearch< T >( limit, items ).call( 0, new Pack< T >() ) : new Pack< T >( limit, new Vector< T >( items.keySet() ) );
+	}
+	
+	/**
+	 * Back-end to pick using BFS.
+	 * 
+	 * @param limit maximum value of combinations
+	 * @param items object value table
+	 * @return solution
+	 */
+	public static< T > Pack< T > breadthFirstSearch( Long limit, Hashtable< T, Long > items ) {
+		if( Pack.needSearch( limit, items ) ) {
+			return new Pack< T >( limit, new Vector< T >( items.keySet() ) );
+		}
+		
+		Vector< Pack< T > > table = new Vector< Pack< T > >();
+		table.add( new Pack< T >() );
+		
+		for( Entry< T, Long> e : items.entrySet() ) {
+			Vector< Pack< T > > tmp = new Vector< Pack< T > >();
+			for( Pack< T > p : table ) {
+				Long newSize = p.getScore() + e.getValue();
+				if( newSize <= limit ) {
+					Vector< T > newDirs = new Vector< T >( p.getItems() );
+					newDirs.add( e.getKey() );
+					tmp.add( new Pack< T >( newSize, newDirs ) );
+				}
+			}
+			table.addAll(table.size(), tmp);
+		}
+		
+		Pack< T > max = new Pack< T >();
+		for( Pack< T > p : table ) {
+			if( p.getScore() >= max.getScore() ) {
+				max = p;
+			}
+		}
+		return max;
+	}
+	
+	private static< T > Boolean needSearch( Long limit, Hashtable< T, Long > items ) {
+		Long sum = 0L;
+		for( Long v : items.values() ) {
+			sum += v;
+		}
+		return sum > limit;
 	}
 	
 	/**
@@ -572,39 +616,6 @@ public class Pack< T > implements Comparable< Pack< T > > {
 			}
 		}
 		
-	}
-	
-	/**
-	 * Back-end to pick using BFS.
-	 * 
-	 * @param limit maximum value of combinations
-	 * @param items object value table
-	 * @return solution
-	 */
-	public static< T > Pack< T > breadthFirstSearch( Long limit, Hashtable< T, Long > items ) {
-		Vector< Pack< T > > table = new Vector< Pack< T > >();
-		table.add( new Pack< T >() );
-		
-		for( Entry< T, Long> e : items.entrySet() ) {
-			Vector< Pack< T > > tmp = new Vector< Pack< T > >();
-			for( Pack< T > p : table ) {
-				Long newSize = p.getScore() + e.getValue();
-				if( newSize <= limit ) {
-					Vector< T > newDirs = new Vector< T >( p.getItems() );
-					newDirs.add( e.getKey() );
-					tmp.add( new Pack< T >( newSize, newDirs ) );
-				}
-			}
-			table.addAll(table.size(), tmp);
-		}
-		
-		Pack< T > max = new Pack< T >();
-		for( Pack< T > p : table ) {
-			if( p.getScore() >= max.getScore() ) {
-				max = p;
-			}
-		}
-		return max;
 	}
 
 }

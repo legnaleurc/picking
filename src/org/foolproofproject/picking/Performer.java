@@ -20,7 +20,6 @@
 package org.foolproofproject.picking;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Vector;
 import org.foolproofproject.Pack;
@@ -30,26 +29,6 @@ import org.foolproofproject.Pack;
  * @author Wei-Cheng Pan
  */
 public class Performer {
-	
-	/**
-	 * Store picking result.
-	 * @author Wei-Cheng Pan
-	 */
-	public class Result {
-		private long value_;
-		private Vector< SmartFile > files_;
-		private Result( long value, Vector< SmartFile > files ) {
-			this.value_ = value;
-			Collections.sort( files );
-			this.files_ = files;
-		}
-		public long getValue() {
-			return this.value_;
-		}
-		public Vector< SmartFile > getFiles() {
-			return this.files_;
-		}
-	}
 	
 	private final long limit_;
 	private long value_;
@@ -78,12 +57,8 @@ public class Performer {
 	 * Pick once.
 	 * @return Result.
 	 */
-	public Result once() {
-		if( this.value_ < this.limit_ ) {	// no need to pick, directly return result
-			return new Result( this.value_, this.items_ );
-		}
-		Pack< SmartFile > r = Pack.pick( this.limit_, this.table_ );
-		return new Result( r.getScore(), r.getItems() );
+	public Pack< SmartFile > call() {
+		return Pack.pick( this.limit_, this.table_ );
 	}
 	
 	/**

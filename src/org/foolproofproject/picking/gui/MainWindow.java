@@ -50,6 +50,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.foolproofproject.Pack;
 import org.foolproofproject.picking.Performer;
 import org.foolproofproject.picking.SmartFile;
 import org.foolproofproject.picking.UnitUtility;
@@ -336,9 +337,9 @@ public class MainWindow extends JFrame {
 		}
 		
 		while( !p.noItem() ) {
-			Performer.Result r = p.once();
-			this.result_.addResult( r.getValue(), this.unit_.getSelectedIndex(), r.getFiles() );
-			p.remove( r.getFiles() );
+			Pack< SmartFile > r = p.call();
+			this.result_.addResult( r.getScore(), this.unit_.getSelectedIndex(), r.getItems() );
+			p.remove( r.getItems() );
 		}
 		
 		this.result_.closeProgress();

@@ -31,7 +31,6 @@ import org.foolproofproject.Pack;
 public class Performer {
 	
 	private final long limit_;
-	private long value_;
 	private Hashtable< SmartFile, Long > table_;
 	private Vector< SmartFile > overflow_, items_;
 	
@@ -42,7 +41,6 @@ public class Performer {
 	 */
 	public Performer( long limit, File[] files ) {
 		this.limit_ = limit;
-		this.value_ = 0L;
 		this.items_ = new Vector< SmartFile >();
 		this.table_ = new Hashtable< SmartFile, Long >();
 		this.overflow_ = new Vector< SmartFile >();
@@ -68,7 +66,7 @@ public class Performer {
 	public void remove( Vector< SmartFile > keys ) {
 		this.items_.removeAll( keys );
 		for( SmartFile key : keys ) {
-			this.value_ -= this.table_.get( key );
+			this.table_.remove( key );
 		}
 	}
 	
@@ -87,7 +85,6 @@ public class Performer {
 	
 	private void put_( SmartFile key, long value ) {
 		if( value < this.limit_ ) {
-			this.value_ += value;
 			this.items_.add( key );
 		} else {
 			this.overflow_.add( key );

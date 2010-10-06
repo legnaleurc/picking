@@ -23,7 +23,6 @@
 package org.foolproofproject.picking.gui;
 
 import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -75,7 +74,7 @@ public class Preference extends JDialog {
 		JPanel k3b = new JPanel();
 		pane.add( k3b );
 		k3b.setBorder( BorderFactory.createTitledBorder( "K3B" ) );
-		k3b.setLayout( new FlowLayout() );
+		k3b.setLayout( new BoxLayout( k3b, BoxLayout.X_AXIS ) );
 		
 		k3b.add( new JLabel( "Save upper then" ) );
 		k3bLB = new NaturalField( 4000 );

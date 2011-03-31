@@ -187,7 +187,6 @@ public class DirectoryTree extends JPanel {
 				File file = ( File )selection.getLastPathComponent();
 				File[] items = file.listFiles( new CustomFilter( false ) );
 				Arrays.sort( items );
-				System.err.printf( "java sucks!!!! %d\n", this.selectionChanged_.countObservers() );
 				this.selectionChanged_.notifyObservers( items );
 			}
 		}
@@ -200,6 +199,10 @@ public class DirectoryTree extends JPanel {
 		}
 		JTree tree = ( JTree )current.getViewport().getView();
 		return tree;
+	}
+
+	public Observable onSelectionChanged() {
+		return this.selectionChanged_;
 	}
 
 	public void open( File file ) {
@@ -260,10 +263,6 @@ public class DirectoryTree extends JPanel {
 				this.dispatch_( tree );
 			}
 		}
-	}
-
-	public Observable onSelectionChanged() {
-		return this.selectionChanged_;
 	}
 
 	public void setHiddenVisible( boolean visible ) {

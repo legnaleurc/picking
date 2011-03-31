@@ -68,7 +68,6 @@ public class FileList extends JPanel {
 					int index = FileList.this.view_.locationToIndex( e.getPoint() );
 					if( index >= 0 ) {
 						File file = ( File )FileList.this.view_.getModel().getElementAt( index );
-						System.err.println( "java sucks!!" );
 						FileList.this.mouseDoubleClicked_.notifyObservers( file );
 					}
 				}

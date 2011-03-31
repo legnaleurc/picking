@@ -304,14 +304,12 @@ public class MainWindow extends JFrame {
 		this.tree_.onSelectionChanged().addObserver( new Observer() {
 			@Override
 			public void update( Observable o, Object arg ) {
-				System.err.println( "java sucks!" );
 				MainWindow.this.list_.setItems( (File[])arg );
 			}
 		} );
 		this.list_.onMouseDoubleClicked().addObserver( new Observer() {
 			@Override
 			public void update(Observable o, Object arg) {
-				System.err.println( "java sucks!!!" );
 				MainWindow.this.tree_.open( (File)arg );
 			}
 		} );

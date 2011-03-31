@@ -27,9 +27,9 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -78,7 +78,7 @@ class ResultWidget extends JPanel {
 	}
 	private static final long serialVersionUID = 3366458847085663811L;
 	private JTree resultTree_;
-	private Hashtable< SmartFile, Long > table_;
+	private HashMap< SmartFile, Long > table_;
 	private JPopupMenu popup_;
 	private DefaultMutableTreeNode selectedNode_;
 	private JProgressBar progressBar_;
@@ -185,7 +185,7 @@ class ResultWidget extends JPanel {
 		this.clear();
 	}
 
-	public void addOverflow( Vector< SmartFile > overflow ) {
+	public void addOverflow( ArrayList< SmartFile > overflow ) {
 		DefaultListModel model = (DefaultListModel) this.overflowList_.getModel();
 		for( SmartFile file : overflow ) {
 			model.addElement( file );
@@ -194,7 +194,7 @@ class ResultWidget extends JPanel {
 		this.progressBar_.setValue( this.progressBar_.getValue() + overflow.size() );
 	}
 
-	public void addResult( long size, int eng, Vector< SmartFile > items ) {
+	public void addResult( long size, int eng, ArrayList< SmartFile > items ) {
 		DefaultMutableTreeNode node = new LabelNode( size, eng );
 		for( SmartFile item : items ) {
 			node.add( new DefaultMutableTreeNode( item ) );
@@ -232,7 +232,7 @@ class ResultWidget extends JPanel {
 
 	public int exportK3BProjectsTo( File dout ) {
 		Long k3bBound = UnitUtility.extract( (Long)Configuration.get( "k3b_export_lower_bound" ), (Integer)Configuration.get( "k3b_export_bound_unit" ) );
-		Vector< DefaultMutableTreeNode > tmp = new Vector< DefaultMutableTreeNode >();
+		ArrayList< DefaultMutableTreeNode > tmp = new ArrayList< DefaultMutableTreeNode >();
 		for( Enumeration< ? > e = this.getRoot_().children(); e.hasMoreElements(); ) {
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode)e.nextElement();
 			if( node instanceof LabelNode ) {
@@ -269,7 +269,7 @@ class ResultWidget extends JPanel {
 		return root;
 	}
 
-	public void openProgress( Hashtable< SmartFile, Long > table ) {
+	public void openProgress( HashMap< SmartFile, Long > table ) {
 		this.clear();
 		this.table_ = table;
 		this.progressBar_.setMaximum( table.size() );

@@ -1,10 +1,10 @@
 /**
  * @file Configuration.java
  * @author Wei-Cheng Pan
- * 
+ *
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
- * 
+ *
  * This file is part of PicKing.
  *
  * PicKing is free software: you can redistribute it and/or modify
@@ -30,18 +30,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 /**
  * @brief Configuration utility.
  */
 public class Configuration implements Serializable {
-	
+
 	private static final long serialVersionUID = -6422237746611091558L;
 	private static final File file = new File( System.getProperty( "user.home" ) + File.separator + ".packing" );
 	private static Configuration self;
-	private Hashtable< String, Object > data;
-	
+	private HashMap< String, Object > data;
+
 	static {
 		try {
 			ObjectInputStream fin = new ObjectInputStream( new FileInputStream( file ) );
@@ -63,18 +63,7 @@ public class Configuration implements Serializable {
 			self = new Configuration();
 		}
 	}
-	
-	/**
-	 * @brief Set configuration.
-	 * @param key configuration key
-	 * @param value configuration value
-	 */
-	public static void set( String key, Object value ) {
-		synchronized (self) {
-			self.data.put(key, value);
-		}
-	}
-	
+
 	/**
 	 * @brief Get configuration.
 	 * @param key configuration key
@@ -84,15 +73,20 @@ public class Configuration implements Serializable {
 	public static Object get( String key ) {
 		return self.data.get( key );
 	}
-	
-	private Configuration() {
-		data = new Hashtable< String, Object >();
-		data.put( "limit", 4483L );
-		data.put( "unit", 2 );
-		data.put( "k3b_export_lower_bound", 4000L );
-		data.put( "k3b_export_bound_unit", 2 );
-		data.put( "debug", false );
-		data.put( "hidden", false );
+
+	private static boolean isWindows() {
+		return System.getProperty( "os.name" ).startsWith( "Windows" );
+	}
+
+	/**
+	 * @brief Set configuration.
+	 * @param key configuration key
+	 * @param value configuration value
+	 */
+	public static void set( String key, Object value ) {
+		synchronized (self) {
+			self.data.put(key, value);
+		}
 	}
 
 	/**
@@ -115,9 +109,15 @@ public class Configuration implements Serializable {
 			Runtime.getRuntime().exec( String.format( "ATTRIB +H \"%s\"" , file.getAbsolutePath()) ).waitFor();
 		}
 	}
-	
-	private static boolean isWindows() {
-		return System.getProperty( "os.name" ).startsWith( "Windows" );
+
+	private Configuration() {
+		this.data = new HashMap< String, Object >();
+		this.data.put( "limit", 4483L );
+		this.data.put( "unit", 2 );
+		this.data.put( "k3b_export_lower_bound", 4000L );
+		this.data.put( "k3b_export_bound_unit", 2 );
+		this.data.put( "debug", false );
+		this.data.put( "hidden", false );
 	}
 
 }

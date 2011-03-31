@@ -1,10 +1,10 @@
 /**
  * @file DirectoryTree.java
  * @author Wei-Cheng Pan
- * 
+ *
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
- * 
+ *
  * This file is part of PicKing.
  *
  * PicKing is free software: you can redistribute it and/or modify
@@ -24,9 +24,9 @@ package org.foolproofproject.picking.gui;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -49,142 +49,23 @@ import org.foolproofproject.picking.SmartFile;
  * Directory tree widget.
  */
 public class DirectoryTree extends JPanel {
-	
-	private static final long serialVersionUID = -8724999594568776949L;
-	private Vector< FileList > listener_;
-	private JTabbedPane tabWidget_;
-	private boolean viewHidden_;
-	
-	public DirectoryTree() {
-		this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
-		this.setBorder( BorderFactory.createTitledBorder( "Directory Tree" ) );
-		this.listener_ = new Vector< FileList >();
-		this.viewHidden_ = (Boolean) Configuration.get( "hidden" );
-		
-		this.tabWidget_ = new JTabbedPane();
-		this.add( tabWidget_ );
-		this.createTabs_();
-		this.tabWidget_.addChangeListener( new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				DirectoryTree.this.dispatch_( DirectoryTree.this.getCurrentTree_() );
-			}
-		} );
-	}
-	
-	private void dispatch_( JTree tree ) {
-		if( tree != null ) {
-			TreePath selection = tree.getSelectionPath();
-			if( selection != null ) {
-				File file = ( File )selection.getLastPathComponent();
-				File[] items = file.listFiles( new CustomFilter( false ) );
-				Arrays.sort( items );
-				for( FileList list : this.listener_ ) {
-					list.setItems( items );
-				}
-			}
+
+	private class CustomFilter implements FileFilter {
+		private boolean directoryOnly_;
+		public CustomFilter( boolean directoryOnly ) {
+			this.directoryOnly_ = directoryOnly;
+		}
+		@Override
+		public boolean accept(File file) {
+			boolean a = this.directoryOnly_ ? file.isDirectory() : true;
+			boolean b = DirectoryTree.this.viewHidden_ ? true : !file.isHidden();
+			return a && b;
 		}
 	}
-	
-	private void createTabs_() {
-		for( File root : File.listRoots() ) {
-			this.tabWidget_.addTab( root.getPath(), this.createRootTab_( SmartFile.fromFile( root ) ) );
-		}
-	}
-	
-	private JScrollPane createRootTab_( SmartFile root ) {
-		JTree view = new JTree( new DirectoryTreeModel( root ) );
-		view.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION );
-		view.addTreeSelectionListener( new TreeSelectionListener() {
-			@Override
-			public void valueChanged(TreeSelectionEvent e) {
-				DirectoryTree.this.dispatch_( ( JTree )e.getSource() );
-			}
-		} );
-		return new JScrollPane( view );
-	}
-	
-	private JTree getCurrentTree_() {
-		JScrollPane current = ( JScrollPane )this.tabWidget_.getSelectedComponent();
-		if( current == null ) {
-			return null;
-		}
-		JTree tree = ( JTree )current.getViewport().getView();
-		return tree;
-	}
-	
-	public void setHiddenVisible( boolean visible ) {
-		this.viewHidden_ = visible;
-	}
-	
-	public void addFileListListener( FileList list ) {
-		this.listener_.add( list );
-	}
-	
-	public void open( File file ) {
-		if( file.isDirectory() ) {
-			File root = file;
-			Vector< File > list = new Vector< File >();
-			while( root.getParentFile() != null ) {
-				list.insertElementAt( root, 0 );
-				root = root.getParentFile();
-			}
-			list.insertElementAt( root, 0 );
-			File[] roots = File.listRoots();
-			for( int i = 0; i < roots.length; ++i ) {
-				if( roots[i].equals( root ) ) {
-					this.tabWidget_.setSelectedIndex( i );
-					break;
-				}
-			}
-			
-			TreePath path = new TreePath( list.toArray() );
-			this.getCurrentTree_().setSelectionPath( path );
-		}
-	}
-	
-	public void refresh() {
-		// dump state
-		Hashtable< File, TreePath > sel = new Hashtable< File, TreePath >();
-		File curRoot = null;
-		for( int i = 0; i < this.tabWidget_.getTabCount(); ++i ) {
-			JScrollPane tab = ( JScrollPane )this.tabWidget_.getComponentAt( i );
-			JTree tree = ( JTree )tab.getViewport().getView();
-			File root = ( File )tree.getModel().getRoot();
-			TreePath path = tree.getSelectionPath();
-			if( path != null ) {
-				sel.put( root, path );
-			}
-			
-			if( this.tabWidget_.getSelectedIndex() == i ) {
-				curRoot = root;
-			}
-		}
-		
-		// clear tabs
-		this.tabWidget_.removeAll();
-		this.createTabs_();
-		
-		// restore state
-		for( int i = 0; i < this.tabWidget_.getTabCount(); ++i ) {
-			JScrollPane tab = ( JScrollPane )this.tabWidget_.getComponentAt( i );
-			JTree tree = ( JTree )tab.getViewport().getView();
-			File root = ( File )tree.getModel().getRoot();
-			TreePath path = sel.get( root );
-			if( path != null ) {
-				tree.setSelectionPath( path );
-			}
-			if( root.equals( curRoot ) ) {
-				this.tabWidget_.setSelectedIndex( i );
-				this.dispatch_( tree );
-			}
-		}
-	}
-	
 	private class DirectoryTreeModel implements TreeModel {
-		
+
 		private SmartFile root_;
-		
+
 		public DirectoryTreeModel( SmartFile root ) {
 			this.root_ = root;
 		}
@@ -192,7 +73,7 @@ public class DirectoryTree extends JPanel {
 		@Override
 		public void addTreeModelListener(TreeModelListener l) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -241,28 +122,147 @@ public class DirectoryTree extends JPanel {
 		@Override
 		public void removeTreeModelListener(TreeModelListener l) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void valueForPathChanged(TreePath path, Object newValue) {
 			// TODO Auto-generated method stub
-			
+
 		}
-		
+
 	}
-	
-	private class CustomFilter implements FileFilter {
-		private boolean directoryOnly_;
-		public CustomFilter( boolean directoryOnly ) {
-			this.directoryOnly_ = directoryOnly;
+	private static final long serialVersionUID = -8724999594568776949L;
+	private ArrayList< FileList > listener_;
+
+	private JTabbedPane tabWidget_;
+
+	private boolean viewHidden_;
+
+	public DirectoryTree() {
+		this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
+		this.setBorder( BorderFactory.createTitledBorder( "Directory Tree" ) );
+		this.listener_ = new ArrayList< FileList >();
+		this.viewHidden_ = (Boolean) Configuration.get( "hidden" );
+
+		this.tabWidget_ = new JTabbedPane();
+		this.add( this.tabWidget_ );
+		this.createTabs_();
+		this.tabWidget_.addChangeListener( new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				DirectoryTree.this.dispatch_( DirectoryTree.this.getCurrentTree_() );
+			}
+		} );
+	}
+
+	public void addFileListListener( FileList list ) {
+		this.listener_.add( list );
+	}
+
+	private JScrollPane createRootTab_( SmartFile root ) {
+		JTree view = new JTree( new DirectoryTreeModel( root ) );
+		view.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION );
+		view.addTreeSelectionListener( new TreeSelectionListener() {
+			@Override
+			public void valueChanged(TreeSelectionEvent e) {
+				DirectoryTree.this.dispatch_( ( JTree )e.getSource() );
+			}
+		} );
+		return new JScrollPane( view );
+	}
+
+	private void createTabs_() {
+		for( File root : File.listRoots() ) {
+			this.tabWidget_.addTab( root.getPath(), this.createRootTab_( SmartFile.fromFile( root ) ) );
 		}
-		@Override
-		public boolean accept(File file) {
-			boolean a = this.directoryOnly_ ? file.isDirectory() : true;
-			boolean b = DirectoryTree.this.viewHidden_ ? true : !file.isHidden();
-			return a && b;
+	}
+
+	private void dispatch_( JTree tree ) {
+		if( tree != null ) {
+			TreePath selection = tree.getSelectionPath();
+			if( selection != null ) {
+				File file = ( File )selection.getLastPathComponent();
+				File[] items = file.listFiles( new CustomFilter( false ) );
+				Arrays.sort( items );
+				for( FileList list : this.listener_ ) {
+					list.setItems( items );
+				}
+			}
 		}
+	}
+
+	private JTree getCurrentTree_() {
+		JScrollPane current = ( JScrollPane )this.tabWidget_.getSelectedComponent();
+		if( current == null ) {
+			return null;
+		}
+		JTree tree = ( JTree )current.getViewport().getView();
+		return tree;
+	}
+
+	public void open( File file ) {
+		if( file.isDirectory() ) {
+			File root = file;
+			ArrayList< File > list = new ArrayList< File >();
+			while( root.getParentFile() != null ) {
+				list.add( 0, root );
+				root = root.getParentFile();
+			}
+			list.add( 0, root );
+			File[] roots = File.listRoots();
+			for( int i = 0; i < roots.length; ++i ) {
+				if( roots[i].equals( root ) ) {
+					this.tabWidget_.setSelectedIndex( i );
+					break;
+				}
+			}
+
+			TreePath path = new TreePath( list.toArray() );
+			this.getCurrentTree_().setSelectionPath( path );
+		}
+	}
+
+	public void refresh() {
+		// dump state
+		HashMap< File, TreePath > sel = new HashMap< File, TreePath >();
+		File curRoot = null;
+		for( int i = 0; i < this.tabWidget_.getTabCount(); ++i ) {
+			JScrollPane tab = ( JScrollPane )this.tabWidget_.getComponentAt( i );
+			JTree tree = ( JTree )tab.getViewport().getView();
+			File root = ( File )tree.getModel().getRoot();
+			TreePath path = tree.getSelectionPath();
+			if( path != null ) {
+				sel.put( root, path );
+			}
+
+			if( this.tabWidget_.getSelectedIndex() == i ) {
+				curRoot = root;
+			}
+		}
+
+		// clear tabs
+		this.tabWidget_.removeAll();
+		this.createTabs_();
+
+		// restore state
+		for( int i = 0; i < this.tabWidget_.getTabCount(); ++i ) {
+			JScrollPane tab = ( JScrollPane )this.tabWidget_.getComponentAt( i );
+			JTree tree = ( JTree )tab.getViewport().getView();
+			File root = ( File )tree.getModel().getRoot();
+			TreePath path = sel.get( root );
+			if( path != null ) {
+				tree.setSelectionPath( path );
+			}
+			if( root.equals( curRoot ) ) {
+				this.tabWidget_.setSelectedIndex( i );
+				this.dispatch_( tree );
+			}
+		}
+	}
+
+	public void setHiddenVisible( boolean visible ) {
+		this.viewHidden_ = visible;
 	}
 
 }

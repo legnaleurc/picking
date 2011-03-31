@@ -1,7 +1,7 @@
 /*
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
- * 
+ *
  * This file is part of PicKing.
  *
  * PicKing is free software: you can redistribute it and/or modify
@@ -20,8 +20,9 @@
 package org.foolproofproject.picking;
 
 import java.io.File;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.foolproofproject.Pack;
 
 /**
@@ -29,11 +30,11 @@ import org.foolproofproject.Pack;
  * @author Wei-Cheng Pan
  */
 public class Performer {
-	
+
 	private final long limit_;
-	private Hashtable< SmartFile, Long > table_;
-	private Vector< SmartFile > overflow_, items_;
-	
+	private HashMap< SmartFile, Long > table_;
+	private ArrayList< SmartFile > overflow_, items_;
+
 	/**
 	 * Constructor.
 	 * @param limit Combination maximum size
@@ -41,16 +42,16 @@ public class Performer {
 	 */
 	public Performer( long limit, File[] files ) {
 		this.limit_ = limit;
-		this.items_ = new Vector< SmartFile >();
-		this.table_ = new Hashtable< SmartFile, Long >();
-		this.overflow_ = new Vector< SmartFile >();
-		
+		this.items_ = new ArrayList< SmartFile >();
+		this.table_ = new HashMap< SmartFile, Long >();
+		this.overflow_ = new ArrayList< SmartFile >();
+
 		for( File f : files ) {
 			SmartFile file = SmartFile.fromFile( f );
 			this.put_( file, file.getTotalSize() );
 		}
 	}
-	
+
 	/**
 	 * Pick once.
 	 * @return Result.
@@ -58,19 +59,12 @@ public class Performer {
 	public Pack< SmartFile > call() {
 		return Pack.pick( this.limit_, this.table_ );
 	}
-	
-	/**
-	 * Remove items by given keys.
-	 * @param keys Item keys
-	 */
-	public void remove( Vector< SmartFile > keys ) {
-		this.items_.removeAll( keys );
-		for( SmartFile key : keys ) {
-			this.table_.remove( key );
-		}
+
+	public ArrayList< SmartFile > getOverflow() {
+		return this.overflow_;
 	}
-	
-	public Hashtable< SmartFile, Long > getTable() {
+
+	public HashMap< SmartFile, Long > getTable() {
 		return this.table_;
 	}
 	public boolean noItem() {
@@ -79,10 +73,6 @@ public class Performer {
 	public boolean noOverflow() {
 		return this.overflow_.isEmpty();
 	}
-	public Vector< SmartFile > getOverflow() {
-		return this.overflow_;
-	}
-	
 	private void put_( SmartFile key, long value ) {
 		if( value < this.limit_ ) {
 			this.items_.add( key );
@@ -90,6 +80,17 @@ public class Performer {
 			this.overflow_.add( key );
 		}
 		this.table_.put( key, value );
+	}
+
+	/**
+	 * Remove items by given keys.
+	 * @param keys Item keys
+	 */
+	public void remove( ArrayList< SmartFile > keys ) {
+		this.items_.removeAll( keys );
+		for( SmartFile key : keys ) {
+			this.table_.remove( key );
+		}
 	}
 
 }

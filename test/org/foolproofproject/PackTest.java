@@ -1,7 +1,7 @@
 /*
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
- * 
+ *
  * This file is part of PicKing.
  *
  * PicKing is free software: you can redistribute it and/or modify
@@ -20,20 +20,21 @@
 package org.foolproofproject;
 
 import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class PackTest {
-	
-	private static Hashtable< Integer, Long > table = new Hashtable< Integer, Long >();
+
+	private static HashMap< Integer, Long > table = new HashMap< Integer, Long >();
 	private static long limit = 0L;
-	
-	private static Hashtable< Integer, Long > generateTestCase( int size, long seed ) {
-		Hashtable< Integer, Long > h = new Hashtable< Integer, Long >();
+
+	private static HashMap< Integer, Long > generateTestCase( int size, long seed ) {
+		HashMap< Integer, Long > h = new HashMap< Integer, Long >();
 		for( int i = 0; i < size; ++i ) {
 			long tmp = ( long )Math.floor( ( 0.5 + Math.random() * 2.5 * seed ) );
 			h.put( i, tmp);
@@ -49,18 +50,31 @@ public class PackTest {
 		limit = size * seed;
 		System.out.printf( "(%s,%d)\n", table, limit );
 	}
-	
+
 	@Test
 	public void testBinarySearch() {
 		Pack< Integer > bs = Pack.binarySearch( limit, table );
 		Collections.sort( bs.getItems() );
 		System.out.println( bs );
-		
+
 		Long sum = 0L;
 		for( int i : bs.getItems() ) {
 			sum += table.get( i );
 		}
 		assertEquals( sum, bs.getScore() );
+	}
+
+	@Test
+	public void testDepthFirstSearch() {
+		Pack< Integer > dfs = Pack.depthFirstSearch( limit, table );
+		Collections.sort( dfs.getItems() );
+		System.out.println( dfs );
+
+		Long sum = 0L;
+		for( int i : dfs.getItems() ) {
+			sum += table.get( i );
+		}
+		assertEquals( sum, dfs.getScore() );
 	}
 
 	@Test
@@ -76,19 +90,6 @@ public class PackTest {
 			sin.append( result[i] );
 		}
 		System.out.println( sin );
-	}
-	
-	@Test
-	public void testDepthFirstSearch() {
-		Pack< Integer > dfs = Pack.depthFirstSearch( limit, table );
-		Collections.sort( dfs.getItems() );
-		System.out.println( dfs );
-		
-		Long sum = 0L;
-		for( int i : dfs.getItems() ) {
-			sum += table.get( i );
-		}
-		assertEquals( sum, dfs.getScore() );
 	}
 
 }

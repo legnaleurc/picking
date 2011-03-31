@@ -1,10 +1,10 @@
 /**
  * @file FileList.java
  * @author Wei-Cheng Pan
- * 
+ *
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
- * 
+ *
  * This file is part of PicKing.
  *
  * PicKing is free software: you can redistribute it and/or modify
@@ -25,6 +25,8 @@ package org.foolproofproject.picking.gui;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.Observable;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -40,51 +42,51 @@ import javax.swing.event.ListSelectionListener;
 public class FileList extends JPanel {
 
 	private static final long serialVersionUID = -5296371739711677521L;
-	private JList view;
-	private DirectoryTree parentTree;
-	private JLabel items;
-	
-	public FileList( DirectoryTree tree ) {
-		parentTree = tree;
-		parentTree.addFileListListener( this );
-		view = new JList();
-		JScrollPane scroll = new JScrollPane( view );
-		setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
-		setBorder( BorderFactory.createTitledBorder( "File List" ) );
-		add( scroll );
-		
-		view.addMouseListener( new MouseAdapter() {
+	private JList view_;
+	private JLabel items_;
+	private Observable mouseDoubleClicked_;
+
+	public FileList() {
+		this.mouseDoubleClicked_ = new Observable() {
+			@Override
+			public void notifyObservers( Object arg ) {
+				this.setChanged();
+				super.notifyObservers( arg );
+			}
+		};
+
+		this.view_ = new JList();
+		JScrollPane scroll = new JScrollPane( this.view_ );
+		this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
+		this.setBorder( BorderFactory.createTitledBorder( "File List" ) );
+		this.add( scroll );
+
+		this.view_.addMouseListener( new MouseAdapter() {
+			@Override
 			public void mouseClicked( MouseEvent e ) {
 				if( e.getClickCount() == 2 ) {
-					int index = view.locationToIndex( e.getPoint() );
+					int index = FileList.this.view_.locationToIndex( e.getPoint() );
 					if( index >= 0 ) {
-						File file = ( File )view.getModel().getElementAt( index );
-						parentTree.open( file );
+						File file = ( File )FileList.this.view_.getModel().getElementAt( index );
+						System.err.println( "java sucks!!" );
+						FileList.this.mouseDoubleClicked_.notifyObservers( file );
 					}
 				}
 			}
 		} );
-		
-		items = new JLabel( "0" );
-		view.getSelectionModel().addListSelectionListener( new ListSelectionListener() {
+
+		this.items_ = new JLabel( "0" );
+		this.view_.getSelectionModel().addListSelectionListener( new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				items.setText( String.valueOf( view.getSelectedIndices().length ) );
+				FileList.this.items_.setText( String.valueOf( FileList.this.view_.getSelectedIndices().length ) );
 			}
 		} );
-		add( items );
+		this.add( this.items_ );
 	}
-	
-	public void setItems( File[] files ) {
-		if( files != null ) {
-			view.setListData( files );
-		} else {
-			view.removeAll();
-		}
-	}
-	
+
 	public File[] getSelectedFiles() {
-		Object[] selection = view.getSelectedValues();
+		Object[] selection = this.view_.getSelectedValues();
 		if( selection == null ) {
 			return null;
 		}
@@ -94,6 +96,18 @@ public class FileList extends JPanel {
 			tmp[i] = (File)selection[i];
 		}
 		return tmp;
+	}
+
+	public Observable onMouseDoubleClicked() {
+		return this.mouseDoubleClicked_;
+	}
+
+	public void setItems( File[] files ) {
+		if( files != null ) {
+			this.view_.setListData( files );
+		} else {
+			this.view_.removeAll();
+		}
 	}
 
 }

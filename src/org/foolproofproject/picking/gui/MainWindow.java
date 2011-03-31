@@ -1,7 +1,7 @@
 /**
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
- * 
+ *
  * This file is part of PicKing.
  *
  * PicKing is free software: you can redistribute it and/or modify
@@ -34,6 +34,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Observable;
+import java.util.Observer;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -57,11 +60,11 @@ import org.foolproofproject.picking.UnitUtility;
 
 /**
  * Main window.
- * 
+ *
  * @author Wei-Cheng Pan
  */
 public class MainWindow extends JFrame {
-	
+
 	private static final long serialVersionUID = 6869079478547863579L;
 	private FileList list_;
 	private NaturalField limit_;
@@ -71,24 +74,24 @@ public class MainWindow extends JFrame {
 	private Preference preference_;
 	private DirectoryTree tree_;
 	private JCheckBox hidden_;
-	
+
 	public MainWindow( String title ) {
 		super( title );
-		
+
 		this.setDefaultCloseOperation( EXIT_ON_CLOSE );
 		this.setSize( 800, 600 );
 		this.setLocationRelativeTo( null );
-		
+
 		Container pane = this.getContentPane();
 		pane.setLayout( new BoxLayout( pane, BoxLayout.Y_AXIS ) );
-		
+
 		this.initViewPort_();
 		this.initControlPanel_();
 		this.initPreference_();
 		this.initAbout_();
-		
+
 		this.initMenuBar_();
-		
+
 		this.addWindowListener( new WindowAdapter() {
 			@Override
 			public void windowClosing( WindowEvent e ) {
@@ -100,20 +103,16 @@ public class MainWindow extends JFrame {
 			}
 		} );
 	}
-	
-	private void initPreference_() {
-		this.preference_ = new Preference( this );
-	}
-	
+
 	private void initAbout_() {
 		this.about_ = new JDialog( this );
 		this.about_.setTitle( "About PacKing" );
 		this.about_.setSize( 320, 240 );
 		this.about_.setLocationRelativeTo( this );
-		
+
 		Container pane = this.about_.getContentPane();
 		pane.setLayout( new BoxLayout( pane, BoxLayout.Y_AXIS ) );
-		
+
 		JPanel center = new JPanel();
 		pane.add( center );
 		center.setLayout( new BoxLayout( center, BoxLayout.Y_AXIS ) );
@@ -124,11 +123,11 @@ public class MainWindow extends JFrame {
 		center.add( new JLabel( "License: LGPLv3 or later" ) );
 		center.add( new JLabel( "e-mail: legnaleurc@gmail.com" ) );
 		center.add( new JLabel( "blog: http://legnaleurc.blogspot.com/" ) );
-		
+
 		JPanel bottom = new JPanel();
 		pane.add( bottom );
 		bottom.setLayout( new GridLayout( 1, 1 ) );
-		
+
 		JButton ok = new JButton( "OK" );
 		bottom.add( ok );
 		ok.addMouseListener( new MouseAdapter() {
@@ -138,15 +137,65 @@ public class MainWindow extends JFrame {
 			}
 		} );
 	}
-	
+
+	private void initControlPanel_() {
+		JPanel panel = new JPanel();
+		panel.setLayout( new GridLayout( 1, 3 ) );
+
+		JPanel limitPanel = new JPanel();
+		panel.add( limitPanel );
+		limitPanel.setLayout( new GridLayout( 1, 2 ) );
+		limitPanel.setBorder( BorderFactory.createTitledBorder( "Limit" ) );
+
+		this.limit_ = new NaturalField();
+		limitPanel.add( this.limit_ );
+
+		this.unit_ = UnitUtility.createComboBox();
+		limitPanel.add( this.unit_ );
+
+		JPanel viewPanel = new JPanel();
+		panel.add( viewPanel );
+		viewPanel.setLayout( new GridLayout( 1, 1 ) );
+		viewPanel.setBorder( BorderFactory.createTitledBorder( "View" ) );
+
+		this.hidden_ = new JCheckBox( "Hidden" );
+		viewPanel.add( this.hidden_ );
+		this.hidden_.addActionListener( new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MainWindow.this.tree_.setHiddenVisible( MainWindow.this.hidden_.isSelected() );
+				MainWindow.this.tree_.refresh();
+			}
+		} );
+
+		JButton start = new JButton( "Start" );
+		panel.add( start );
+		start.addMouseListener( new MouseAdapter() {
+			@Override
+			public void mouseClicked( MouseEvent e ) {
+				new Thread( new Runnable() {
+					@Override
+					public void run() {
+						MainWindow.this.perform();
+					}
+				} ).start();
+			}
+		} );
+
+		Container pane = this.getContentPane();
+		pane.add( panel );
+
+		this.read();
+	}
+
 	private void initMenuBar_() {
 		JMenuBar menuBar = new JMenuBar();
 		this.setJMenuBar( menuBar );
-		
+
 		JMenu file = new JMenu( "File" );
 		menuBar.add( file );
 		file.setMnemonic( KeyEvent.VK_F );
-		
+
 		JMenuItem save = new JMenuItem( "Save Result" );
 		file.add( save );
 		save.setMnemonic( KeyEvent.VK_S );
@@ -157,7 +206,7 @@ public class MainWindow extends JFrame {
 				MainWindow.this.save();
 			}
 		} );
-		
+
 		JMenuItem export = new JMenuItem( "Export to K3B" );
 		file.add( export );
 		export.setMnemonic( KeyEvent.VK_E );
@@ -176,11 +225,11 @@ public class MainWindow extends JFrame {
 				}
 			}
 		} );
-		
+
 		JMenu edit = new JMenu( "Edit" );
 		menuBar.add( edit );
 		edit.setMnemonic( KeyEvent.VK_E );
-		
+
 		JMenuItem refresh = new JMenuItem( "Refresh" );
 		edit.add( refresh );
 		refresh.setMnemonic( KeyEvent.VK_R );
@@ -191,7 +240,7 @@ public class MainWindow extends JFrame {
 				MainWindow.this.tree_.refresh();
 			}
 		} );
-		
+
 		JMenuItem preferences = new JMenuItem( "Preferences" );
 		edit.add( preferences );
 		preferences.setMnemonic( KeyEvent.VK_P );
@@ -201,11 +250,11 @@ public class MainWindow extends JFrame {
 				MainWindow.this.preference_.exec( MainWindow.this.limit_.toLong(), MainWindow.this.unit_.getSelectedIndex(), MainWindow.this.hidden_.isSelected() );
 			}
 		} );
-		
+
 		JMenu help = new JMenu( "Help" );
 		menuBar.add( help );
 		help.setMnemonic( KeyEvent.VK_H );
-		
+
 		JMenuItem debugLog = new JMenuItem( "Debug Log" );
 		help.add( debugLog );
 		debugLog.setMnemonic( KeyEvent.VK_D );
@@ -215,7 +264,7 @@ public class MainWindow extends JFrame {
 				LogDialog.getDebugLog().setVisible( true );
 			}
 		} );
-		
+
 		JMenuItem errorLog = new JMenuItem( "Error Log" );
 		help.add( errorLog );
 		errorLog.setMnemonic( KeyEvent.VK_E );
@@ -225,7 +274,7 @@ public class MainWindow extends JFrame {
 				LogDialog.getErrorLog().setVisible( true );
 			}
 		} );
-		
+
 		JMenuItem about = new JMenuItem( "About ..." );
 		help.add( about );
 		about.setMnemonic( KeyEvent.VK_A );
@@ -237,81 +286,69 @@ public class MainWindow extends JFrame {
 		} );
 	}
 
+	private void initPreference_() {
+		this.preference_ = new Preference( this );
+	}
+
 	private void initViewPort_() {
 		JPanel central = new JPanel();
 		central.setLayout( new GridLayout( 1, 3 ) );
 		central.setMaximumSize( new Dimension( Integer.MAX_VALUE, Integer.MAX_VALUE ) );
-		
+
 		this.tree_ = new DirectoryTree();
 		central.add( this.tree_ );
-		
-		this.list_ = new FileList( tree_ );
+
+		this.list_ = new FileList();
 		central.add( this.list_ );
-		
+
+		this.tree_.onSelectionChanged().addObserver( new Observer() {
+			@Override
+			public void update( Observable o, Object arg ) {
+				System.err.println( "java sucks!" );
+				MainWindow.this.list_.setItems( (File[])arg );
+			}
+		} );
+		this.list_.onMouseDoubleClicked().addObserver( new Observer() {
+			@Override
+			public void update(Observable o, Object arg) {
+				System.err.println( "java sucks!!!" );
+				MainWindow.this.tree_.open( (File)arg );
+			}
+		} );
+
 		this.result_ = new ResultWidget();
 		central.add( this.result_ );
-		
+
 		Container pane = this.getContentPane();
 		pane.add( central );
-		
+
 		this.tree_.open( new SmartFile( System.getProperty( "user.home" ) ) );
 	}
-	
-	private void initControlPanel_() {
-		JPanel panel = new JPanel();
-		panel.setLayout( new GridLayout( 1, 3 ) );
-		
-		JPanel limitPanel = new JPanel();
-		panel.add( limitPanel );
-		limitPanel.setLayout( new GridLayout( 1, 2 ) );
-		limitPanel.setBorder( BorderFactory.createTitledBorder( "Limit" ) );
-		
-		this.limit_ = new NaturalField();
-		limitPanel.add( this.limit_ );
-		
-		this.unit_ = UnitUtility.createComboBox();
-		limitPanel.add( this.unit_ );
-		
-		JPanel viewPanel = new JPanel();
-		panel.add( viewPanel );
-		viewPanel.setLayout( new GridLayout( 1, 1 ) );
-		viewPanel.setBorder( BorderFactory.createTitledBorder( "View" ) );
-		
-		this.hidden_ = new JCheckBox( "Hidden" );
-		viewPanel.add( this.hidden_ );
-		this.hidden_.addActionListener( new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				MainWindow.this.tree_.setHiddenVisible( MainWindow.this.hidden_.isSelected() );
-				MainWindow.this.tree_.refresh();
-			}
-		} );
-		
-		JButton start = new JButton( "Start" );
-		panel.add( start );
-		start.addMouseListener( new MouseAdapter() {
-			public void mouseClicked( MouseEvent e ) {
-				new Thread( new Runnable() {
-					@Override
-					public void run() {
-						MainWindow.this.perform();
-					}
-				} ).start();
-			}
-		} );
-		
-		Container pane = this.getContentPane();
-		pane.add( panel );
-		
-		this.read();
+
+	public void perform() {
+		Performer p = new Performer( UnitUtility.extract( this.limit_.toLong(), this.unit_.getSelectedIndex() ), this.list_.getSelectedFiles() );
+
+		this.result_.openProgress( p.getTable() );
+
+		if( !p.noOverflow() ) {
+			this.result_.addOverflow( p.getOverflow() );
+		}
+
+		while( !p.noItem() ) {
+			Pack< SmartFile > r = p.call();
+			this.result_.addResult( r.getScore(), this.unit_.getSelectedIndex(), r.getItems() );
+			p.remove( r.getItems() );
+		}
+
+		this.result_.closeProgress();
 	}
-	
+
 	public void read() {
 		this.limit_.setLong( (Long) Configuration.get( "limit" ) );
 		this.unit_.setSelectedIndex( (Integer) Configuration.get( "unit" ) );
 		this.hidden_.setSelected( (Boolean) Configuration.get( "hidden" ) );
 	}
-	
+
 	public void save() {
 		File file = FileDialog.getSaveFileName( this, new FileNameExtensionFilter( "Plain Text", "txt" ));
 		if( file != null ) {
@@ -325,24 +362,6 @@ public class MainWindow extends JFrame {
 				LogDialog.getErrorLog().log( e.getMessage() );
 			}
 		}
-	}
-	
-	public void perform() {
-		Performer p = new Performer( UnitUtility.extract( this.limit_.toLong(), this.unit_.getSelectedIndex() ), this.list_.getSelectedFiles() );
-		
-		this.result_.openProgress( p.getTable() );
-		
-		if( !p.noOverflow() ) {
-			this.result_.addOverflow( p.getOverflow() );
-		}
-		
-		while( !p.noItem() ) {
-			Pack< SmartFile > r = p.call();
-			this.result_.addResult( r.getScore(), this.unit_.getSelectedIndex(), r.getItems() );
-			p.remove( r.getItems() );
-		}
-		
-		this.result_.closeProgress();
 	}
 
 }

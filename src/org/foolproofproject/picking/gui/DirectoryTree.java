@@ -27,6 +27,7 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Observable;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -133,16 +134,21 @@ public class DirectoryTree extends JPanel {
 
 	}
 	private static final long serialVersionUID = -8724999594568776949L;
-	private ArrayList< FileList > listener_;
-
 	private JTabbedPane tabWidget_;
-
 	private boolean viewHidden_;
+	private Observable selectionChanged_;
 
 	public DirectoryTree() {
+		this.selectionChanged_ = new Observable() {
+			@Override
+			public void notifyObservers( Object arg ) {
+				this.setChanged();
+				super.notifyObservers( arg );
+			}
+		};
+
 		this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
 		this.setBorder( BorderFactory.createTitledBorder( "Directory Tree" ) );
-		this.listener_ = new ArrayList< FileList >();
 		this.viewHidden_ = (Boolean) Configuration.get( "hidden" );
 
 		this.tabWidget_ = new JTabbedPane();
@@ -154,10 +160,6 @@ public class DirectoryTree extends JPanel {
 				DirectoryTree.this.dispatch_( DirectoryTree.this.getCurrentTree_() );
 			}
 		} );
-	}
-
-	public void addFileListListener( FileList list ) {
-		this.listener_.add( list );
 	}
 
 	private JScrollPane createRootTab_( SmartFile root ) {
@@ -185,9 +187,8 @@ public class DirectoryTree extends JPanel {
 				File file = ( File )selection.getLastPathComponent();
 				File[] items = file.listFiles( new CustomFilter( false ) );
 				Arrays.sort( items );
-				for( FileList list : this.listener_ ) {
-					list.setItems( items );
-				}
+				System.err.printf( "java sucks!!!! %d\n", this.selectionChanged_.countObservers() );
+				this.selectionChanged_.notifyObservers( items );
 			}
 		}
 	}
@@ -259,6 +260,10 @@ public class DirectoryTree extends JPanel {
 				this.dispatch_( tree );
 			}
 		}
+	}
+
+	public Observable onSelectionChanged() {
+		return this.selectionChanged_;
 	}
 
 	public void setHiddenVisible( boolean visible ) {

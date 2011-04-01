@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -34,8 +35,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Observable;
-import java.util.Observer;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -55,6 +54,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.foolproofproject.Pack;
 import org.foolproofproject.picking.Performer;
+import org.foolproofproject.picking.Signal;
 import org.foolproofproject.picking.SmartFile;
 import org.foolproofproject.picking.UnitUtility;
 
@@ -78,7 +78,7 @@ public class MainWindow extends JFrame {
 	public MainWindow( String title ) {
 		super( title );
 
-		this.setDefaultCloseOperation( EXIT_ON_CLOSE );
+		this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		this.setSize( 800, 600 );
 		this.setLocationRelativeTo( null );
 
@@ -199,7 +199,7 @@ public class MainWindow extends JFrame {
 		JMenuItem save = new JMenuItem( "Save Result" );
 		file.add( save );
 		save.setMnemonic( KeyEvent.VK_S );
-		save.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK ) );
+		save.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK ) );
 		save.addActionListener( new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -210,7 +210,7 @@ public class MainWindow extends JFrame {
 		JMenuItem export = new JMenuItem( "Export to K3B" );
 		file.add( export );
 		export.setMnemonic( KeyEvent.VK_E );
-		export.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK ) );
+		export.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK ) );
 		export.addActionListener( new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -301,16 +301,16 @@ public class MainWindow extends JFrame {
 		this.list_ = new FileList();
 		central.add( this.list_ );
 
-		this.tree_.onSelectionChanged().addObserver( new Observer() {
+		this.tree_.onSelectionChanged().connect( new Signal.Slot() {
 			@Override
-			public void update( Observable o, Object arg ) {
-				MainWindow.this.list_.setItems( (File[])arg );
+			public void call( Object sender, Object ... args ) {
+				MainWindow.this.list_.setItems( (File[])args[0] );
 			}
 		} );
-		this.list_.onMouseDoubleClicked().addObserver( new Observer() {
+		this.list_.onMouseDoubleClicked().connect( new Signal.Slot() {
 			@Override
-			public void update(Observable o, Object arg) {
-				MainWindow.this.tree_.open( (File)arg );
+			public void call( Object sender, Object ... args ) {
+				MainWindow.this.tree_.open( (File)args[0] );
 			}
 		} );
 

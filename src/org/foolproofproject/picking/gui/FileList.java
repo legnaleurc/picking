@@ -25,7 +25,6 @@ package org.foolproofproject.picking.gui;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.Observable;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -36,6 +35,8 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.foolproofproject.picking.Signal;
+
 /**
  * @brief File list widget.
  */
@@ -44,16 +45,10 @@ public class FileList extends JPanel {
 	private static final long serialVersionUID = -5296371739711677521L;
 	private JList view_;
 	private JLabel items_;
-	private Observable mouseDoubleClicked_;
+	private Signal mouseDoubleClicked_;
 
 	public FileList() {
-		this.mouseDoubleClicked_ = new Observable() {
-			@Override
-			public void notifyObservers( Object arg ) {
-				this.setChanged();
-				super.notifyObservers( arg );
-			}
-		};
+		this.mouseDoubleClicked_ = new Signal( this );
 
 		this.view_ = new JList();
 		JScrollPane scroll = new JScrollPane( this.view_ );
@@ -64,11 +59,11 @@ public class FileList extends JPanel {
 		this.view_.addMouseListener( new MouseAdapter() {
 			@Override
 			public void mouseClicked( MouseEvent e ) {
-				if( e.getClickCount() == 2 ) {
+				if( e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2 ) {
 					int index = FileList.this.view_.locationToIndex( e.getPoint() );
 					if( index >= 0 ) {
 						File file = ( File )FileList.this.view_.getModel().getElementAt( index );
-						FileList.this.mouseDoubleClicked_.notifyObservers( file );
+						FileList.this.mouseDoubleClicked_.emit( file );
 					}
 				}
 			}
@@ -97,7 +92,7 @@ public class FileList extends JPanel {
 		return tmp;
 	}
 
-	public Observable onMouseDoubleClicked() {
+	public Signal onMouseDoubleClicked() {
 		return this.mouseDoubleClicked_;
 	}
 

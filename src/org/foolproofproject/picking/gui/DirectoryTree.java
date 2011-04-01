@@ -27,7 +27,6 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Observable;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -44,6 +43,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.foolproofproject.picking.Signal;
 import org.foolproofproject.picking.SmartFile;
 
 /**
@@ -136,16 +136,10 @@ public class DirectoryTree extends JPanel {
 	private static final long serialVersionUID = -8724999594568776949L;
 	private JTabbedPane tabWidget_;
 	private boolean viewHidden_;
-	private Observable selectionChanged_;
+	private Signal selectionChanged_;
 
 	public DirectoryTree() {
-		this.selectionChanged_ = new Observable() {
-			@Override
-			public void notifyObservers( Object arg ) {
-				this.setChanged();
-				super.notifyObservers( arg );
-			}
-		};
+		this.selectionChanged_ = new Signal( this );
 
 		this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
 		this.setBorder( BorderFactory.createTitledBorder( "Directory Tree" ) );
@@ -187,7 +181,7 @@ public class DirectoryTree extends JPanel {
 				File file = ( File )selection.getLastPathComponent();
 				File[] items = file.listFiles( new CustomFilter( false ) );
 				Arrays.sort( items );
-				this.selectionChanged_.notifyObservers( items );
+				this.selectionChanged_.emit( (Object)items );
 			}
 		}
 	}
@@ -201,7 +195,7 @@ public class DirectoryTree extends JPanel {
 		return tree;
 	}
 
-	public Observable onSelectionChanged() {
+	public Signal onSelectionChanged() {
 		return this.selectionChanged_;
 	}
 

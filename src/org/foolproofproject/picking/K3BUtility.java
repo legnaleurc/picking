@@ -1,7 +1,7 @@
 /*
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
- * 
+ *
  * This file is part of PicKing.
  *
  * PicKing is free software: you can redistribute it and/or modify
@@ -41,11 +41,7 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class K3BUtility {
 
-	private static XMLOutputFactory xmlFactory = XMLOutputFactory.newInstance();
-	private DefaultMutableTreeNode node;
-	private ZipOutputStream zout;
-	private XMLStreamWriter xout;
-
+	private static XMLOutputFactory xmlFactory_ = XMLOutputFactory.newInstance();
 	/**
 	 * Export items to K3B project.
 	 * @param file Exporting file
@@ -55,169 +51,173 @@ public class K3BUtility {
 	 */
 	public static void export( File file, DefaultMutableTreeNode node ) throws IOException, XMLStreamException {
 		K3BUtility k3b = new K3BUtility( node );
-		
-		k3b.zout = new ZipOutputStream( new BufferedOutputStream( new FileOutputStream( file ) ) );	
-		
-		k3b.zout.putNextEntry( new ZipEntry( "mimetype" ) );
-		k3b.zout.write( "application/x-k3b".getBytes( "UTF-8" ) );
-		k3b.zout.closeEntry();
-		
-		k3b.zout.putNextEntry( new ZipEntry( "maindata.xml" ) );
+
+		k3b.zout_ = new ZipOutputStream( new BufferedOutputStream( new FileOutputStream( file ) ) );
+
+		k3b.zout_.putNextEntry( new ZipEntry( "mimetype" ) );
+		k3b.zout_.write( "application/x-k3b".getBytes( "UTF-8" ) );
+		k3b.zout_.closeEntry();
+
+		k3b.zout_.putNextEntry( new ZipEntry( "maindata.xml" ) );
 		k3b.writeXML();
-		k3b.zout.closeEntry();
-		
-		k3b.zout.close();
+		k3b.zout_.closeEntry();
+
+		k3b.zout_.close();
 	}
-	
+	private DefaultMutableTreeNode node_;
+	private ZipOutputStream zout_;
+
+	private XMLStreamWriter xout_;
+
 	private K3BUtility( DefaultMutableTreeNode node ) {
-		this.node = node;
-		this.zout = null;
-		this.xout = null;
+		this.node_ = node;
+		this.zout_ = null;
+		this.xout_ = null;
 	}
-	
+
+	private void writeK3BFilesNode( SmartFile file ) throws XMLStreamException {
+		if( file.isDirectory() ) {
+			this.xout_.writeStartElement( "directory" );
+			this.xout_.writeAttribute( "name", file.toString() );
+			for( SmartFile child : file.listFiles() ) {
+				this.writeK3BFilesNode( child );
+			}
+			this.xout_.writeEndElement();
+		} else {
+			this.xout_.writeStartElement( "file" );
+			this.xout_.writeAttribute( "name", file.toString() );
+			this.xout_.writeStartElement( "url" );
+			this.xout_.writeCharacters( file.getAbsolutePath() );
+			this.xout_.writeEndElement();
+			this.xout_.writeEndElement();
+		}
+	}
+
 	private void writeXML() throws UnsupportedEncodingException, XMLStreamException {
 		Calendar now = Calendar.getInstance();
 		String title = String.format( "%02d%02d%02d", now.get( Calendar.YEAR ) % 100, now.get( Calendar.MONTH ) + 1, now.get( Calendar.DATE ) );
-		
-		xout = xmlFactory.createXMLStreamWriter( new OutputStreamWriter( zout, "UTF-8" ) );
-		xout.writeStartDocument( "UTF-8", "1.0" );
-		xout.writeDTD( "<!DOCTYPE k3b_dvd_project>" );
-		xout.writeStartElement( "k3b_dvd_project" );
-		
-		xout.writeStartElement( "general" );
-		xout.writeStartElement( "writing_mode" );
-		xout.writeCharacters( "auto" );
-		xout.writeEndElement();
-		xout.writeEmptyElement( "dummy" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "on_the_fly" );
-		xout.writeAttribute( "activated", "yes");
-		xout.writeEmptyElement( "only_create_images" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "remove_images" );
-		xout.writeAttribute( "activated", "yes");
-		xout.writeEndElement();
 
-		xout.writeStartElement( "options" );
-		xout.writeEmptyElement( "rock_ridge" );
-		xout.writeAttribute( "activated", "yes");
-		xout.writeEmptyElement( "joliet" );
-		xout.writeAttribute( "activated", "yes");
-		xout.writeEmptyElement( "udf" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "joliet_allow_103_characters" );
-		xout.writeAttribute( "activated", "yes");
-		xout.writeEmptyElement( "iso_allow_lowercase" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "iso_allow_period_at_begin" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "iso_allow_31_char" );
-		xout.writeAttribute( "activated", "yes");
-		xout.writeEmptyElement( "iso_omit_version_numbers" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "iso_omit_trailing_period" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "iso_max_filename_length" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "iso_relaxed_filenames" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "iso_no_iso_translate" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "iso_allow_multidot" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "iso_untranslated_filenames" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "follow_symbolic_links" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "create_trans_tbl" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "hide_trans_tbl" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeStartElement( "iso_level" );
-		xout.writeCharacters( "2" );
-		xout.writeEndElement();
-		xout.writeEmptyElement( "discard_symlinks" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "discard_broken_symlinks" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "preserve_file_permissions" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "force_input_charset" );
-		xout.writeAttribute( "activated", "no");
-		xout.writeEmptyElement( "do_not_cache_inodes" );
-		xout.writeAttribute( "activated", "yes");
-		xout.writeStartElement( "input_charset" );
-		xout.writeCharacters( "iso8859-1" );
-		xout.writeEndElement();
-		xout.writeStartElement( "whitespace_treatment" );
-		xout.writeCharacters( "noChange" );
-		xout.writeEndElement();
-		xout.writeStartElement( "whitespace_replace_string" );
-		xout.writeCharacters( "_" );
-		xout.writeEndElement();
-		xout.writeStartElement( "data_track_mode" );
-		xout.writeCharacters( "auto" );
-		xout.writeEndElement();
-		xout.writeStartElement( "multisession" );
-		xout.writeCharacters( "auto" );
-		xout.writeEndElement();
-		xout.writeEmptyElement( "verify_data" );
-		xout.writeAttribute( "activated", "yes");
-		xout.writeEndElement();
+		this.xout_ = K3BUtility.xmlFactory_.createXMLStreamWriter( new OutputStreamWriter( this.zout_, "UTF-8" ) );
+		this.xout_.writeStartDocument( "UTF-8", "1.0" );
+		this.xout_.writeDTD( "<!DOCTYPE k3b_dvd_project>" );
+		this.xout_.writeStartElement( "k3b_dvd_project" );
 
-		xout.writeStartElement( "header" );
-		xout.writeStartElement( "volume_id" );
-		xout.writeCharacters( title );
-		xout.writeEndElement();
-		xout.writeStartElement( "volume_set_id" );
-		xout.writeEndElement();
-		xout.writeStartElement( "volume_set_size" );
-		xout.writeCharacters( "1" );
-		xout.writeEndElement();
-		xout.writeStartElement( "volume_set_number" );
-		xout.writeCharacters( "1" );
-		xout.writeEndElement();
-		xout.writeStartElement( "system_id" );
-		xout.writeCharacters( "LINUX" );
-		xout.writeEndElement();
-		xout.writeStartElement( "application_id" );
-		xout.writeCharacters( "K3B THE CD KREATOR (C) 1998-2006 SEBASTIAN TRUEG AND THE K3B TEAM" );
-		xout.writeEndElement();
-		xout.writeStartElement( "publisher" );
-		xout.writeEndElement();
-		xout.writeStartElement( "preparer" );
-		xout.writeEndElement();
-		xout.writeEndElement();
-		
-		xout.writeStartElement( "files" );
-		for( Enumeration< ? > e = node.children(); e.hasMoreElements(); ) {
+		this.xout_.writeStartElement( "general" );
+		this.xout_.writeStartElement( "writing_mode" );
+		this.xout_.writeCharacters( "auto" );
+		this.xout_.writeEndElement();
+		this.xout_.writeEmptyElement( "dummy" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "on_the_fly" );
+		this.xout_.writeAttribute( "activated", "yes");
+		this.xout_.writeEmptyElement( "only_create_images" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "remove_images" );
+		this.xout_.writeAttribute( "activated", "yes");
+		this.xout_.writeEndElement();
+
+		this.xout_.writeStartElement( "options" );
+		this.xout_.writeEmptyElement( "rock_ridge" );
+		this.xout_.writeAttribute( "activated", "yes");
+		this.xout_.writeEmptyElement( "joliet" );
+		this.xout_.writeAttribute( "activated", "yes");
+		this.xout_.writeEmptyElement( "udf" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "joliet_allow_103_characters" );
+		this.xout_.writeAttribute( "activated", "yes");
+		this.xout_.writeEmptyElement( "iso_allow_lowercase" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "iso_allow_period_at_begin" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "iso_allow_31_char" );
+		this.xout_.writeAttribute( "activated", "yes");
+		this.xout_.writeEmptyElement( "iso_omit_version_numbers" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "iso_omit_trailing_period" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "iso_max_filename_length" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "iso_relaxed_filenames" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "iso_no_iso_translate" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "iso_allow_multidot" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "iso_untranslated_filenames" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "follow_symbolic_links" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "create_trans_tbl" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "hide_trans_tbl" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeStartElement( "iso_level" );
+		this.xout_.writeCharacters( "2" );
+		this.xout_.writeEndElement();
+		this.xout_.writeEmptyElement( "discard_symlinks" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "discard_broken_symlinks" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "preserve_file_permissions" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "force_input_charset" );
+		this.xout_.writeAttribute( "activated", "no");
+		this.xout_.writeEmptyElement( "do_not_cache_inodes" );
+		this.xout_.writeAttribute( "activated", "yes");
+		this.xout_.writeStartElement( "input_charset" );
+		this.xout_.writeCharacters( "iso8859-1" );
+		this.xout_.writeEndElement();
+		this.xout_.writeStartElement( "whitespace_treatment" );
+		this.xout_.writeCharacters( "noChange" );
+		this.xout_.writeEndElement();
+		this.xout_.writeStartElement( "whitespace_replace_string" );
+		this.xout_.writeCharacters( "_" );
+		this.xout_.writeEndElement();
+		this.xout_.writeStartElement( "data_track_mode" );
+		this.xout_.writeCharacters( "auto" );
+		this.xout_.writeEndElement();
+		this.xout_.writeStartElement( "multisession" );
+		this.xout_.writeCharacters( "auto" );
+		this.xout_.writeEndElement();
+		this.xout_.writeEmptyElement( "verify_data" );
+		this.xout_.writeAttribute( "activated", "yes");
+		this.xout_.writeEndElement();
+
+		this.xout_.writeStartElement( "header" );
+		this.xout_.writeStartElement( "volume_id" );
+		this.xout_.writeCharacters( title );
+		this.xout_.writeEndElement();
+		this.xout_.writeStartElement( "volume_set_id" );
+		this.xout_.writeEndElement();
+		this.xout_.writeStartElement( "volume_set_size" );
+		this.xout_.writeCharacters( "1" );
+		this.xout_.writeEndElement();
+		this.xout_.writeStartElement( "volume_set_number" );
+		this.xout_.writeCharacters( "1" );
+		this.xout_.writeEndElement();
+		this.xout_.writeStartElement( "system_id" );
+		this.xout_.writeCharacters( "LINUX" );
+		this.xout_.writeEndElement();
+		this.xout_.writeStartElement( "application_id" );
+		this.xout_.writeCharacters( "K3B THE CD KREATOR (C) 1998-2006 SEBASTIAN TRUEG AND THE K3B TEAM" );
+		this.xout_.writeEndElement();
+		this.xout_.writeStartElement( "publisher" );
+		this.xout_.writeEndElement();
+		this.xout_.writeStartElement( "preparer" );
+		this.xout_.writeEndElement();
+		this.xout_.writeEndElement();
+
+		this.xout_.writeStartElement( "files" );
+		for( Enumeration< ? > e = this.node_.children(); e.hasMoreElements(); ) {
 			DefaultMutableTreeNode child = (DefaultMutableTreeNode)e.nextElement();
-			writeK3BFilesNode( (SmartFile)child.getUserObject() );
+			this.writeK3BFilesNode( (SmartFile)child.getUserObject() );
 		}
-		xout.writeEndElement();
-		
-		xout.writeEndElement();
-		xout.writeEndDocument();
-		xout.flush();
-		xout.close();
-	}
-	
-	private void writeK3BFilesNode( SmartFile file ) throws XMLStreamException {
-		if( file.isDirectory() ) {
-			xout.writeStartElement( "directory" );
-			xout.writeAttribute( "name", file.toString() );
-			for( SmartFile child : file.listFiles() ) {
-				writeK3BFilesNode( child );
-			}
-			xout.writeEndElement();
-		} else {
-			xout.writeStartElement( "file" );
-			xout.writeAttribute( "name", file.toString() );
-			xout.writeStartElement( "url" );
-			xout.writeCharacters( file.getAbsolutePath() );
-			xout.writeEndElement();
-			xout.writeEndElement();
-		}
+		this.xout_.writeEndElement();
+
+		this.xout_.writeEndElement();
+		this.xout_.writeEndDocument();
+		this.xout_.flush();
+		this.xout_.close();
 	}
 
 }

@@ -1,10 +1,10 @@
 /**
  * @file NaturalField.java
  * @author Wei-Cheng Pan
- * 
+ *
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
- * 
+ *
  * This file is part of PicKing.
  *
  * PicKing is free software: you can redistribute it and/or modify
@@ -34,31 +34,20 @@ import javax.swing.text.PlainDocument;
 public class NaturalField extends JTextField {
 
 	private static final long serialVersionUID = -4923755274608244338L;
-	
+
 	public NaturalField() {
 		super( "4483" );
 	}
-	
+
 	public NaturalField( long number ) {
 		super( String.valueOf( number ) );
 	}
-	
-	public void setLong( long number ) {
-		setText( String.valueOf( number ) );
-	}
-	
-	public long toLong() {
-		try {
-			return Long.parseLong( super.getText() );
-		} catch (NumberFormatException e) {
-			LogDialog.getErrorLog().log( e.getMessage() );
-			return 0L;
-		}
-	}
-	
+
+	@Override
 	protected Document createDefaultModel() {
 		return new PlainDocument() {
 			private static final long serialVersionUID = -3237520404172699543L;
+			@Override
 			public void insertString( int offs, String str, AttributeSet a ) throws BadLocationException {
 				if( str == null ) {
 					return;
@@ -71,6 +60,19 @@ public class NaturalField extends JTextField {
 				super.insertString(offs, str, a);
 			}
 		};
+	}
+
+	public void setLong( long number ) {
+		this.setText( String.valueOf( number ) );
+	}
+
+	public long toLong() {
+		try {
+			return Long.parseLong( super.getText() );
+		} catch (NumberFormatException e) {
+			LogDialog.getErrorLog().log( e.getMessage() );
+			return 0L;
+		}
 	}
 
 }

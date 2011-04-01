@@ -38,29 +38,29 @@ import java.util.HashMap;
 public class Configuration implements Serializable {
 
 	private static final long serialVersionUID = -6422237746611091558L;
-	private static final File file = new File( System.getProperty( "user.home" ) + File.separator + ".packing" );
-	private static Configuration self;
-	private HashMap< String, Object > data;
+	private static final File file_ = new File( System.getProperty( "user.home" ) + File.separator + ".packing" );
+	private static Configuration self_;
+	private HashMap< String, Object > data_;
 
 	static {
 		try {
-			ObjectInputStream fin = new ObjectInputStream( new FileInputStream( file ) );
-			self = (Configuration) fin.readObject();
-			if( self.data == null ) {
+			ObjectInputStream fin = new ObjectInputStream( new FileInputStream( Configuration.file_ ) );
+			Configuration.self_ = (Configuration) fin.readObject();
+			if( Configuration.self_.data_ == null ) {
 				throw new Exception( "Configuration format is mismatched." );
 			}
 			fin.close();
 		} catch (FileNotFoundException e) {
-			self = new Configuration();
+			Configuration.self_ = new Configuration();
 			try {
-				sync();
+				Configuration.sync();
 			} catch (Exception e1) {
 				LogDialog.getErrorLog().log( e1.getMessage() );
 			}
 		} catch (Exception e) {
 			LogDialog.getErrorLog().log( e.getMessage() );
 			LogDialog.getErrorLog().log( "Rolling back to default value." );
-			self = new Configuration();
+			Configuration.self_ = new Configuration();
 		}
 	}
 
@@ -71,7 +71,7 @@ public class Configuration implements Serializable {
 	 * @note Will return null if no such key.
 	 */
 	public static Object get( String key ) {
-		return self.data.get( key );
+		return Configuration.self_.data_.get( key );
 	}
 
 	private static boolean isWindows() {
@@ -84,8 +84,8 @@ public class Configuration implements Serializable {
 	 * @param value configuration value
 	 */
 	public static void set( String key, Object value ) {
-		synchronized (self) {
-			self.data.put(key, value);
+		synchronized (Configuration.self_) {
+			Configuration.self_.data_.put(key, value);
 		}
 	}
 
@@ -95,29 +95,29 @@ public class Configuration implements Serializable {
 	 * @throws IOException file writing error
 	 */
 	public static void sync() throws InterruptedException, IOException {
-		if( isWindows() && file.exists() && file.isHidden() ) {
-			Runtime.getRuntime().exec( String.format( "ATTRIB -H \"%s\"" , file.getAbsolutePath()) ).waitFor();
+		if( Configuration.isWindows() && Configuration.file_.exists() && Configuration.file_.isHidden() ) {
+			Runtime.getRuntime().exec( String.format( "ATTRIB -H \"%s\"" , Configuration.file_.getAbsolutePath()) ).waitFor();
 		}
 		try {
-			ObjectOutputStream fout = new ObjectOutputStream( new FileOutputStream( file ) );
-			fout.writeObject( self );
+			ObjectOutputStream fout = new ObjectOutputStream( new FileOutputStream( Configuration.file_ ) );
+			fout.writeObject( Configuration.self_ );
 			fout.close();
 		} catch (FileNotFoundException e) {
 			LogDialog.getErrorLog().log( e.getMessage() );
 		}
-		if( isWindows() && !file.isHidden() ) {
-			Runtime.getRuntime().exec( String.format( "ATTRIB +H \"%s\"" , file.getAbsolutePath()) ).waitFor();
+		if( Configuration.isWindows() && !Configuration.file_.isHidden() ) {
+			Runtime.getRuntime().exec( String.format( "ATTRIB +H \"%s\"" , Configuration.file_.getAbsolutePath()) ).waitFor();
 		}
 	}
 
 	private Configuration() {
-		this.data = new HashMap< String, Object >();
-		this.data.put( "limit", 4483L );
-		this.data.put( "unit", 2 );
-		this.data.put( "k3b_export_lower_bound", 4000L );
-		this.data.put( "k3b_export_bound_unit", 2 );
-		this.data.put( "debug", false );
-		this.data.put( "hidden", false );
+		this.data_ = new HashMap< String, Object >();
+		this.data_.put( "limit", 4483L );
+		this.data_.put( "unit", 2 );
+		this.data_.put( "k3b_export_lower_bound", 4000L );
+		this.data_.put( "k3b_export_bound_unit", 2 );
+		this.data_.put( "debug", false );
+		this.data_.put( "hidden", false );
 	}
 
 }

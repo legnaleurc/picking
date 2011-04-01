@@ -1,10 +1,10 @@
 /**
  * @file LogDialog.java
  * @author Wei-Cheng Pan
- * 
+ *
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
- * 
+ *
  * This file is part of PicKing.
  *
  * PicKing is free software: you can redistribute it and/or modify
@@ -34,53 +34,53 @@ import javax.swing.JTextArea;
  * @brief Log dialog.
  */
 public class LogDialog extends JDialog {
-	
+
 	private static final long serialVersionUID = -8893137565616271012L;
-	private static LogDialog error = new LogDialog( "Error Log" );
-	private static LogDialog debug = new LogDialog( "Debug Log" );
-	private JTextArea textArea;
-	
-	/**
-	 * @brief Get error log widget.
-	 */
-	public static LogDialog getErrorLog() {
-		return error;
-	}
-	
+	private static LogDialog error_ = new LogDialog( "Error Log" );
+	private static LogDialog debug_ = new LogDialog( "Debug Log" );
 	/**
 	 * @brief Get debug log widget.
 	 */
 	public static LogDialog getDebugLog() {
-		return debug;
+		return LogDialog.debug_;
 	}
-	
+
+	/**
+	 * @brief Get error log widget.
+	 */
+	public static LogDialog getErrorLog() {
+		return LogDialog.error_;
+	}
+
+	private JTextArea textArea_;
+
 	private LogDialog( String title ) {
 		super( ( MainWindow )null );
-		setSize( 320, 240 );
-		setTitle( title );
-		setLocationRelativeTo( null );
-		
-		Container pane = getContentPane();
+		this.setSize( 320, 240 );
+		this.setTitle( title );
+		this.setLocationRelativeTo( null );
+
+		Container pane = this.getContentPane();
 		pane.setLayout( new BoxLayout( pane, BoxLayout.Y_AXIS ) );
-		
+
 		JPanel main = new JPanel();
 		pane.add( main );
 		main.setLayout( new BoxLayout( main, BoxLayout.Y_AXIS ) );
-		
-		textArea = new JTextArea();
-		textArea.setEditable( false );
-		
-		JScrollPane scroll = new JScrollPane( textArea );
+
+		this.textArea_ = new JTextArea();
+		this.textArea_.setEditable( false );
+
+		JScrollPane scroll = new JScrollPane( this.textArea_ );
 		main.add( scroll );
 	}
-	
+
 	/**
 	 * @brief Write a log message.
 	 * @param msg log message
 	 */
 	public void log( String msg ) {
-		synchronized( textArea ) {
-			textArea.append( msg + "\n" );
+		synchronized( this.textArea_ ) {
+			this.textArea_.append( msg + "\n" );
 		}
 	}
 

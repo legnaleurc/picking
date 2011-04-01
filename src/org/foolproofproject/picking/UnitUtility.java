@@ -1,7 +1,7 @@
 /*
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
- * 
+ *
  * This file is part of PicKing.
  *
  * PicKing is free software: you can redistribute it and/or modify
@@ -26,16 +26,28 @@ import javax.swing.JComboBox;
  * @author Wei-Cheng Pan
  */
 public class UnitUtility {
-	
-	private static final String[] unit = new String[4];
-	
+
+	private static final String[] unit_ = new String[4];
+
 	static {
-		unit[0] = "B";
-		unit[1] = "KB";
-		unit[2] = "MB";
-		unit[3] = "GB";
+		UnitUtility.unit_[0] = "B";
+		UnitUtility.unit_[1] = "KB";
+		UnitUtility.unit_[2] = "MB";
+		UnitUtility.unit_[3] = "GB";
 	}
-	
+
+	/**
+	 * Create unit JComboBox.
+	 * @return JComboBox
+	 */
+	public static JComboBox createComboBox() {
+		JComboBox tmp = new JComboBox();
+		for( String u : UnitUtility.unit_ ) {
+			tmp.addItem( u );
+		}
+		return tmp;
+	}
+
 	/**
 	 * Extract IEC standard units to precise value.
 	 * @param value unit value
@@ -45,17 +57,7 @@ public class UnitUtility {
 	public static long extract( long value, int eng ) {
 		return (long) (value * Math.pow( 1024, eng ));
 	}
-	
-	/**
-	 * Convert precise value to IEC string.
-	 * @param value precise value
-	 * @param eng unit
-	 * @return IEC string
-	 */
-	public static String toString( long value, int eng ) {
-		return String.format( "%d %s", (long)( value / Math.pow( 1024, eng ) ), unit[eng] );
-	}
-	
+
 	/**
 	 * Convert precise value to IEC string.
 	 * @param value precise value
@@ -68,19 +70,17 @@ public class UnitUtility {
 			++pow;
 			size /= 1024;
 		}
-		return String.format( "%.3f %s", size, unit[pow] );
+		return String.format( "%.3f %s", size, UnitUtility.unit_[pow] );
 	}
-	
+
 	/**
-	 * Create unit JComboBox.
-	 * @return JComboBox
+	 * Convert precise value to IEC string.
+	 * @param value precise value
+	 * @param eng unit
+	 * @return IEC string
 	 */
-	public static JComboBox createComboBox() {
-		JComboBox tmp = new JComboBox();
-		for( String u : unit ) {
-			tmp.addItem( u );
-		}
-		return tmp;
+	public static String toString( long value, int eng ) {
+		return String.format( "%d %s", (long)( value / Math.pow( 1024, eng ) ), UnitUtility.unit_[eng] );
 	}
 
 }

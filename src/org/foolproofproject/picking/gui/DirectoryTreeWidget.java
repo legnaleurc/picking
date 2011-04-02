@@ -50,7 +50,7 @@ import org.foolproofproject.picking.Signal;
 /**
  * Directory tree widget.
  */
-public class DirectoryTree extends JPanel {
+public class DirectoryTreeWidget extends JPanel {
 
 	private class CustomFilter implements FileFilter {
 		private boolean directoryOnly_;
@@ -60,7 +60,7 @@ public class DirectoryTree extends JPanel {
 		@Override
 		public boolean accept(File file) {
 			boolean a = this.directoryOnly_ ? file.isDirectory() : true;
-			boolean b = DirectoryTree.this.viewHidden_ ? true : !file.isHidden();
+			boolean b = DirectoryTreeWidget.this.viewHidden_ ? true : !file.isHidden();
 			return a && b;
 		}
 	}
@@ -139,7 +139,7 @@ public class DirectoryTree extends JPanel {
 	private boolean viewHidden_;
 	private Signal selectionChanged_;
 
-	public DirectoryTree() {
+	public DirectoryTreeWidget() {
 		this.selectionChanged_ = new Signal( this );
 
 		this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
@@ -152,7 +152,7 @@ public class DirectoryTree extends JPanel {
 		this.tabWidget_.addChangeListener( new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				DirectoryTree.this.dispatch_( DirectoryTree.this.getCurrentTree_() );
+				DirectoryTreeWidget.this.dispatch_( DirectoryTreeWidget.this.getCurrentTree_() );
 			}
 		} );
 	}
@@ -163,7 +163,7 @@ public class DirectoryTree extends JPanel {
 		view.addTreeSelectionListener( new TreeSelectionListener() {
 			@Override
 			public void valueChanged(TreeSelectionEvent e) {
-				DirectoryTree.this.dispatch_( ( JTree )e.getSource() );
+				DirectoryTreeWidget.this.dispatch_( ( JTree )e.getSource() );
 			}
 		} );
 		view.setCellRenderer( new DefaultTreeCellRenderer() {

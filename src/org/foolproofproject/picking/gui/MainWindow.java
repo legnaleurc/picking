@@ -65,13 +65,13 @@ import org.foolproofproject.picking.UnitUtility;
 public class MainWindow extends JFrame {
 
 	private static final long serialVersionUID = 6869079478547863579L;
-	private FileList list_;
+	private FileListWidget list_;
 	private NaturalField limit_;
 	private ResultWidget result_;
 	private JComboBox unit_;
 	private JDialog about_;
 	private Preference preference_;
-	private DirectoryTree tree_;
+	private DirectoryTreeWidget tree_;
 	private JCheckBox hidden_;
 
 	public MainWindow( String title ) {
@@ -294,10 +294,10 @@ public class MainWindow extends JFrame {
 		central.setLayout( new GridLayout( 1, 3 ) );
 		central.setMaximumSize( new Dimension( Integer.MAX_VALUE, Integer.MAX_VALUE ) );
 
-		this.tree_ = new DirectoryTree();
+		this.tree_ = new DirectoryTreeWidget();
 		central.add( this.tree_ );
 
-		this.list_ = new FileList();
+		this.list_ = new FileListWidget();
 		central.add( this.list_ );
 
 		this.tree_.onSelectionChanged().connect( new Signal.Slot() {

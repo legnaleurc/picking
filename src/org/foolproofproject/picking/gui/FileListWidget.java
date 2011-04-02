@@ -42,14 +42,14 @@ import org.foolproofproject.picking.Signal;
 /**
  * @brief File list widget.
  */
-public class FileList extends JPanel {
+public class FileListWidget extends JPanel {
 
 	private static final long serialVersionUID = -5296371739711677521L;
 	private JList view_;
 	private JLabel items_;
 	private Signal mouseDoubleClicked_;
 
-	public FileList() {
+	public FileListWidget() {
 		this.mouseDoubleClicked_ = new Signal( this );
 
 		this.view_ = new JList();
@@ -72,10 +72,10 @@ public class FileList extends JPanel {
 			@Override
 			public void mouseClicked( MouseEvent e ) {
 				if( e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2 ) {
-					int index = FileList.this.view_.locationToIndex( e.getPoint() );
+					int index = FileListWidget.this.view_.locationToIndex( e.getPoint() );
 					if( index >= 0 ) {
-						File file = ( File )FileList.this.view_.getModel().getElementAt( index );
-						FileList.this.mouseDoubleClicked_.emit( file );
+						File file = ( File )FileListWidget.this.view_.getModel().getElementAt( index );
+						FileListWidget.this.mouseDoubleClicked_.emit( file );
 					}
 				}
 			}
@@ -85,7 +85,7 @@ public class FileList extends JPanel {
 		this.view_.getSelectionModel().addListSelectionListener( new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				FileList.this.items_.setText( String.valueOf( FileList.this.view_.getSelectedIndices().length ) );
+				FileListWidget.this.items_.setText( String.valueOf( FileListWidget.this.view_.getSelectedIndices().length ) );
 			}
 		} );
 		this.add( this.items_ );

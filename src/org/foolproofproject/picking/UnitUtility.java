@@ -83,4 +83,7 @@ public class UnitUtility {
 		return String.format( "%d %s", (long)( value / Math.pow( 1024, eng ) ), UnitUtility.unit_[eng] );
 	}
 
+	private UnitUtility() {
+	}
+
 }

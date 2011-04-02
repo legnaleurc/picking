@@ -41,4 +41,7 @@ public class CleanUpUtility {
 		file.setExecutable( true );
 	}
 
+	private CleanUpUtility() {
+	}
+
 }

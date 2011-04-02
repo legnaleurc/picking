@@ -66,7 +66,6 @@ public class K3BUtility {
 	}
 	private DefaultMutableTreeNode node_;
 	private ZipOutputStream zout_;
-
 	private XMLStreamWriter xout_;
 
 	private K3BUtility( DefaultMutableTreeNode node ) {

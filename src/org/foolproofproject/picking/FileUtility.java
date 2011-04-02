@@ -45,7 +45,4 @@ public class FileUtility {
 	private FileUtility() {
 	}
 
-	private FileUtility( FileUtility that ) {
-	}
-
 }

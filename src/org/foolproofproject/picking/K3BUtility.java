@@ -75,11 +75,11 @@ public class K3BUtility {
 		this.xout_ = null;
 	}
 
-	private void writeK3BFilesNode( SmartFile file ) throws XMLStreamException {
+	private void writeK3BFilesNode( File file ) throws XMLStreamException {
 		if( file.isDirectory() ) {
 			this.xout_.writeStartElement( "directory" );
 			this.xout_.writeAttribute( "name", file.toString() );
-			for( SmartFile child : file.listFiles() ) {
+			for( File child : file.listFiles() ) {
 				this.writeK3BFilesNode( child );
 			}
 			this.xout_.writeEndElement();
@@ -210,7 +210,7 @@ public class K3BUtility {
 		this.xout_.writeStartElement( "files" );
 		for( Enumeration< ? > e = this.node_.children(); e.hasMoreElements(); ) {
 			DefaultMutableTreeNode child = (DefaultMutableTreeNode)e.nextElement();
-			this.writeK3BFilesNode( (SmartFile)child.getUserObject() );
+			this.writeK3BFilesNode( (File)child.getUserObject() );
 		}
 		this.xout_.writeEndElement();
 

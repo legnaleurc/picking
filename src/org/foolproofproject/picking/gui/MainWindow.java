@@ -55,7 +55,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.foolproofproject.Pack;
 import org.foolproofproject.picking.Performer;
 import org.foolproofproject.picking.Signal;
-import org.foolproofproject.picking.SmartFile;
 import org.foolproofproject.picking.UnitUtility;
 
 /**
@@ -320,7 +319,7 @@ public class MainWindow extends JFrame {
 		Container pane = this.getContentPane();
 		pane.add( central );
 
-		this.tree_.open( new SmartFile( System.getProperty( "user.home" ) ) );
+		this.tree_.open( new File( System.getProperty( "user.home" ) ) );
 	}
 
 	public void perform() {
@@ -333,7 +332,7 @@ public class MainWindow extends JFrame {
 		}
 
 		while( !p.noItem() ) {
-			Pack< SmartFile > r = p.call();
+			Pack< File > r = p.call();
 			this.result_.addResult( r.getScore(), this.unit_.getSelectedIndex(), r.getItems() );
 			p.remove( r.getItems() );
 		}

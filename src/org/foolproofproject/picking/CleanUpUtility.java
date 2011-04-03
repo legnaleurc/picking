@@ -33,7 +33,7 @@ public class CleanUpUtility {
 		fout.println( "#! /bin/sh\n" );
 		for( Enumeration< ? > e = node.children(); e.hasMoreElements(); ) {
 			DefaultMutableTreeNode child = (DefaultMutableTreeNode)e.nextElement();
-			SmartFile sm = ( SmartFile )child.getUserObject();
+			File sm = ( File )child.getUserObject();
 			fout.printf( "rm -rf '%s'\n", sm.getAbsolutePath() );
 		}
 		fout.print( "\nrm -rf $0\n" );

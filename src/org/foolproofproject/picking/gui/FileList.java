@@ -22,12 +22,14 @@
  */
 package org.foolproofproject.picking.gui;
 
+import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -55,6 +57,16 @@ public class FileList extends JPanel {
 		this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
 		this.setBorder( BorderFactory.createTitledBorder( "File List" ) );
 		this.add( scroll );
+
+		this.view_.setCellRenderer( new DefaultListCellRenderer() {
+			private static final long serialVersionUID = 3063544286502616301L;
+			@Override
+			public Component getListCellRendererComponent( JList list, Object value, int index, boolean isSelected, boolean cellHasFocus ) {
+				super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus );
+				this.setText( ( ( File )value ).getName() );
+				return this;
+			}
+		} );
 
 		this.view_.addMouseListener( new MouseAdapter() {
 			@Override

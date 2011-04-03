@@ -32,8 +32,8 @@ import org.foolproofproject.Pack;
 public class Performer {
 
 	private final long limit_;
-	private HashMap< SmartFile, Long > table_;
-	private ArrayList< SmartFile > overflow_, items_;
+	private HashMap< File, Long > table_;
+	private ArrayList< File > overflow_, items_;
 
 	/**
 	 * Constructor.
@@ -42,13 +42,12 @@ public class Performer {
 	 */
 	public Performer( long limit, File[] files ) {
 		this.limit_ = limit;
-		this.items_ = new ArrayList< SmartFile >();
-		this.table_ = new HashMap< SmartFile, Long >();
-		this.overflow_ = new ArrayList< SmartFile >();
+		this.items_ = new ArrayList< File >();
+		this.table_ = new HashMap< File, Long >();
+		this.overflow_ = new ArrayList< File >();
 
-		for( File f : files ) {
-			SmartFile file = SmartFile.fromFile( f );
-			this.put_( file, file.getTotalSize() );
+		for( File file : files ) {
+			this.put_( file, FileUtility.getTotalSize( file ) );
 		}
 	}
 
@@ -56,15 +55,15 @@ public class Performer {
 	 * Pick once.
 	 * @return Result.
 	 */
-	public Pack< SmartFile > call() {
+	public Pack< File > call() {
 		return Pack.pick( this.limit_, this.table_ );
 	}
 
-	public ArrayList< SmartFile > getOverflow() {
+	public ArrayList< File > getOverflow() {
 		return this.overflow_;
 	}
 
-	public HashMap< SmartFile, Long > getTable() {
+	public HashMap< File, Long > getTable() {
 		return this.table_;
 	}
 	public boolean noItem() {
@@ -73,7 +72,7 @@ public class Performer {
 	public boolean noOverflow() {
 		return this.overflow_.isEmpty();
 	}
-	private void put_( SmartFile key, long value ) {
+	private void put_( File key, long value ) {
 		if( value < this.limit_ ) {
 			this.items_.add( key );
 		} else {
@@ -86,9 +85,9 @@ public class Performer {
 	 * Remove items by given keys.
 	 * @param keys Item keys
 	 */
-	public void remove( ArrayList< SmartFile > keys ) {
+	public void remove( ArrayList< File > keys ) {
 		this.items_.removeAll( keys );
-		for( SmartFile key : keys ) {
+		for( File key : keys ) {
 			this.table_.remove( key );
 		}
 	}

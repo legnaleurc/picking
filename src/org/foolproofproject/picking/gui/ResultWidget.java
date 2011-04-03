@@ -54,7 +54,6 @@ import javax.xml.stream.XMLStreamException;
 
 import org.foolproofproject.picking.CleanUpUtility;
 import org.foolproofproject.picking.K3BUtility;
-import org.foolproofproject.picking.SmartFile;
 import org.foolproofproject.picking.UnitUtility;
 
 /**
@@ -78,7 +77,7 @@ class ResultWidget extends JPanel {
 	}
 	private static final long serialVersionUID = 3366458847085663811L;
 	private JTree resultTree_;
-	private HashMap< SmartFile, Long > table_;
+	private HashMap< File, Long > table_;
 	private JPopupMenu popup_;
 	private DefaultMutableTreeNode selectedNode_;
 	private JProgressBar progressBar_;
@@ -144,7 +143,7 @@ class ResultWidget extends JPanel {
 				if( ResultWidget.this.table_ != null && leaf ) {
 					DefaultMutableTreeNode node = ( DefaultMutableTreeNode )value;
 					Object item = node.getUserObject();
-					if( item instanceof SmartFile && ResultWidget.this.table_.containsKey( item ) ) {
+					if( item instanceof File && ResultWidget.this.table_.containsKey( item ) ) {
 						self.setToolTipText( UnitUtility.toString( ResultWidget.this.table_.get( item ) ) );
 					}
 				}
@@ -158,8 +157,9 @@ class ResultWidget extends JPanel {
 			public Component getListCellRendererComponent( JList list, Object value, int index, boolean isSelected, boolean cellHasFocus ) {
 				super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus );
 				if( ResultWidget.this.table_ != null ) {
-					if( value instanceof SmartFile && ResultWidget.this.table_.containsKey( value ) ) {
+					if( value instanceof File && ResultWidget.this.table_.containsKey( value ) ) {
 						this.setToolTipText( UnitUtility.toString( ResultWidget.this.table_.get( value ) ) );
+						this.setText( ( ( File )value ).getName() );
 					}
 				}
 				return this;
@@ -181,22 +181,35 @@ class ResultWidget extends JPanel {
 			}
 		} );
 
+		this.resultTree_.setCellRenderer( new DefaultTreeCellRenderer() {
+			private static final long serialVersionUID = 8665540353276218058L;
+			@Override
+			public Component getTreeCellRendererComponent( JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus ) {
+				super.getTreeCellRendererComponent( tree, value, sel, expanded, leaf, row, hasFocus );
+				Object object = ( ( DefaultMutableTreeNode )value ).getUserObject();
+				if( object instanceof File ) {
+					this.setText( ( ( File )object ).getName() );
+				}
+				return this;
+			}
+		} );
+
 		this.table_ = null;
 		this.clear();
 	}
 
-	public void addOverflow( ArrayList< SmartFile > overflow ) {
+	public void addOverflow( ArrayList< File > overflow ) {
 		DefaultListModel model = (DefaultListModel) this.overflowList_.getModel();
-		for( SmartFile file : overflow ) {
+		for( File file : overflow ) {
 			model.addElement( file );
 		}
 
 		this.progressBar_.setValue( this.progressBar_.getValue() + overflow.size() );
 	}
 
-	public void addResult( long size, int eng, ArrayList< SmartFile > items ) {
+	public void addResult( long size, int eng, ArrayList< File > items ) {
 		DefaultMutableTreeNode node = new LabelNode( size, eng );
-		for( SmartFile item : items ) {
+		for( File item : items ) {
 			node.add( new DefaultMutableTreeNode( item ) );
 		}
 		this.getRoot_().add( node );
@@ -269,7 +282,7 @@ class ResultWidget extends JPanel {
 		return root;
 	}
 
-	public void openProgress( HashMap< SmartFile, Long > table ) {
+	public void openProgress( HashMap< File, Long > table ) {
 		this.clear();
 		this.table_ = table;
 		this.progressBar_.setMaximum( table.size() );

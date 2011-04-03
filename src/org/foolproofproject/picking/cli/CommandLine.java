@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 
 import org.foolproofproject.Pack;
 import org.foolproofproject.picking.Performer;
-import org.foolproofproject.picking.SmartFile;
 import org.foolproofproject.picking.UnitUtility;
 
 /**
@@ -78,9 +77,9 @@ public class CommandLine {
 		Performer p = new Performer( limit, files );
 
 		while( !p.noItem() ) {
-			Pack< SmartFile > pair = p.call();
+			Pack< File > pair = p.call();
 			System.out.println( UnitUtility.toString( pair.getScore(), eng ) + ":" );
-			for( SmartFile item : pair.getItems() ) {
+			for( File item : pair.getItems() ) {
 				System.out.println( "\t" + item );
 			}
 			p.remove( pair.getItems() );
@@ -88,7 +87,7 @@ public class CommandLine {
 
 		if( !p.noOverflow() ) {
 			System.out.println( "Overflow:" );
-			for( SmartFile item : p.getOverflow() ) {
+			for( File item : p.getOverflow() ) {
 				System.out.println( "\t" + item );
 			}
 		}

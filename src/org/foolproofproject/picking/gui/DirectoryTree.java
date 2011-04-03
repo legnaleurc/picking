@@ -22,6 +22,7 @@
  */
 package org.foolproofproject.picking.gui;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
@@ -39,12 +40,12 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.foolproofproject.picking.Signal;
-import org.foolproofproject.picking.SmartFile;
 
 /**
  * Directory tree widget.
@@ -65,9 +66,9 @@ public class DirectoryTree extends JPanel {
 	}
 	private class DirectoryTreeModel implements TreeModel {
 
-		private SmartFile root_;
+		private File root_;
 
-		public DirectoryTreeModel( SmartFile root ) {
+		public DirectoryTreeModel( File root ) {
 			this.root_ = root;
 		}
 
@@ -78,8 +79,8 @@ public class DirectoryTree extends JPanel {
 		}
 
 		@Override
-		public SmartFile getChild(Object parent, int index) {
-			SmartFile[] children = ( ( SmartFile )parent ).listFiles( new CustomFilter( true ) );
+		public File getChild(Object parent, int index) {
+			File[] children = ( ( File )parent ).listFiles( new CustomFilter( true ) );
 			if( children == null || ( index >= children.length ) ) {
 				return null;
 			}
@@ -88,7 +89,7 @@ public class DirectoryTree extends JPanel {
 
 		@Override
 		public int getChildCount(Object parent) {
-			SmartFile[] children = ( ( SmartFile )parent ).listFiles( new CustomFilter( true ) );
+			File[] children = ( ( File )parent ).listFiles( new CustomFilter( true ) );
 			if( children == null ) {
 				return 0;
 			}
@@ -97,11 +98,11 @@ public class DirectoryTree extends JPanel {
 
 		@Override
 		public int getIndexOfChild(Object parent, Object child) {
-			SmartFile[] children = ( ( SmartFile )parent ).listFiles( new CustomFilter( true ) );
+			File[] children = ( ( File )parent ).listFiles( new CustomFilter( true ) );
 			if( children == null ) {
 				return -1;
 			}
-			SmartFile target = ( SmartFile )child;
+			File target = ( File )child;
 			for( int i = 0; i < children.length; ++i ) {
 				if( target.equals( children[i] ) ) {
 					return i;
@@ -111,13 +112,13 @@ public class DirectoryTree extends JPanel {
 		}
 
 		@Override
-		public SmartFile getRoot() {
+		public File getRoot() {
 			return this.root_;
 		}
 
 		@Override
 		public boolean isLeaf(Object node) {
-			return ( ( SmartFile )node ).listFiles( new CustomFilter( true ) ) == null;
+			return ( ( File )node ).listFiles( new CustomFilter( true ) ) == null;
 		}
 
 		@Override
@@ -156,7 +157,7 @@ public class DirectoryTree extends JPanel {
 		} );
 	}
 
-	private JScrollPane createRootTab_( SmartFile root ) {
+	private JScrollPane createRootTab_( File root ) {
 		JTree view = new JTree( new DirectoryTreeModel( root ) );
 		view.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION );
 		view.addTreeSelectionListener( new TreeSelectionListener() {
@@ -165,12 +166,21 @@ public class DirectoryTree extends JPanel {
 				DirectoryTree.this.dispatch_( ( JTree )e.getSource() );
 			}
 		} );
+		view.setCellRenderer( new DefaultTreeCellRenderer() {
+			private static final long serialVersionUID = -8226412998997225459L;
+			@Override
+			public Component getTreeCellRendererComponent( JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus ) {
+				super.getTreeCellRendererComponent( tree, value, sel, expanded, leaf, row, hasFocus );
+				this.setText( ( ( File )value ).getName() );
+				return this;
+			}
+		} );
 		return new JScrollPane( view );
 	}
 
 	private void createTabs_() {
 		for( File root : File.listRoots() ) {
-			this.tabWidget_.addTab( root.getPath(), this.createRootTab_( SmartFile.fromFile( root ) ) );
+			this.tabWidget_.addTab( root.getPath(), this.createRootTab_( root ) );
 		}
 	}
 

@@ -30,6 +30,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -207,7 +208,7 @@ class ResultWidget extends JPanel {
 		this.progressBar_.setValue( this.progressBar_.getValue() + overflow.size() );
 	}
 
-	public void addResult( long size, int eng, ArrayList< File > items ) {
+	public void addResult( long size, int eng, List< File > items ) {
 		DefaultMutableTreeNode node = new LabelNode( size, eng );
 		for( File item : items ) {
 			node.add( new DefaultMutableTreeNode( item ) );

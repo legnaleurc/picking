@@ -22,6 +22,7 @@ package org.foolproofproject.picking;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.foolproofproject.Pack;
 
@@ -85,7 +86,7 @@ public class Performer {
 	 * Remove items by given keys.
 	 * @param keys Item keys
 	 */
-	public void remove( ArrayList< File > keys ) {
+	public void remove( List< File > keys ) {
 		this.items_.removeAll( keys );
 		for( File key : keys ) {
 			this.table_.remove( key );

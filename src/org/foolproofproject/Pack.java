@@ -19,10 +19,12 @@
  */
 package org.foolproofproject;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 /**
@@ -139,10 +141,10 @@ public class Pack< T > implements Comparable< Pack< T > > {
 		}
 
 		private Long limit_;
-		private HashMap< T, Long > items_;
+		private AbstractMap< T, Long > items_;
 		private ArrayList< T > map_;
 
-		public BinarySearch( Long limit, HashMap< T, Long > items ) {
+		public BinarySearch( Long limit, AbstractMap< T, Long > items ) {
 			this.limit_ = limit;
 			this.items_ = items;
 			this.map_ = new ArrayList< T >( items.keySet() );
@@ -225,7 +227,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 		private ArrayList< Long > values_;
 		private Long limit_;
 
-		public DepthFirstSearch( Long limit, HashMap< T, Long > items ) {
+		public DepthFirstSearch( Long limit, AbstractMap< T, Long > items ) {
 			ArrayList< Entry< T, Long > > tmp = new ArrayList< Entry< T, Long > >( items.entrySet() );
 			Collections.sort( tmp, new Comparator< Entry< T, Long > >() {
 				@Override
@@ -350,10 +352,10 @@ public class Pack< T > implements Comparable< Pack< T > > {
 		}
 
 		private Long limit_;
-		private HashMap< T, Long > table_;
+		private AbstractMap< T, Long > table_;
 		private ArrayList< Cell< T > > population_;
 
-		public GeneticAlgorithm( Long limit, HashMap< T, Long > items ) {
+		public GeneticAlgorithm( Long limit, AbstractMap< T, Long > items ) {
 			this.limit_ = limit;
 			this.table_ = items;
 
@@ -467,7 +469,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 
 	}
 
-	public static< T > Pack< T > binarySearch( Long limit, HashMap< T, Long > items ) {
+	public static< T > Pack< T > binarySearch( Long limit, AbstractMap< T, Long > items ) {
 		return ( Pack.needSearch( limit, items ) ) ? new BinarySearch< T >( limit, items ).call() : new Pack< T >( limit, new ArrayList< T >( items.keySet() ) );
 	}
 
@@ -478,7 +480,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	 * @param items object value table
 	 * @return solution
 	 */
-	public static< T > Pack< T > breadthFirstSearch( Long limit, HashMap< T, Long > items ) {
+	public static< T > Pack< T > breadthFirstSearch( Long limit, AbstractMap< T, Long > items ) {
 		if( Pack.needSearch( limit, items ) ) {
 			return new Pack< T >( limit, new ArrayList< T >( items.keySet() ) );
 		}
@@ -515,7 +517,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	 * @param items object value table
 	 * @return solution
 	 */
-	public static< T > Pack< T > depthFirstSearch( Long limit, HashMap< T, Long > items ) {
+	public static< T > Pack< T > depthFirstSearch( Long limit, AbstractMap< T, Long > items ) {
 		return ( Pack.needSearch( limit, items ) ) ? new DepthFirstSearch< T >( limit, items ).call( 0, new Pack< T >() ) : new Pack< T >( limit, new ArrayList< T >( items.keySet() ) );
 	}
 
@@ -527,11 +529,11 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	 * @param items object value table
 	 * @return solution
 	 */
-	public static< T > Pack< T > geneticAlgorithm( Long limit, HashMap< T, Long > items ) {
+	public static< T > Pack< T > geneticAlgorithm( Long limit, AbstractMap< T, Long > items ) {
 		return ( Pack.needSearch( limit, items ) ) ? new GeneticAlgorithm< T >( limit, items ).call() : new Pack< T >( limit, new ArrayList< T >( items.keySet() ) );
 	}
 
-	private static< T > Boolean needSearch( Long limit, HashMap< T, Long > items ) {
+	private static< T > Boolean needSearch( Long limit, AbstractMap< T, Long>  items ) {
 		Long sum = 0L;
 		for( Long v : items.values() ) {
 			sum += v;
@@ -548,7 +550,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	 * @param items object value table
 	 * @return solution
 	 */
-	public static< T > Pack< T > pick( Long limit, HashMap< T, Long > items ) {
+	public static< T > Pack< T > pick( Long limit, AbstractMap< T, Long > items ) {
 		if( items.size() < 26 ) {
 			return Pack.binarySearch( limit, items );
 		} else {
@@ -556,7 +558,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 		}
 	}
 	private Long score_;
-	private ArrayList< T > items_;
+	private List< T > items_;
 	/**
 	 * Default constructor.
 	 * Will initialize value to 0, items as an empty Vector.
@@ -571,7 +573,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	 * @param score total value of items
 	 * @param items selected objects
 	 */
-	private Pack( long score, ArrayList< T > items ) {
+	private Pack( long score, List< T > items ) {
 		this.score_ = score;
 		this.items_ = items;
 	}
@@ -600,7 +602,7 @@ public class Pack< T > implements Comparable< Pack< T > > {
 	 *
 	 * @return Items list.
 	 */
-	public ArrayList< T > getItems() {
+	public List< T > getItems() {
 		return this.items_;
 	}
 

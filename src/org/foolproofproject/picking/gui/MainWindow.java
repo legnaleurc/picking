@@ -1,4 +1,4 @@
-/**
+/*
  * PicKing, a file picker.
  * Copyright (C) 2009  Wei-Cheng Pan <legnaleurc@gmail.com>
  *
@@ -19,346 +19,155 @@
  */
 package org.foolproofproject.picking.gui;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import java.util.ArrayList;
 
 import org.foolproofproject.Pack;
-import org.foolproofproject.picking.Performer;
-import org.foolproofproject.picking.Signal;
 import org.foolproofproject.picking.UnitUtility;
 
-/**
- * Main window.
- *
- * @author Wei-Cheng Pan
- */
-public class MainWindow extends JFrame {
+import com.trolltech.qt.QSignalEmitter;
+import com.trolltech.qt.core.QDir;
+import com.trolltech.qt.core.QModelIndex;
+import com.trolltech.qt.core.QThreadPool;
+import com.trolltech.qt.core.Qt;
+import com.trolltech.qt.gui.QAbstractItemView.SelectionMode;
+import com.trolltech.qt.gui.QFileSystemModel;
+import com.trolltech.qt.gui.QHeaderView;
+import com.trolltech.qt.gui.QItemSelectionModel;
+import com.trolltech.qt.gui.QMainWindow;
+import com.trolltech.qt.gui.QProgressBar;
+import com.trolltech.qt.gui.QTreeView;
+import com.trolltech.qt.gui.QTreeWidgetItem;
 
-	private static final long serialVersionUID = 6869079478547863579L;
-	private FileListWidget list_;
-	private NaturalField limit_;
-	private ResultWidget result_;
-	private JComboBox unit_;
-	private JDialog about_;
-	private Preference preference_;
-	private DirectoryTreeWidget tree_;
-	private JCheckBox hidden_;
+public class MainWindow extends QMainWindow {
 
-	public MainWindow( String title ) {
-		super( title );
+	Ui_MainWindow ui_;
+	QFileSystemModel treeModel_;
+	QFileSystemModel listModel_;
+	QProgressBar progress_;
 
-		this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-		this.setSize( 800, 600 );
-		this.setLocationRelativeTo( null );
+	public MainWindow() {
+		super();
+		this.ui_ = new Ui_MainWindow();
+		this.ui_.setupUi( this );
 
-		Container pane = this.getContentPane();
-		pane.setLayout( new BoxLayout( pane, BoxLayout.Y_AXIS ) );
+		this.treeModel_ = new QFileSystemModel( this );
+		this.ui_.treeView.setModel( this.treeModel_ );
+		this.treeModel_.setRootPath( QDir.rootPath() );
+		this.treeModel_.setFilter( QDir.Filter.Dirs, QDir.Filter.NoDotAndDotDot );
 
-		this.initViewPort_();
-		this.initControlPanel_();
-		this.initPreference_();
-		this.initAbout_();
+		this.ui_.treeView.setSelectionMode( SelectionMode.SingleSelection );
+		QItemSelectionModel selection = this.ui_.treeView.selectionModel();
+		selection.currentChanged.connect( this, "onTreeSelectionChanged_( QModelIndex )" );
 
-		this.initMenuBar_();
+		this.listModel_ = new QFileSystemModel( this );
+		this.ui_.listView.setModel( this.listModel_ );
+		this.listModel_.setRootPath( QDir.rootPath() );
+		this.ui_.listView.setSelectionMode( SelectionMode.MultiSelection );
+		this.ui_.listView.doubleClicked.connect( this, "onListDoubleClicked_( QModelIndex )" );
 
-		this.addWindowListener( new WindowAdapter() {
-			@Override
-			public void windowClosing( WindowEvent e ) {
-				try {
-					Configuration.sync();
-				} catch (Exception e1) {
-					JOptionPane.showMessageDialog( e.getComponent(), e1.getMessage(), "Error on saving configuration!", JOptionPane.ERROR_MESSAGE );
-				}
-			}
-		} );
+		this.ui_.treeView.header().setSectionHidden( 1, true );
+		this.ui_.treeView.header().setSectionHidden( 2, true );
+		this.ui_.treeView.header().setSectionHidden( 3, true );
+		this.focusTreeItem_( this.treeModel_.index( QDir.homePath() ) );
+
+		this.ui_.start.clicked.connect( this, "onStartPressed_()" );
+
+		this.progress_ = new QProgressBar( this );
+		this.ui_.statusbar.insertPermanentWidget( 0, this.progress_ );
+		this.progress_.hide();
+
+		this.ui_.treeView.setTextElideMode( Qt.TextElideMode.ElideNone );
+		this.ui_.listView.setTextElideMode( Qt.TextElideMode.ElideNone );
+		this.ui_.pack.setTextElideMode( Qt.TextElideMode.ElideNone );
+		this.ui_.overflow.setTextElideMode( Qt.TextElideMode.ElideNone );
+
+		this.ui_.pack.expanded.connect( this, "onTreeSizeChanged_( QModelIndex )" );
+		this.ui_.pack.collapsed.connect( this, "onTreeSizeChanged_( QModelIndex )" );
+		this.ui_.pack.header().setResizeMode( QHeaderView.ResizeMode.Interactive );
+
+		this.ui_.treeView.expanded.connect( this, "onTreeSizeChanged_( QModelIndex )" );
+		this.ui_.treeView.collapsed.connect( this, "onTreeSizeChanged_( QModelIndex )" );
+		this.ui_.treeView.header().setResizeMode( QHeaderView.ResizeMode.Interactive );
+		this.treeModel_.directoryLoaded.connect( this, "onDirectoryLoaded_( String )" );
 	}
 
-	private void initAbout_() {
-		this.about_ = new JDialog( this );
-		this.about_.setTitle( "About PacKing" );
-		this.about_.setSize( 320, 240 );
-		this.about_.setLocationRelativeTo( this );
-
-		Container pane = this.about_.getContentPane();
-		pane.setLayout( new BoxLayout( pane, BoxLayout.Y_AXIS ) );
-
-		JPanel center = new JPanel();
-		pane.add( center );
-		center.setLayout( new BoxLayout( center, BoxLayout.Y_AXIS ) );
-		center.setMaximumSize( new Dimension( Integer.MAX_VALUE, Integer.MAX_VALUE ) );
-
-		center.add( new JLabel( "Version: 0.2.3" ) );
-		center.add( new JLabel( "Author: legnaleurc (FoolproofProject)" ) );
-		center.add( new JLabel( "License: LGPLv3 or later" ) );
-		center.add( new JLabel( "e-mail: legnaleurc@gmail.com" ) );
-		center.add( new JLabel( "blog: http://legnaleurc.blogspot.com/" ) );
-
-		JPanel bottom = new JPanel();
-		pane.add( bottom );
-		bottom.setLayout( new GridLayout( 1, 1 ) );
-
-		JButton ok = new JButton( "OK" );
-		bottom.add( ok );
-		ok.addMouseListener( new MouseAdapter() {
-			@Override
-			public void mouseClicked( MouseEvent e ) {
-				MainWindow.this.about_.setVisible( false );
-			}
-		} );
-	}
-
-	private void initControlPanel_() {
-		JPanel panel = new JPanel();
-		panel.setLayout( new GridLayout( 1, 3 ) );
-
-		JPanel limitPanel = new JPanel();
-		panel.add( limitPanel );
-		limitPanel.setLayout( new GridLayout( 1, 2 ) );
-		limitPanel.setBorder( BorderFactory.createTitledBorder( "Limit" ) );
-
-		this.limit_ = new NaturalField();
-		limitPanel.add( this.limit_ );
-
-		this.unit_ = UnitUtility.createComboBox();
-		limitPanel.add( this.unit_ );
-
-		JPanel viewPanel = new JPanel();
-		panel.add( viewPanel );
-		viewPanel.setLayout( new GridLayout( 1, 1 ) );
-		viewPanel.setBorder( BorderFactory.createTitledBorder( "View" ) );
-
-		this.hidden_ = new JCheckBox( "Hidden" );
-		viewPanel.add( this.hidden_ );
-		this.hidden_.addActionListener( new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				MainWindow.this.tree_.setHiddenVisible( MainWindow.this.hidden_.isSelected() );
-				MainWindow.this.tree_.refresh();
-			}
-		} );
-
-		JButton start = new JButton( "Start" );
-		panel.add( start );
-		start.addMouseListener( new MouseAdapter() {
-			@Override
-			public void mouseClicked( MouseEvent e ) {
-				new Thread( new Runnable() {
-					@Override
-					public void run() {
-						MainWindow.this.perform();
-					}
-				} ).start();
-			}
-		} );
-
-		Container pane = this.getContentPane();
-		pane.add( panel );
-
-		this.read();
-	}
-
-	private void initMenuBar_() {
-		JMenuBar menuBar = new JMenuBar();
-		this.setJMenuBar( menuBar );
-
-		JMenu file = new JMenu( "File" );
-		menuBar.add( file );
-		file.setMnemonic( KeyEvent.VK_F );
-
-		JMenuItem save = new JMenuItem( "Save Result" );
-		file.add( save );
-		save.setMnemonic( KeyEvent.VK_S );
-		save.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK ) );
-		save.addActionListener( new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				MainWindow.this.save();
-			}
-		} );
-
-		JMenuItem export = new JMenuItem( "Export to K3B" );
-		file.add( export );
-		export.setMnemonic( KeyEvent.VK_E );
-		export.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK ) );
-		export.addActionListener( new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				File file = FileDialog.getExistingDirectory( (Component)e.getSource() );
-				if( file != null ) {
-					if( !file.exists() ) {
-						JOptionPane.showMessageDialog( MainWindow.this, "`" + file.getAbsolutePath() + "\' dose not exists.", "Open Error", JOptionPane.ERROR_MESSAGE );
-						return;
-					}
-					int succeed = MainWindow.this.result_.exportK3BProjectsTo( file );
-					JOptionPane.showMessageDialog( MainWindow.this, "Exported " + succeed + " K3B project(s).", "Done", JOptionPane.INFORMATION_MESSAGE );
-				}
-			}
-		} );
-
-		JMenu edit = new JMenu( "Edit" );
-		menuBar.add( edit );
-		edit.setMnemonic( KeyEvent.VK_E );
-
-		JMenuItem refresh = new JMenuItem( "Refresh" );
-		edit.add( refresh );
-		refresh.setMnemonic( KeyEvent.VK_R );
-		refresh.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_F5, 0 ) );
-		refresh.addActionListener( new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				MainWindow.this.tree_.refresh();
-			}
-		} );
-
-		JMenuItem preferences = new JMenuItem( "Preferences" );
-		edit.add( preferences );
-		preferences.setMnemonic( KeyEvent.VK_P );
-		preferences.addActionListener( new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				MainWindow.this.preference_.exec( MainWindow.this.limit_.toLong(), MainWindow.this.unit_.getSelectedIndex(), MainWindow.this.hidden_.isSelected() );
-			}
-		} );
-
-		JMenu help = new JMenu( "Help" );
-		menuBar.add( help );
-		help.setMnemonic( KeyEvent.VK_H );
-
-		JMenuItem debugLog = new JMenuItem( "Debug Log" );
-		help.add( debugLog );
-		debugLog.setMnemonic( KeyEvent.VK_D );
-		debugLog.addActionListener( new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				LogDialog.getDebugLog().setVisible( true );
-			}
-		} );
-
-		JMenuItem errorLog = new JMenuItem( "Error Log" );
-		help.add( errorLog );
-		errorLog.setMnemonic( KeyEvent.VK_E );
-		errorLog.addActionListener( new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				LogDialog.getErrorLog().setVisible( true );
-			}
-		} );
-
-		JMenuItem about = new JMenuItem( "About ..." );
-		help.add( about );
-		about.setMnemonic( KeyEvent.VK_A );
-		about.addActionListener( new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				MainWindow.this.about_.setVisible( true );
-			}
-		} );
-	}
-
-	private void initPreference_() {
-		this.preference_ = new Preference( this );
-	}
-
-	private void initViewPort_() {
-		JPanel central = new JPanel();
-		central.setLayout( new GridLayout( 1, 3 ) );
-		central.setMaximumSize( new Dimension( Integer.MAX_VALUE, Integer.MAX_VALUE ) );
-
-		this.tree_ = new DirectoryTreeWidget();
-		central.add( this.tree_ );
-
-		this.list_ = new FileListWidget();
-		central.add( this.list_ );
-
-		this.tree_.onSelectionChanged().connect( new Signal.Slot() {
-			@Override
-			public void call( Object sender, Object ... args ) {
-				MainWindow.this.list_.setItems( (File[])args[0] );
-			}
-		} );
-		this.list_.onMouseDoubleClicked().connect( new Signal.Slot() {
-			@Override
-			public void call( Object sender, Object ... args ) {
-				MainWindow.this.tree_.open( (File)args[0] );
-			}
-		} );
-
-		this.result_ = new ResultWidget();
-		central.add( this.result_ );
-
-		Container pane = this.getContentPane();
-		pane.add( central );
-
-		this.tree_.open( new File( System.getProperty( "user.home" ) ) );
-	}
-
-	public void perform() {
-		Performer p = new Performer( UnitUtility.extract( this.limit_.toLong(), this.unit_.getSelectedIndex() ), this.list_.getSelectedFiles() );
-
-		this.result_.openProgress( p.getTable() );
-
-		if( !p.noOverflow() ) {
-			this.result_.addOverflow( p.getOverflow() );
+	private void expandTreeItem_( QModelIndex index ) {
+		if( index == null ) {
+			return;
 		}
-
-		while( !p.noItem() ) {
-			Pack< File > r = p.call();
-			this.result_.addResult( r.getScore(), this.unit_.getSelectedIndex(), r.getItems() );
-			p.remove( r.getItems() );
-		}
-
-		this.result_.closeProgress();
+		this.expandTreeItem_( index.parent() );
+		this.ui_.treeView.expand( index );
 	}
 
-	public void read() {
-		this.limit_.setLong( (Long) Configuration.get( "limit" ) );
-		this.unit_.setSelectedIndex( (Integer) Configuration.get( "unit" ) );
-		this.hidden_.setSelected( (Boolean) Configuration.get( "hidden" ) );
+	private void focusTreeItem_( QModelIndex index ) {
+		this.expandTreeItem_( index );
+		this.ui_.treeView.setCurrentIndex( index );
 	}
 
-	public void save() {
-		File file = FileDialog.getSaveFileName( this, new FileNameExtensionFilter( "Plain Text", "txt" ));
-		if( file != null ) {
-			try {
-				PrintStream fout = new PrintStream( file, "UTF-8" );
-				this.result_.save( fout );
-				fout.close();
-			} catch (FileNotFoundException e) {
-				LogDialog.getErrorLog().log( e.getMessage() );
-			} catch (UnsupportedEncodingException e) {
-				LogDialog.getErrorLog().log( e.getMessage() );
-			}
+	@SuppressWarnings("unused")
+	private void onDirectoryLoaded_( String path ) {
+		this.ui_.treeView.header().resizeSection( 0, this.ui_.treeView.sizeHintForColumn( 0 ) );
+	}
+
+	@SuppressWarnings("unused")
+	private void onListDoubleClicked_( QModelIndex index ) {
+		String filePath = this.listModel_.filePath( index );
+		QModelIndex target = this.treeModel_.index( filePath );
+		this.focusTreeItem_( target );
+	}
+
+	@SuppressWarnings("unused")
+	private void onOverflowDetected_( File item ) {
+		this.ui_.overflow.addItem( item.getName() );
+	}
+
+	@SuppressWarnings("unused")
+	private void onPacked_( Pack< File > pack ) {
+		QTreeWidgetItem root = new QTreeWidgetItem( this.ui_.pack );
+		root.setText( 0, UnitUtility.toString( pack.getScore(), this.ui_.comboBox.currentIndex() ) );
+		for( File file : pack.getItems() ) {
+			QTreeWidgetItem child = new QTreeWidgetItem( root );
+			child.setText( 0, file.getName() );
+			root.addChild( child );
 		}
+		this.ui_.pack.addTopLevelItem( root );
+		this.progress_.setValue( this.progress_.value() + pack.getItems().size() );
+	}
+
+	@SuppressWarnings("unused")
+	private void onStartPressed_() {
+		this.ui_.pack.clear();
+		this.ui_.overflow.clear();
+
+		Long limit = UnitUtility.extract( this.ui_.spinBox.value(), this.ui_.comboBox.currentIndex() );
+
+		ArrayList< String > filePaths = new ArrayList< String >();
+		for( QModelIndex index : this.ui_.listView.selectionModel().selectedRows( 0 ) ) {
+			filePaths.add( this.listModel_.filePath( index ) );
+		}
+		this.progress_.setMaximum( filePaths.size() );
+		this.progress_.setValue( 0 );
+		this.progress_.show();
+
+		PackingRunner runner = new PackingRunner( limit, filePaths );
+		runner.overflowDetected.connect( this, "onOverflowDetected_( File )" );
+		runner.packed.connect( this, "onPacked_( Pack )" );
+		runner.finished.connect( this.progress_, "hide()" );
+		QThreadPool.globalInstance().start( runner );
+	}
+
+	@SuppressWarnings("unused")
+	private void onTreeSelectionChanged_( QModelIndex index ) {
+		String filePath = this.treeModel_.filePath( index );
+		QModelIndex target = this.listModel_.index( filePath );
+		this.ui_.listView.setRootIndex( target );
+	}
+
+	@SuppressWarnings("unused")
+	private void onTreeSizeChanged_( QModelIndex index ) {
+		QTreeView tree = (QTreeView) QSignalEmitter.signalSender();
+		tree.header().resizeSection( 0, tree.sizeHintForColumn( 0 ) );
 	}
 
 }

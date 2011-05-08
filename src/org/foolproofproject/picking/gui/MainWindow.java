@@ -136,7 +136,6 @@ public class MainWindow extends QMainWindow {
 			root.addChild( child );
 		}
 		this.ui_.pack.addTopLevelItem( root );
-		this.progress_.setValue( this.progress_.value() + pack.getItems().size() );
 	}
 
 	@SuppressWarnings("unused")
@@ -144,6 +143,12 @@ public class MainWindow extends QMainWindow {
 		this.progress_.hide();
 		this.ui_.pack.expandAll();
 		this.resizeTreeHeader( this.ui_.pack );
+	}
+
+	@SuppressWarnings("unused")
+	private void onProgressChanged_( Integer current, Integer maximum ) {
+		this.progress_.setMaximum( maximum );
+		this.progress_.setValue( current );
 	}
 
 	@SuppressWarnings("unused")
@@ -157,13 +162,12 @@ public class MainWindow extends QMainWindow {
 		for( QModelIndex index : this.ui_.listView.selectionModel().selectedRows( 0 ) ) {
 			filePaths.add( this.listModel_.filePath( index ) );
 		}
-		this.progress_.setMaximum( filePaths.size() );
-		this.progress_.setValue( 0 );
 		this.progress_.show();
 
 		PackingRunner runner = new PackingRunner( limit, filePaths );
 		runner.overflowDetected.connect( this, "onOverflowDetected_( File )" );
 		runner.packed.connect( this, "onPacked_( Pack )" );
+		runner.progressChanged.connect( this, "onProgressChanged_( Integer, Integer )" );
 		runner.finished.connect( this, "onPackFinished_()" );
 		QThreadPool.globalInstance().start( runner );
 	}

@@ -36,6 +36,7 @@ public class PackingRunner extends QRunnable {
 	public Signal1< File > overflowDetected = new Signal1< File >();
 	public Signal1< Pack< File > > packed = new Signal1< Pack< File > >();
 	public Signal0 finished = new Signal0();
+	public Signal2< Integer, Integer > progressChanged = new Signal2< Integer, Integer >();
 
 	public PackingRunner( Long limit, List< String > items ) {
 		this.limit_ = limit;
@@ -44,20 +45,27 @@ public class PackingRunner extends QRunnable {
 
 	@Override
 	public void run() {
+		Integer current = 0;
+		Integer total = this.items_.size();
+		this.progressChanged.emit( current, total );
 		HashMap< File, Long > table = new HashMap< File, Long >();
 		for( String filePath : this.items_ ) {
 			File file = new File( filePath );
 			Long size = FileUtility.getTotalSize( file );
+			this.progressChanged.emit( ++current, total );
 			if( size <= this.limit_ ) {
 				table.put( file, size );
 			} else {
 				this.overflowDetected.emit( file );
 			}
 		}
+		total += table.size();
+		this.progressChanged.emit( current, total );
 
 		while( !table.isEmpty() ) {
 			Pack< File > pack = Pack.pick( this.limit_, table );
 			this.packed.emit( pack );
+			this.progressChanged.emit( ++current, total );
 			for( File item : pack.getItems() ) {
 				table.remove( item );
 			}

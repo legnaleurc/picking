@@ -31,6 +31,7 @@ import com.trolltech.qt.core.QModelIndex;
 import com.trolltech.qt.core.QThreadPool;
 import com.trolltech.qt.core.Qt;
 import com.trolltech.qt.gui.QAbstractItemView.SelectionMode;
+import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.gui.QFileSystemModel;
 import com.trolltech.qt.gui.QHeaderView;
 import com.trolltech.qt.gui.QItemSelectionModel;
@@ -94,6 +95,8 @@ public class MainWindow extends QMainWindow {
 		this.treeModel_.directoryLoaded.connect( this, "onDirectoryLoaded_( String )" );
 
 		this.ui_.viewHidden.toggled.connect( this, "onViewHiddenToggled_( Boolean )" );
+
+		this.ui_.actionAbout_Qt_Jambi.triggered.connect( QApplication.instance(), "aboutQtJambi()" );
 	}
 
 	private void expandTreeItem_( QModelIndex index ) {

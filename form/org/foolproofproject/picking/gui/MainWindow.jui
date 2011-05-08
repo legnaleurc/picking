@@ -101,7 +101,7 @@
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QCheckBox" name="checkBox">
+          <widget class="QCheckBox" name="viewHidden">
            <property name="text">
             <string>View Hidden</string>
            </property>
@@ -176,8 +176,44 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="action_Export_Result"/>
+    <addaction name="actionExport_As_K3B_Project_File"/>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="action_About"/>
+    <addaction name="actionAbout_Qt_Jambi"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_Export_Result">
+   <property name="text">
+    <string>&amp;Export Result</string>
+   </property>
+  </action>
+  <action name="actionExport_As_K3B_Project_File">
+   <property name="text">
+    <string>Export As &amp;K3B Project File</string>
+   </property>
+  </action>
+  <action name="action_About">
+   <property name="text">
+    <string>&amp;About ...</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt_Jambi">
+   <property name="text">
+    <string>About &amp;Qt Jambi ...</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

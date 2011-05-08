@@ -54,7 +54,9 @@ public class MainWindow extends QMainWindow {
 		this.treeModel_ = new QFileSystemModel( this );
 		this.ui_.treeView.setModel( this.treeModel_ );
 		this.treeModel_.setRootPath( QDir.rootPath() );
-		this.treeModel_.setFilter( QDir.Filter.Dirs, QDir.Filter.NoDotAndDotDot );
+		QDir.Filters filter = this.treeModel_.filter();
+		filter.clear( QDir.Filter.Files );
+		this.treeModel_.setFilter( filter );
 
 		this.ui_.treeView.setSelectionMode( SelectionMode.SingleSelection );
 		QItemSelectionModel selection = this.ui_.treeView.selectionModel();
@@ -90,6 +92,8 @@ public class MainWindow extends QMainWindow {
 		this.ui_.treeView.collapsed.connect( this, "onTreeSizeChanged_( QModelIndex )" );
 		this.ui_.treeView.header().setResizeMode( QHeaderView.ResizeMode.Interactive );
 		this.treeModel_.directoryLoaded.connect( this, "onDirectoryLoaded_( String )" );
+
+		this.ui_.viewHidden.toggled.connect( this, "onViewHiddenToggled_( Boolean )" );
 	}
 
 	private void expandTreeItem_( QModelIndex index ) {
@@ -174,6 +178,21 @@ public class MainWindow extends QMainWindow {
 	@SuppressWarnings("unused")
 	private void onTreeSizeChanged_( QModelIndex index ) {
 		this.resizeTreeHeader( (QTreeView) QSignalEmitter.signalSender() );
+	}
+
+	@SuppressWarnings("unused")
+	private void onViewHiddenToggled_( Boolean viewHidden ) {
+		QDir.Filters treeFilter = this.treeModel_.filter();
+		QDir.Filters listFilter = this.listModel_.filter();
+		if( viewHidden ) {
+			treeFilter.set( QDir.Filter.Hidden );
+			listFilter.set( QDir.Filter.Hidden );
+		} else {
+			treeFilter.clear( QDir.Filter.Hidden );
+			listFilter.clear( QDir.Filter.Hidden );
+		}
+		this.treeModel_.setFilter( treeFilter );
+		this.listModel_.setFilter( listFilter );
 	}
 
 	private void resizeTreeHeader( QTreeView tree ) {

@@ -180,28 +180,32 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="action_Export_Result"/>
-    <addaction name="actionExport_As_K3B_Project_File"/>
+    <addaction name="action_Save_Result"/>
+    <addaction name="action_Export_As_K3B_Project_File"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
      <string>&amp;Help</string>
     </property>
     <addaction name="action_About"/>
-    <addaction name="actionAbout_Qt_Jambi"/>
+    <addaction name="action_About_Qt"/>
+    <addaction name="action_About_Qt_Jambi"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action_Export_Result">
+  <action name="action_Save_Result">
    <property name="text">
-    <string>&amp;Export Result</string>
+    <string>&amp;Save Result</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionExport_As_K3B_Project_File">
+  <action name="action_Export_As_K3B_Project_File">
    <property name="text">
-    <string>Export As &amp;K3B Project File</string>
+    <string>&amp;Export As K3B Project File</string>
    </property>
   </action>
   <action name="action_About">
@@ -209,9 +213,14 @@
     <string>&amp;About ...</string>
    </property>
   </action>
-  <action name="actionAbout_Qt_Jambi">
+  <action name="action_About_Qt_Jambi">
    <property name="text">
-    <string>About &amp;Qt Jambi ...</string>
+    <string>About Qt &amp;Jambi ...</string>
+   </property>
+  </action>
+  <action name="action_About_Qt">
+   <property name="text">
+    <string>About &amp;Qt ...</string>
    </property>
   </action>
  </widget>

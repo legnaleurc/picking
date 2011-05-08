@@ -20,32 +20,42 @@
 package org.foolproofproject.picking.gui;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.xml.stream.XMLStreamException;
+
 import org.foolproofproject.Pack;
+import org.foolproofproject.picking.K3BUtility;
 import org.foolproofproject.picking.UnitUtility;
 
 import com.trolltech.qt.QSignalEmitter;
 import com.trolltech.qt.core.QDir;
 import com.trolltech.qt.core.QModelIndex;
+import com.trolltech.qt.core.QPoint;
 import com.trolltech.qt.core.QThreadPool;
 import com.trolltech.qt.core.Qt;
 import com.trolltech.qt.gui.QAbstractItemView.SelectionMode;
+import com.trolltech.qt.gui.QAction;
 import com.trolltech.qt.gui.QApplication;
+import com.trolltech.qt.gui.QFileDialog;
 import com.trolltech.qt.gui.QFileSystemModel;
 import com.trolltech.qt.gui.QHeaderView;
 import com.trolltech.qt.gui.QItemSelectionModel;
 import com.trolltech.qt.gui.QMainWindow;
+import com.trolltech.qt.gui.QMenu;
 import com.trolltech.qt.gui.QProgressBar;
 import com.trolltech.qt.gui.QTreeView;
 import com.trolltech.qt.gui.QTreeWidgetItem;
 
 public class MainWindow extends QMainWindow {
 
-	Ui_MainWindow ui_;
-	QFileSystemModel treeModel_;
-	QFileSystemModel listModel_;
-	QProgressBar progress_;
+	private Ui_MainWindow ui_;
+	private QFileSystemModel treeModel_;
+	private QFileSystemModel listModel_;
+	private QProgressBar progress_;
+	private QMenu contextMenu_;
+	private QTreeWidgetItem currentItem_;
 
 	public MainWindow() {
 		super();
@@ -96,7 +106,15 @@ public class MainWindow extends QMainWindow {
 
 		this.ui_.viewHidden.toggled.connect( this, "onViewHiddenToggled_( Boolean )" );
 
-		this.ui_.actionAbout_Qt_Jambi.triggered.connect( QApplication.instance(), "aboutQtJambi()" );
+		this.ui_.action_About_Qt.triggered.connect( QApplication.instance(), "aboutQt()" );
+		this.ui_.action_About_Qt_Jambi.triggered.connect( QApplication.instance(), "aboutQtJambi()" );
+
+		this.ui_.pack.setContextMenuPolicy( Qt.ContextMenuPolicy.CustomContextMenu );
+		this.ui_.pack.customContextMenuRequested.connect( this, "onContextMenuRequested_( QPoint )" );
+		this.contextMenu_ = new QMenu( this );
+		QAction action = new QAction( "Export to K3B", this );
+		this.contextMenu_.addAction( action );
+		action.triggered.connect( this, "onK3BAction_()" );
 	}
 
 	private void expandTreeItem_( QModelIndex index ) {
@@ -113,8 +131,34 @@ public class MainWindow extends QMainWindow {
 	}
 
 	@SuppressWarnings("unused")
+	private void onContextMenuRequested_( QPoint pos ) {
+		QTreeWidgetItem item = this.ui_.pack.itemAt( pos );
+		if( item != null ) {
+			if( item.parent() != null ) {
+				item = item.parent();
+			}
+			this.currentItem_ = item;
+			this.contextMenu_.exec( this.ui_.pack.mapToGlobal( pos ) );
+		}
+	}
+
+	@SuppressWarnings("unused")
 	private void onDirectoryLoaded_( String path ) {
 		this.resizeTreeHeader( this.ui_.treeView );
+	}
+
+	@SuppressWarnings("unused")
+	private void onK3BAction_() {
+		String filePath = QFileDialog.getSaveFileName( this, this.tr( "Choose File Path" ), QDir.homePath(), new QFileDialog.Filter( this.tr( "K3B Projects(*.k3b)" ) ) );
+		try {
+			K3BUtility.export( new File( filePath ), this.currentItem_ );
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (XMLStreamException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@SuppressWarnings("unused")
@@ -136,6 +180,7 @@ public class MainWindow extends QMainWindow {
 		for( File file : pack.getItems() ) {
 			QTreeWidgetItem child = new QTreeWidgetItem( root );
 			child.setText( 0, file.getName() );
+			child.setData( 0, Qt.ItemDataRole.UserRole, file );
 			root.addChild( child );
 		}
 		this.ui_.pack.addTopLevelItem( root );

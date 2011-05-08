@@ -26,14 +26,15 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
-import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
+import com.trolltech.qt.core.Qt;
+import com.trolltech.qt.gui.QTreeWidgetItem;
 
 /**
  * Some functionality of K3B.
@@ -49,7 +50,7 @@ public class K3BUtility {
 	 * @throws IOException file writing error
 	 * @throws XMLStreamException XML serialization error
 	 */
-	public static void export( File file, DefaultMutableTreeNode node ) throws IOException, XMLStreamException {
+	public static void export( File file, QTreeWidgetItem node ) throws IOException, XMLStreamException {
 		K3BUtility k3b = new K3BUtility( node );
 
 		k3b.zout_ = new ZipOutputStream( new BufferedOutputStream( new FileOutputStream( file ) ) );
@@ -64,11 +65,11 @@ public class K3BUtility {
 
 		k3b.zout_.close();
 	}
-	private DefaultMutableTreeNode node_;
+	private QTreeWidgetItem node_;
 	private ZipOutputStream zout_;
 	private XMLStreamWriter xout_;
 
-	private K3BUtility( DefaultMutableTreeNode node ) {
+	private K3BUtility( QTreeWidgetItem node ) {
 		this.node_ = node;
 		this.zout_ = null;
 		this.xout_ = null;
@@ -207,9 +208,9 @@ public class K3BUtility {
 		this.xout_.writeEndElement();
 
 		this.xout_.writeStartElement( "files" );
-		for( Enumeration< ? > e = this.node_.children(); e.hasMoreElements(); ) {
-			DefaultMutableTreeNode child = (DefaultMutableTreeNode)e.nextElement();
-			this.writeK3BFilesNode( (File)child.getUserObject() );
+		for( int i = 0; i < this.node_.childCount(); ++i ) {
+			QTreeWidgetItem child = this.node_.child( i );
+			this.writeK3BFilesNode( (File) child.data( 0, Qt.ItemDataRole.UserRole ) );
 		}
 		this.xout_.writeEndElement();
 

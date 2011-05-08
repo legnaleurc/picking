@@ -55,12 +55,13 @@ public class PackingRunner extends QRunnable {
 			this.progressChanged.emit( ++current, total );
 			if( size <= this.limit_ ) {
 				table.put( file, size );
+				this.progressChanged.emit( current, ++total );
 			} else {
 				this.overflowDetected.emit( file );
 			}
 		}
-		total += table.size();
-		this.progressChanged.emit( current, total );
+//		total += table.size();
+//		this.progressChanged.emit( current, total );
 
 		while( !table.isEmpty() ) {
 			Pack< File > pack = Pack.pick( this.limit_, table );

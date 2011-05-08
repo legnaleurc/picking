@@ -19,7 +19,6 @@
  */
 package org.foolproofproject.picking;
 
-import javax.swing.JComboBox;
 
 /**
  * Unit conversion utility.
@@ -31,21 +30,9 @@ public class UnitUtility {
 
 	static {
 		UnitUtility.unit_[0] = "B";
-		UnitUtility.unit_[1] = "KB";
-		UnitUtility.unit_[2] = "MB";
-		UnitUtility.unit_[3] = "GB";
-	}
-
-	/**
-	 * Create unit JComboBox.
-	 * @return JComboBox
-	 */
-	public static JComboBox createComboBox() {
-		JComboBox tmp = new JComboBox();
-		for( String u : UnitUtility.unit_ ) {
-			tmp.addItem( u );
-		}
-		return tmp;
+		UnitUtility.unit_[1] = "KiB";
+		UnitUtility.unit_[2] = "MiB";
+		UnitUtility.unit_[3] = "GiB";
 	}
 
 	/**

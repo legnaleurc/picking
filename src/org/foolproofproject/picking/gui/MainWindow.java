@@ -107,7 +107,7 @@ public class MainWindow extends QMainWindow {
 
 	@SuppressWarnings("unused")
 	private void onDirectoryLoaded_( String path ) {
-		this.ui_.treeView.header().resizeSection( 0, this.ui_.treeView.sizeHintForColumn( 0 ) );
+		this.resizeTreeHeader( this.ui_.treeView );
 	}
 
 	@SuppressWarnings("unused")
@@ -136,6 +136,13 @@ public class MainWindow extends QMainWindow {
 	}
 
 	@SuppressWarnings("unused")
+	private void onPackFinished_() {
+		this.progress_.hide();
+		this.ui_.pack.expandAll();
+		this.resizeTreeHeader( this.ui_.pack );
+	}
+
+	@SuppressWarnings("unused")
 	private void onStartPressed_() {
 		this.ui_.pack.clear();
 		this.ui_.overflow.clear();
@@ -153,7 +160,7 @@ public class MainWindow extends QMainWindow {
 		PackingRunner runner = new PackingRunner( limit, filePaths );
 		runner.overflowDetected.connect( this, "onOverflowDetected_( File )" );
 		runner.packed.connect( this, "onPacked_( Pack )" );
-		runner.finished.connect( this.progress_, "hide()" );
+		runner.finished.connect( this, "onPackFinished_()" );
 		QThreadPool.globalInstance().start( runner );
 	}
 
@@ -166,7 +173,10 @@ public class MainWindow extends QMainWindow {
 
 	@SuppressWarnings("unused")
 	private void onTreeSizeChanged_( QModelIndex index ) {
-		QTreeView tree = (QTreeView) QSignalEmitter.signalSender();
+		this.resizeTreeHeader( (QTreeView) QSignalEmitter.signalSender() );
+	}
+
+	private void resizeTreeHeader( QTreeView tree ) {
 		tree.header().resizeSection( 0, tree.sizeHintForColumn( 0 ) );
 	}
 

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import javax.xml.stream.XMLStreamException;
 
 import org.foolproofproject.Pack;
+import org.foolproofproject.picking.CleanUpUtility;
 import org.foolproofproject.picking.K3BUtility;
 import org.foolproofproject.picking.UnitUtility;
 
@@ -108,6 +109,7 @@ public class MainWindow extends QMainWindow {
 
 		this.ui_.action_About_Qt.triggered.connect( QApplication.instance(), "aboutQt()" );
 		this.ui_.action_About_Qt_Jambi.triggered.connect( QApplication.instance(), "aboutQtJambi()" );
+		this.ui_.action_Export_As_K3B_Project_File.triggered.connect( this, "exportAll_()" );
 
 		this.ui_.pack.setContextMenuPolicy( Qt.ContextMenuPolicy.CustomContextMenu );
 		this.ui_.pack.customContextMenuRequested.connect( this, "onContextMenuRequested_( QPoint )" );
@@ -123,6 +125,30 @@ public class MainWindow extends QMainWindow {
 		}
 		this.expandTreeItem_( index.parent() );
 		this.ui_.treeView.expand( index );
+	}
+
+	@SuppressWarnings("unused")
+	private void exportAll_() {
+		int nPack = this.ui_.pack.topLevelItemCount();
+		if( nPack <= 0 ) {
+			return;
+		}
+		String template = String.format( "%%0%dd", String.valueOf( nPack ).length() );
+		File path = new File( QFileDialog.getExistingDirectory( this, this.tr( "Choose Output Directory" ), QDir.homePath() ) );
+		for( int i = 0; i < nPack; ++i ) {
+			String baseName = String.format( template, i );
+			QTreeWidgetItem root = this.ui_.pack.topLevelItem( i );
+			try {
+				K3BUtility.export( new File( path, baseName + ".k3b" ), root );
+				CleanUpUtility.export( new File( path, baseName + ".sh" ), root );
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (XMLStreamException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private void focusTreeItem_( QModelIndex index ) {

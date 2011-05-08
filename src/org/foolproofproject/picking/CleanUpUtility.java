@@ -22,18 +22,18 @@ package org.foolproofproject.picking;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.util.Enumeration;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import com.trolltech.qt.core.Qt;
+import com.trolltech.qt.gui.QTreeWidgetItem;
 
 public class CleanUpUtility {
 
-	public static void export( File file, DefaultMutableTreeNode node ) throws FileNotFoundException {
+	public static void export( File file, QTreeWidgetItem node ) throws FileNotFoundException {
 		PrintStream fout = new PrintStream( file );
 		fout.println( "#! /bin/sh\n" );
-		for( Enumeration< ? > e = node.children(); e.hasMoreElements(); ) {
-			DefaultMutableTreeNode child = (DefaultMutableTreeNode)e.nextElement();
-			File sm = ( File )child.getUserObject();
+		for( int i = 0; i < node.childCount(); ++i ) {
+			QTreeWidgetItem child = node.child( i );
+			File sm = ( File )child.data( 0, Qt.ItemDataRole.UserRole );
 			fout.printf( "rm -rf '%s'\n", sm.getAbsolutePath() );
 		}
 		fout.print( "\nrm -rf $0\n" );
